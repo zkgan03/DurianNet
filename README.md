@@ -5,5 +5,5 @@
 
 2. Framework / Project
     - .NET == 8.0+
-    - SQL Server Management Studio 19
+    - SQL Server Management Studio 19 / 20
 
