@@ -1,0 +1,246 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    style="@style/Theme.Material3.Light.BottomSheetDialog"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:backgroundTint="@color/white"
+    app:layout_behavior="com.google.android.material.bottomsheet.BottomSheetBehavior">
+
+    <!--  Progress Indicator  -->
+    <com.google.android.material.progressindicator.CircularProgressIndicator
+        android:id="@+id/bottom_sheet_progress_indicator"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:indeterminate="true"
+        android:translationZ="10dp"
+        app:indicatorColor="@color/LightGray"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+
+    <com.google.android.material.bottomsheet.BottomSheetDragHandleView
+        android:id="@+id/bottomSheetDragHandleView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <androidx.core.widget.NestedScrollView
+        android:id="@+id/content_container"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/bottomSheetDragHandleView">
+        <!--  Main content  -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:paddingBottom="16dp"
+            app:behavior_hideable="true"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/bottomSheetDragHandleView">
+
+
+            <!-- Seller Image   -->
+            <ImageView
+                android:id="@+id/image_view_seller"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:adjustViewBounds="true"
+                android:maxHeight="150dp"
+                android:scaleType="fitCenter"
+                tools:src="@drawable/ic_launcher_background" />
+
+            <!-- Seller Details view -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:paddingHorizontal="16dp">
+
+
+                <!--  Seller Name  -->
+                <com.google.android.material.textview.MaterialTextView
+                    android:id="@+id/text_view_seller_name"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="16dp"
+                    android:textColor="@android:color/black"
+                    android:textSize="26sp"
+                    android:textStyle="bold"
+                    tools:text="Title" />
+
+                <!--  Durian Types  -->
+                <com.google.android.material.chip.ChipGroup
+                    android:id="@+id/chip_group_durian_types"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    app:chipSpacingVertical="5dp">
+
+                    <com.google.android.material.chip.Chip
+                        style="@style/CustomChipStyle"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="test"
+                        app:chipMinHeight="28dp"
+                        app:chipMinTouchTargetSize="28dp" />
+
+                    <com.google.android.material.chip.Chip
+                        style="@style/CustomChipStyle"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="test"
+                        app:chipMinHeight="28dp"
+                        app:chipMinTouchTargetSize="28dp" />
+
+
+                </com.google.android.material.chip.ChipGroup>
+
+                <!--  Description  -->
+                <com.google.android.material.textview.MaterialTextView
+                    android:id="@+id/text_view_descriptions"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:paddingVertical="16dp"
+                    android:textColor="@android:color/black"
+                    android:textSize="14sp"
+                    tools:text="123 Main Street" />
+
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <!--  Rating  -->
+                    <RatingBar
+                        android:id="@+id/rating_bar_overall_rating"
+                        style="@style/CustomRatingBar"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center_vertical"
+                        android:numStars="5"
+                        android:rating="4.5"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent" />
+
+                    <com.google.android.material.textview.MaterialTextView
+                        android:id="@+id/text_overall_rating"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center_vertical"
+                        android:layout_marginLeft="26dp"
+                        android:text="(4.5)"
+                        android:textColor="@android:color/black"
+                        android:textSize="14sp"
+                        app:layout_constraintBottom_toBottomOf="@+id/rating_bar_overall_rating"
+                        app:layout_constraintStart_toEndOf="@+id/rating_bar_overall_rating"
+                        app:layout_constraintTop_toTopOf="@+id/rating_bar_overall_rating" />
+
+                    <!-- Open google map button for this location -->
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btn_see_in_google_map"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:backgroundTint="@color/cta_color"
+
+                        android:text="See in Google Map"
+                        android:textColor="@color/white"
+                        android:textSize="14sp"
+                        app:cornerRadius="5dp"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintTop_toTopOf="parent" />
+
+
+                </androidx.constraintlayout.widget.ConstraintLayout>
+
+            </LinearLayout>
+
+
+            <!-- Divider -->
+            <View
+                android:id="@+id/divider1"
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_marginTop="16dp"
+                android:background="@android:color/black" />
+
+
+            <!-- Display existing comment and rating -->
+            <TextView
+                android:id="@+id/text_user_added_comment_title"
+                android:layout_width="wrap_content"
+                android:layout_height="14dp"
+                android:layout_marginStart="10dp"
+                android:layout_marginTop="5dp"
+                android:layout_marginBottom="12dp"
+                android:text="Your Comment"
+                android:textSize="14sp"
+                android:visibility="gone" />
+
+            <TextView
+                android:id="@+id/text_user_not_added_comment_title"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="10dp"
+                android:layout_marginTop="5dp"
+                android:layout_marginBottom="12dp"
+                android:text="Add a comment"
+                android:textSize="14sp"
+                android:visibility="visible" />
+
+
+            <!-- user comment -->
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/user_comment_section"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <!--        <include layout="@layout/item_user_commented" />-->
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+
+            <!-- Divider -->
+            <View
+                android:id="@+id/divider2"
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_marginTop="16dp"
+                android:background="@android:color/black" />
+
+            <com.google.android.material.textview.MaterialTextView
+                android:id="@+id/text_all_comments_title"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="10dp"
+                android:layout_marginTop="5dp"
+                android:layout_marginBottom="12dp"
+                android:textSize="14sp"
+                tools:text="Comments (12)" />
+
+            <!-- Comments Section   -->
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/recycler_view_all_comments"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:nestedScrollingEnabled="false"
+                android:paddingBottom="16dp" />
+
+
+        </LinearLayout>
+    </androidx.core.widget.NestedScrollView>
+
+</androidx.constraintlayout.widget.ConstraintLayout>
+

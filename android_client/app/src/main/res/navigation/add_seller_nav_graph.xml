@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/add_seller_nav_graph"
+    app:startDestination="@id/addSellerDetectionFragment">
+    <fragment
+        android:id="@+id/addSellerDetectionFragment"
+        android:name="com.example.duriannet.presentation.seller_locator.fragments.AddSellerDetectionFragment"
+        android:label="fragment_add_seller_detection"
+        tools:layout="@layout/fragment_add_seller_detection">
+        <action
+            android:id="@+id/action_addSellerDetectionFragment_to_addSellerFragment"
+            app:destination="@id/addSellerFragment" />
+    </fragment>
+
+
+    <fragment
+        android:id="@+id/addSellerFragment"
+        android:name="com.example.duriannet.presentation.seller_locator.fragments.AddSellerFragment"
+        android:label="AddSellerFragment">
+        <action
+            android:id="@+id/action_addSellerFragment_to_manage_seller_nav_graph"
+            app:destination="@id/manage_seller_nav_graph"
+            app:popUpTo="@id/addSellerDetectionFragment"
+            app:popUpToInclusive="true" />
+    </fragment>
+
+    <include app:graph="@navigation/manage_seller_nav_graph" />
+</navigation>

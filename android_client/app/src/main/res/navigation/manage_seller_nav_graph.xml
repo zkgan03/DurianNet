@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/manage_seller_nav_graph"
+    app:startDestination="@id/manageSellerFragment">
+
+    <fragment
+        android:id="@+id/manageSellerFragment"
+        android:name="com.example.duriannet.presentation.seller_locator.fragments.ManageSellerFragment"
+        android:label="ManageSellerFragment" >
+        <action
+            android:id="@+id/action_manageSellerFragment_to_editSellerFragment"
+            app:destination="@id/editSellerFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/editSellerFragment"
+        android:name="com.example.duriannet.presentation.seller_locator.fragments.EditSellerFragment"
+        android:label="fragment_edit_seller"
+        tools:layout="@layout/fragment_edit_seller" />
+</navigation>

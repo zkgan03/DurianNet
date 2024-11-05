@@ -23,7 +23,7 @@
         android:title="ImageDetection" />
     
     <item
-        android:id="@+id/sellerLocatorHome"
+        android:id="@+id/seller_locator_nav_graph"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:icon="@drawable/ic_sellerlocator"

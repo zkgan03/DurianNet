@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/background_green"
-    tools:context=".presentation.accountmanagement.LoginFragment">
+    tools:context=".presentation.account_management.LoginFragment">
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>
