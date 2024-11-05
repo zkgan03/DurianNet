@@ -7,3 +7,10 @@
     - .NET == 8.0+
     - SQL Server Management Studio 19
 
+
+
+## Installation Guide
+
+1. Database setup
+   - Reconfigure the `Data Source` of Connection String (`DefaultConnection`) in side `appsettings.json` file
+   - run `dotnet ef database update` in project directory.
