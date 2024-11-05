@@ -1,4 +1,4 @@
-namespace DurianNet.Models
+namespace DurianNet.Models.ViewModels
 {
     public class ErrorViewModel
     {
