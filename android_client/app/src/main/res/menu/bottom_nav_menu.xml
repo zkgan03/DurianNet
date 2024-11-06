@@ -16,7 +16,7 @@
         android:title="Chatbot" />
    
     <item
-        android:id="@+id/imageDetectionHome"
+        android:id="@+id/detector_nav_graph"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:icon="@drawable/ic_imagedetection"

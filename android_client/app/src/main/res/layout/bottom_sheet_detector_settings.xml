@@ -1,0 +1,220 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical">
+
+    <com.google.android.material.bottomsheet.BottomSheetDragHandleView
+        android:id="@+id/bottomSheetDragHandleView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+
+    <!-- Setting title  -->
+    <com.google.android.material.textview.MaterialTextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingHorizontal="16dp"
+        android:paddingBottom="16dp"
+        android:text="Settings"
+        android:textSize="24sp"
+        android:textStyle="bold" />
+
+    <!--  Setting Items  -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="50dp"
+        android:orientation="vertical"
+        android:paddingBottom="20dp">
+
+
+        <!--   Model Selection -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:paddingVertical="5dp"
+            android:paddingStart="24dp"
+            android:paddingEnd="10dp">
+
+            <com.google.android.material.textview.MaterialTextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Model Selection"
+                android:textSize="@dimen/bottom_sheet_textSize" />
+
+            <com.google.android.material.textfield.TextInputLayout
+                style="@style/Widget.Material3.TextInputLayout.OutlinedBox.Dense.ExposedDropdownMenu"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:boxStrokeColor="@color/accent_dark_green">
+
+                <AutoCompleteTextView
+                    android:id="@+id/actvModelSelection"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:inputType="none"
+                    android:paddingVertical="10dp"
+                    android:textSize="16sp" />
+
+            </com.google.android.material.textfield.TextInputLayout>
+
+        </LinearLayout>
+
+        <!-- Num of Detection   -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:paddingVertical="5dp"
+            android:paddingStart="24dp"
+            android:paddingEnd="10dp">
+
+            <com.google.android.material.textview.MaterialTextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Max Number of Detection"
+                android:textSize="@dimen/bottom_sheet_textSize" />
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <com.google.android.material.slider.Slider
+                    android:id="@+id/sliderMaxNumOfDetection"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="20dp"
+                    android:stepSize="1"
+                    android:value="@string/default_max_number_detection"
+                    android:valueFrom="0"
+                    android:valueTo="30"
+                    app:thumbColor="@color/accent_dark_green"
+                    app:thumbHeight="30dp"
+                    app:thumbStrokeColor="@color/accent_dark_green"
+                    app:tickColorInactive="@color/accent_dark_green"
+                    app:trackColorActive="@color/accent_dark_green"
+                    app:trackColorInactive="#D3D3D3"
+                    app:trackHeight="10dp" />
+
+                <com.google.android.material.textview.MaterialTextView
+                    android:id="@+id/tvMaxNumOfDetection"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentEnd="true"
+                    android:layout_centerVertical="true"
+                    android:text="@string/default_max_number_detection"
+                    android:textSize="16sp" />
+
+            </RelativeLayout>
+
+
+        </LinearLayout>
+
+        <!-- Confidence Threshold   -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:paddingVertical="5dp"
+            android:paddingStart="24dp"
+            android:paddingEnd="10dp">
+
+            <com.google.android.material.textview.MaterialTextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Confidence Threshold"
+                android:textSize="@dimen/bottom_sheet_textSize" />
+
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <com.google.android.material.slider.Slider
+                    android:id="@+id/sliderConfidenceThreshold"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="20dp"
+                    android:stepSize="0.01"
+                    android:value="@string/default_confidence_threshold"
+                    android:valueFrom="0"
+                    android:valueTo="1"
+                    app:thumbColor="@color/accent_dark_green"
+                    app:thumbHeight="30dp"
+                    app:thumbStrokeColor="@color/accent_dark_green"
+                    app:tickColorInactive="@color/accent_dark_green"
+                    app:trackColorActive="@color/accent_dark_green"
+                    app:trackColorInactive="#D3D3D3"
+                    app:trackHeight="10dp" />
+
+                <com.google.android.material.textview.MaterialTextView
+                    android:id="@+id/tvConfidenceThreshold"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentEnd="true"
+                    android:layout_centerVertical="true"
+                    android:text="@string/default_confidence_threshold"
+                    android:textSize="16sp" />
+
+            </RelativeLayout>
+
+
+        </LinearLayout>
+
+        <!-- IoU Threshold   -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:paddingVertical="5dp"
+            android:paddingStart="24dp"
+            android:paddingEnd="10dp">
+
+            <com.google.android.material.textview.MaterialTextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="IoU Threshold"
+                android:textSize="@dimen/bottom_sheet_textSize" />
+
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <com.google.android.material.slider.Slider
+                    android:id="@+id/sliderIoUThreshold"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="20dp"
+                    android:stepSize="0.01"
+                    android:value="@string/default_iou_threshold"
+                    android:valueFrom="0"
+                    android:valueTo="1"
+                    app:thumbColor="@color/accent_dark_green"
+                    app:thumbHeight="30dp"
+                    app:thumbStrokeColor="@color/accent_dark_green"
+                    app:tickColorInactive="@color/accent_dark_green"
+                    app:trackColorActive="@color/accent_dark_green"
+                    app:trackColorInactive="#D3D3D3"
+                    app:trackHeight="10dp" />
+
+                <com.google.android.material.textview.MaterialTextView
+                    android:id="@+id/tvIoUThreshold"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentEnd="true"
+                    android:layout_centerVertical="true"
+                    android:text="@string/default_iou_threshold"
+                    android:textSize="16sp" />
+
+            </RelativeLayout>
+
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+</LinearLayout>

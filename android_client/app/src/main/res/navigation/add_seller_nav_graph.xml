@@ -6,7 +6,7 @@
     app:startDestination="@id/addSellerDetectionFragment">
     <fragment
         android:id="@+id/addSellerDetectionFragment"
-        android:name="com.example.duriannet.presentation.seller_locator.fragments.AddSellerDetectionFragment"
+        android:name="com.example.duriannet.presentation.seller_locator.fragments.add_seller.AddSellerDetectionFragment"
         android:label="fragment_add_seller_detection"
         tools:layout="@layout/fragment_add_seller_detection">
         <action
@@ -17,7 +17,7 @@
 
     <fragment
         android:id="@+id/addSellerFragment"
-        android:name="com.example.duriannet.presentation.seller_locator.fragments.AddSellerFragment"
+        android:name="com.example.duriannet.presentation.seller_locator.fragments.add_seller.AddSellerFragment"
         android:label="AddSellerFragment">
         <action
             android:id="@+id/action_addSellerFragment_to_manage_seller_nav_graph"

@@ -200,8 +200,8 @@ class GoogleMapManager<T : ClusterItem>(
         circle = googleMap.addCircle {
             center(location)
             radius(1000.0)
-            fillColor(ContextCompat.getColor(context, R.color.color_primary_translucent))
-            strokeColor(ContextCompat.getColor(context, R.color.primary_color))
+            fillColor(ContextCompat.getColor(context, R.color.active_indicator_green_translucent))
+            strokeColor(ContextCompat.getColor(context, R.color.accent_dark_green))
         }
     }
 

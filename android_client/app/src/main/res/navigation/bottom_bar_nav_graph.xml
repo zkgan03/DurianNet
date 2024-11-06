@@ -12,5 +12,6 @@
         tools:layout="@layout/fragment_login" />
 
     <include app:graph="@navigation/seller_locator_nav_graph" />
+    <include app:graph="@navigation/detector_nav_graph" />
 
 </navigation>

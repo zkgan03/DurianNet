@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/detector_nav_graph"
+    app:startDestination="@id/detectorEntryFragment">
+
+    <fragment
+        android:id="@+id/detectorEntryFragment"
+        android:name="com.example.duriannet.presentation.detector.fragments.DetectorEntryFragment"
+        android:label="fragment_detector_entry"
+        tools:layout="@layout/fragment_detector_entry" >
+        <action
+            android:id="@+id/action_detectorEntryFragment_to_instantDetectViewPagerFragment"
+            app:destination="@id/instantDetectViewPagerFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/instantDetectViewPagerFragment"
+        android:name="com.example.duriannet.presentation.detector.fragments.instant_detect.InstantDetectViewPagerFragment"
+        android:label="InstantDetectViewPagerFragment" />
+</navigation>

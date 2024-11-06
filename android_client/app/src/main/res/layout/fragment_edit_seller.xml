@@ -4,7 +4,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".presentation.seller_locator.fragments.EditSellerFragment">
+    android:background="@color/white"
+    tools:context=".presentation.seller_locator.fragments.manage_seller.EditSellerFragment">
 
     <com.google.android.material.appbar.MaterialToolbar
         android:id="@+id/toolbar"

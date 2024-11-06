@@ -3,8 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:background="@android:color/transparent">
+    android:layout_height="match_parent">
 
 
     <!--  Google map  -->
@@ -43,7 +42,7 @@
             android:contentDescription="@null"
             app:elevation="2dp"
             app:maxImageSize="26dp"
-            app:rippleColor="@color/fab_ripple_color"
+            app:rippleColor="@color/ripple_color"
             app:shapeAppearanceOverlay="@style/ShapeAppearanceOverlay.Material3.Button"
             app:srcCompat="@drawable/ic_locate_myself"
             app:tint="@color/black" />
@@ -54,10 +53,10 @@
             android:layout_height="wrap_content"
             android:layout_marginHorizontal="12dp"
             android:layout_marginTop="12dp"
-            android:backgroundTint="@color/cta_color"
+            android:backgroundTint="@color/accent_dark_green"
             android:contentDescription="@null"
             app:maxImageSize="26dp"
-            app:rippleColor="@color/fab_ripple_color"
+            app:rippleColor="@color/ripple_color"
             app:srcCompat="@drawable/ic_add_seller"
             app:tint="@color/white" />
 
@@ -67,13 +66,13 @@
             android:layout_height="wrap_content"
             android:layout_gravity="end|bottom"
             android:layout_margin="12dp"
-            android:background="@color/cta_color"
-            android:backgroundTint="@color/cta_color"
+            android:background="@color/accent_dark_green"
+            android:backgroundTint="@color/accent_dark_green"
             android:contentDescription="@null"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:maxImageSize="26dp"
-            app:rippleColor="@color/fab_ripple_color"
+            app:rippleColor="@color/ripple_color"
             app:srcCompat="@drawable/ic_manage_seller"
             app:tint="@color/white" />
     </LinearLayout>

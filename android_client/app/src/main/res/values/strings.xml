@@ -1,5 +1,17 @@
 <resources>
     <string name="app_name">DurianNet</string>
-<!-- TODO: Remove or change this placeholder text -->
+    <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="instant_detect_description">A powerful real-time detection feature that enables fast and accurate object recognition from both live camera feeds and gallery images. With seamless integration of real-time analysis and image processing, it provides instant insights and draws bounding boxes around detected objects, ensuring quick and efficient detection at your fingertips. Whether you\'re capturing live footage or analyzing saved images, Instant Detect delivers reliable results in seconds.</string>
+    <string name="tv_gallery_placeholder">Click + to add an image to begin the object detection\n</string>
+    <string name="tab_title_camera">Camera</string>
+    <string name="tab_title_gallery">Gallery</string>
+    <string name="default_max_number_detection">10</string>
+    <string name="default_confidence_threshold">0.4</string>
+    <string name="default_iou_threshold">0.45</string>
+
+    <string-array name="detection_models">
+        <item>YoloV8m 320x320 (Local)</item>
+        <item>YoloV10s 640x640 (Server)</item>
+    </string-array>
 </resources>

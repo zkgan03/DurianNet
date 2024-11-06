@@ -4,11 +4,8 @@
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    style="@style/Theme.Material3.Light.BottomSheetDialog"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:backgroundTint="@color/white"
-    app:layout_behavior="com.google.android.material.bottomsheet.BottomSheetBehavior">
+    android:layout_height="match_parent">
 
     <!--  Progress Indicator  -->
     <com.google.android.material.progressindicator.CircularProgressIndicator
@@ -28,6 +25,7 @@
         android:id="@+id/bottomSheetDragHandleView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:tint="@color/black"
         app:layout_constraintTop_toTopOf="parent" />
 
     <androidx.core.widget.NestedScrollView
@@ -75,7 +73,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="16dp"
-                    android:textColor="@android:color/black"
+                    android:textColor="@color/black"
                     android:textSize="26sp"
                     android:textStyle="bold"
                     tools:text="Title" />
@@ -113,7 +111,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:paddingVertical="16dp"
-                    android:textColor="@android:color/black"
+                    android:textColor="@color/black"
                     android:textSize="14sp"
                     tools:text="123 Main Street" />
 
@@ -140,7 +138,7 @@
                         android:layout_gravity="center_vertical"
                         android:layout_marginLeft="26dp"
                         android:text="(4.5)"
-                        android:textColor="@android:color/black"
+                        android:textColor="@color/black"
                         android:textSize="14sp"
                         app:layout_constraintBottom_toBottomOf="@+id/rating_bar_overall_rating"
                         app:layout_constraintStart_toEndOf="@+id/rating_bar_overall_rating"
@@ -151,8 +149,7 @@
                         android:id="@+id/btn_see_in_google_map"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:backgroundTint="@color/cta_color"
-
+                        android:backgroundTint="@color/accent_dark_green"
                         android:text="See in Google Map"
                         android:textColor="@color/white"
                         android:textSize="14sp"
@@ -196,6 +193,7 @@
                 android:layout_marginTop="5dp"
                 android:layout_marginBottom="12dp"
                 android:text="Add a comment"
+                android:textColor="@color/black"
                 android:textSize="14sp"
                 android:visibility="visible" />
 
@@ -227,6 +225,7 @@
                 android:layout_marginStart="10dp"
                 android:layout_marginTop="5dp"
                 android:layout_marginBottom="12dp"
+                android:textColor="@color/black"
                 android:textSize="14sp"
                 tools:text="Comments (12)" />
 

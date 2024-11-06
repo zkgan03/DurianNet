@@ -5,6 +5,17 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
+    <com.google.android.material.appbar.MaterialToolbar
+        android:id="@+id/toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        android:layout_alignParentTop="true"
+        app:layout_constraintTop_toTopOf="parent"
+        app:menu="@menu/detector_menu"
+        app:title="Add Seller"
+        app:titleCentered="true"
+        app:titleTextColor="@color/black" />
+
     <androidx.camera.view.PreviewView
         android:id="@+id/view_finder"
         android:layout_width="0dp"
@@ -13,7 +24,7 @@
         app:layout_constraintDimensionRatio="3:4"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/process_progress"
         app:scaleType="fillStart" />
 
 
@@ -54,14 +65,13 @@
         android:id="@+id/process_progress"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_margin="32dp"
-        android:layout_marginBottom="72dp"
+        android:layout_marginTop="16dp"
+        android:layout_marginEnd="32dp"
         android:textAlignment="textEnd"
         android:textColor="@color/black"
         android:textSize="24sp"
-        app:layout_constraintBottom_toTopOf="@+id/view_finder"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/toolbar"
         tools:text="67%" />
 
     <ImageButton
@@ -101,7 +111,7 @@
         android:textColor="@color/white"
         android:textSize="14sp"
         app:chipCornerRadius="8dp"
-        app:chipSurfaceColor="#9A000000"
+        app:chipSurfaceColor="@color/chip_info_color"
         app:closeIconVisible="false"
         app:layout_constraintBottom_toBottomOf="@+id/view_finder"
         app:layout_constraintEnd_toEndOf="parent"
@@ -113,12 +123,15 @@
         android:layout_width="match_parent"
         android:layout_height="?attr/actionBarSize"
         android:layout_alignParentBottom="true"
+        android:background="@color/absolute_white"
         app:layout_constraintBottom_toBottomOf="parent">
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/btnStartDetection"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:backgroundTint="@color/button_color"
+            android:enabled="false"
             android:paddingHorizontal="16dp"
             android:text="Start Detection"
             android:textColor="@color/white"
