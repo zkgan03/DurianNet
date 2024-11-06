@@ -1,6 +1,7 @@
 package com.example.duriannet.presentation.detector.view_models
 
 import android.content.Context
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.duriannet.services.detector.interfaces.IDetector
@@ -66,6 +67,8 @@ class DetectorViewModel : ViewModel() {
             withContext(Dispatchers.IO) {
 
                 if (_detector != null) return@withContext
+
+                Log.e("detector view model", "start detector")
 
                 _isServerDetection = isServerDetection
 

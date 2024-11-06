@@ -139,11 +139,8 @@ class InstantCameraFragment : BaseInstantDetectFragment() {
 //            cameraExecutor = Executors.newSingleThreadExecutor()
 
             // Wait for the views to be properly laid out
-            cameraBinding.viewFinder.post {
-                // Set up the camera and its use cases
-                cameraManager?.setAnalyzer()
-            }
-
+            // Set up the camera and its use cases
+            cameraManager?.setAnalyzer()
             // show the camera view only after the connection is establish and the camera is ready
             cameraBinding.progress.visibility = View.GONE
         }
@@ -160,11 +157,6 @@ class InstantCameraFragment : BaseInstantDetectFragment() {
             cameraBinding.progress.visibility = View.VISIBLE
             cameraManager?.clearAnalyzer()
         }
-    }
-
-    override fun onError(error: String) {
-        super.onError(error)
-
     }
 
     override fun onDetect(

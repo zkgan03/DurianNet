@@ -1,7 +1,5 @@
 package com.example.duriannet.presentation.detector.fragments.instant_detect
 
-import android.Manifest
-import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -11,10 +9,7 @@ import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ArrayAdapter
-import android.widget.Toast
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
-import androidx.appcompat.widget.Toolbar
 import androidx.core.view.MenuProvider
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Lifecycle
@@ -23,30 +18,8 @@ import com.example.duriannet.R
 import com.example.duriannet.databinding.BottomSheetDetectorSettingsBinding
 import com.example.duriannet.databinding.FragmentInstantDetectViewPagerBinding
 import com.example.duriannet.presentation.detector.adapters.InstantViewPagerAdapter
-import com.example.duriannet.utils.Common.hasPermissions
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.tabs.TabLayoutMediator
-
-private val PERMISSIONS_REQUIRED =
-    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
-        arrayOf(
-            Manifest.permission.CAMERA,
-            Manifest.permission.READ_MEDIA_VIDEO,
-            Manifest.permission.READ_MEDIA_IMAGES,
-            Manifest.permission.READ_MEDIA_VISUAL_USER_SELECTED
-        )
-    } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-        arrayOf(
-            Manifest.permission.CAMERA,
-            Manifest.permission.READ_MEDIA_VIDEO,
-            Manifest.permission.READ_MEDIA_IMAGES,
-        )
-    } else {
-        arrayOf(
-            Manifest.permission.CAMERA,
-            Manifest.permission.READ_EXTERNAL_STORAGE,
-        )
-    }
 
 
 class InstantDetectViewPagerFragment : Fragment() {
@@ -54,20 +27,10 @@ class InstantDetectViewPagerFragment : Fragment() {
     private var _binding: FragmentInstantDetectViewPagerBinding? = null
     private val binding get() = _binding!!
 
-    private val requestAllPermissionLauncher =
-        registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { _ ->
-            if (!hasPermissions(requireContext(), PERMISSIONS_REQUIRED)) {
-                Toast.makeText(requireContext(), "Permission request denied", Toast.LENGTH_LONG).show()
-                requireActivity().onBackPressedDispatcher.onBackPressed()
-            }
-        }
-
-
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?,
-    ): View? {
-
+    ): View {
         _binding = FragmentInstantDetectViewPagerBinding.inflate(inflater, container, false)
         return binding.root
     }
@@ -79,14 +42,6 @@ class InstantDetectViewPagerFragment : Fragment() {
         setupViewPager()
     }
 
-
-    override fun onResume() {
-        super.onResume()
-
-        if (!hasPermissions(requireContext(), PERMISSIONS_REQUIRED)) {
-            requestAllPermissionLauncher.launch(PERMISSIONS_REQUIRED)
-        }
-    }
 
     override fun onDestroyView() {
         super.onDestroyView()

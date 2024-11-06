@@ -6,8 +6,8 @@ import android.util.Log
 import android.view.View
 import android.widget.Toast
 import androidx.fragment.app.Fragment
-import androidx.hilt.navigation.fragment.hiltNavGraphViewModels
 import androidx.lifecycle.lifecycleScope
+import androidx.navigation.navGraphViewModels
 import com.example.duriannet.R
 import com.example.duriannet.models.DetectionResult
 import com.example.duriannet.presentation.detector.view_models.DetectorViewModel
@@ -16,7 +16,7 @@ import kotlinx.coroutines.launch
 
 abstract class BaseInstantDetectFragment : Fragment(), IDetectorListener {
 
-    protected val viewModel: DetectorViewModel by hiltNavGraphViewModels(R.id.detector_nav_graph)
+    protected val viewModel: DetectorViewModel by navGraphViewModels(R.id.detector_nav_graph)
 
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -62,14 +62,12 @@ abstract class BaseInstantDetectFragment : Fragment(), IDetectorListener {
         viewModel.setConfidenceThreshold(resources.getString(R.string.default_confidence_threshold).toFloat())
         viewModel.setIouThreshold(resources.getString(R.string.default_iou_threshold).toFloat())
         viewModel.setMaxNumberDetection(resources.getString(R.string.default_max_number_detection).toInt())
+        viewModel.startDetector(
+            false,
+            this@BaseInstantDetectFragment,
+            requireContext()
+        )
 
-        viewLifecycleOwner.lifecycleScope.launch {
-            viewModel.startDetector(
-                false,
-                this@BaseInstantDetectFragment,
-                requireContext()
-            )
-        }
 
         Log.e(TAG, "onViewCreated")
     }
@@ -83,10 +81,7 @@ abstract class BaseInstantDetectFragment : Fragment(), IDetectorListener {
 
     override fun onDestroyView() {
         super.onDestroyView()
-        lifecycleScope.launch {
-            viewModel.stopDetector()
-        }
-
+        viewModel.stopDetector()
         Log.e(TAG, "onDestroyView")
         Toast.makeText(context, "Detector destroyed", Toast.LENGTH_SHORT).show()
     }

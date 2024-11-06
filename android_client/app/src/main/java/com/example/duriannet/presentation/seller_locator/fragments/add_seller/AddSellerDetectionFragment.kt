@@ -7,14 +7,10 @@ import android.os.Bundle
 import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
-import android.view.Menu
-import android.view.MenuInflater
-import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.view.MenuProvider
 import androidx.hilt.navigation.fragment.hiltNavGraphViewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
@@ -32,7 +28,7 @@ import com.example.duriannet.services.detector.DetectionHub
 import com.example.duriannet.services.detector.enum.DetectorStatusEnum
 import com.example.duriannet.services.detector.interfaces.IDetector
 import com.example.duriannet.services.detector.interfaces.IDetectorListener
-import com.example.duriannet.services.detector.utils.Utils
+import com.example.duriannet.services.detector.utils.Common
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -72,11 +68,16 @@ class AddSellerDetectionFragment : Fragment(), IDetectorListener {
         setupActionBar()
         setupUI()
         setupAccelerometerSensor()
-        viewLifecycleOwner.lifecycleScope.launch {
-            repeatOnLifecycle(Lifecycle.State.CREATED) {
-                setupDetector()
-            }
-        }
+        setupDetector()
+    }
+
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        releaseCamera()
+        Log.e(TAG, "onDestroyView")
+        detectionResultBundle.clear()
+        _binding = null
     }
 
     private fun setupAccelerometerSensor() {
@@ -102,13 +103,6 @@ class AddSellerDetectionFragment : Fragment(), IDetectorListener {
         }
     }
 
-    override fun onDestroyView() {
-        super.onDestroyView()
-        releaseCamera()
-        Log.e(TAG, "onDestroyView")
-        detectionResultBundle.clear()
-        _binding = null
-    }
 
     private fun setupActionBar() {
 
@@ -208,16 +202,16 @@ class AddSellerDetectionFragment : Fragment(), IDetectorListener {
     private val detectNumber = 20
     private val detectionResultBundle = mutableListOf<Array<DetectionResult>>()
 
-    private suspend fun setupDetector() {
-        withContext(Dispatchers.IO) {
-//            detector = YoloDetector(
-//                context = requireContext(),
-//                detectorListener = this@AddSellerDetectionFragment
-//            ) // TODO : change to server detection
-            detector = DetectionHub(
-                detectorListener = this@AddSellerDetectionFragment
-            )
-            viewModel.detectionSize = Pair(DetectionHub.DETECT_IMG_SIZE, DetectionHub.DETECT_IMG_SIZE)
+    private fun setupDetector() {
+        viewLifecycleOwner.lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.CREATED) {
+                withContext(Dispatchers.IO) {
+                    detector = DetectionHub(
+                        detectorListener = this@AddSellerDetectionFragment
+                    )
+                    viewModel.detectionSize = Pair(DetectionHub.DETECT_IMG_SIZE, DetectionHub.DETECT_IMG_SIZE)
+                }
+            }
         }
     }
 
@@ -338,10 +332,10 @@ class AddSellerDetectionFragment : Fragment(), IDetectorListener {
                 var isTracked = false
                 for (trackedResults in trackedDetectionResults) {
 
-                    val iou = Utils.calculateIoU(result, trackedResults.first())
+                    val iou = Common.calculateIoU(result, trackedResults.first())
                     Log.e("DetectionViewModel", "iou: $iou")
 
-                    if (Utils.calculateIoU(result, trackedResults.first()) >= iouThreshold) {
+                    if (Common.calculateIoU(result, trackedResults.first()) >= iouThreshold) {
                         trackedResults.add(result)
                         isTracked = true
                         break

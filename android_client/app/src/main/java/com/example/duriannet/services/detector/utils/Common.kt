@@ -3,7 +3,7 @@ package com.example.duriannet.services.detector.utils
 import com.example.duriannet.models.DetectionResult
 
 
-object Utils {
+object Common {
 
     // Non-Maximum Suppression :
     // a post-processing technique used in object detection to eliminate duplicate detections

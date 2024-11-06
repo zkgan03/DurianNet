@@ -5,7 +5,7 @@ import android.graphics.Bitmap
 import android.os.SystemClock
 import android.util.Log
 import com.example.duriannet.utils.Constant
-import com.example.duriannet.services.detector.utils.Utils.applyNMS
+import com.example.duriannet.services.detector.utils.Common.applyNMS
 import com.example.duriannet.services.detector.interfaces.IDetectorListener
 import com.example.duriannet.models.DetectionResult
 import com.example.duriannet.services.detector.base.BaseDetector

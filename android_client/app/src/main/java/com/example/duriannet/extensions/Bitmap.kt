@@ -122,18 +122,18 @@ fun Bitmap.drawResults(
     strokeWidth: Float = 4f,
     @ColorInt textColor: Int = Color.WHITE,
     textSize: Float = 25f,
-    @ColorInt backgroundColor: Int = Color.RED,
+    @ColorInt borderColor: Int = Color.RED,
 ): Bitmap {
     val bitmap = this
     val canvas = Canvas(bitmap)
 
     val boxPaint = Paint()
-    boxPaint.color = backgroundColor
+    boxPaint.color = borderColor
     boxPaint.style = Paint.Style.STROKE
     boxPaint.strokeWidth = strokeWidth
 
     val txtBackgroundPaint = Paint()
-    txtBackgroundPaint.color = backgroundColor
+    txtBackgroundPaint.color = borderColor
     txtBackgroundPaint.style = Paint.Style.FILL
     txtBackgroundPaint.textSize = textSize
 

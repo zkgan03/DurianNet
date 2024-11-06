@@ -31,6 +31,7 @@
             <com.google.android.material.textview.MaterialTextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
                 android:text="@string/instant_detect_description" />
 
 
@@ -71,6 +72,7 @@
             <com.google.android.material.textview.MaterialTextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
                 android:text="An advanced object detection feature that required to hold the device steady for a few seconds to scan an object. By capturing multiple frames during this time, it averages the data to produce a more accurate and higher-quality result." />
 
             <com.google.android.material.button.MaterialButton
