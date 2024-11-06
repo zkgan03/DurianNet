@@ -2,14 +2,19 @@ package com.example.duriannet.presentation
 
 import android.os.Build
 import android.os.Bundle
+import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavController
 import androidx.navigation.findNavController
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.setupWithNavController
 import com.example.duriannet.databinding.ActivityMainBinding
+import com.example.duriannet.utils.Event
+import com.example.duriannet.utils.EventBus
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
 class MainActivity : AppCompatActivity() {
@@ -24,6 +29,20 @@ class MainActivity : AppCompatActivity() {
         setContentView(binding.root)
         setupBackPress()
         setupBottomNav()
+        setupEventBus()
+    }
+
+    private fun setupEventBus() {
+
+        lifecycleScope.launch {
+            EventBus.events.collect { event ->
+                when (event) {
+                    is Event.Toast -> {
+                        Toast.makeText(this@MainActivity, event.message, Toast.LENGTH_SHORT).show()
+                    }
+                }
+            }
+        }
     }
 
     private fun setupBottomNav() {
