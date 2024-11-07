@@ -1,4 +1,9 @@
 using DurianNet.Data;
+using DurianNet.Hubs;
+using DurianNet.Services.CommentService;
+using DurianNet.Services.DetectionService;
+using DurianNet.Services.DetectionService.YOLO.v10;
+using DurianNet.Services.SellerService;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -8,6 +13,22 @@ builder.Services.AddControllersWithViews();
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+
+//Setup dependencies
+builder.Services.AddSingleton<IDetector, YoloV10Detector>();
+builder.Services.AddSingleton<ISellerService, FakeSellerService>();
+builder.Services.AddSingleton<ICommentService, FakeCommentService>();
+
+
+// Setup signalR
+builder.Services.AddSignalR(option =>
+{
+    option.ClientTimeoutInterval = TimeSpan.FromMinutes(10);
+    option.KeepAliveInterval = TimeSpan.FromSeconds(10);
+    option.EnableDetailedErrors = true;
+    option.MaximumReceiveMessageSize = null; // unlimited
+
+}).AddMessagePackProtocol();
 
 // Setup Database
 builder.Services.AddDbContext<ApplicationDBContext>(options =>
@@ -40,5 +61,7 @@ app.UseAuthorization();
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}");
+
+app.MapHub<ObjectDetectionHub>("/DetectionHub");
 
 app.Run();

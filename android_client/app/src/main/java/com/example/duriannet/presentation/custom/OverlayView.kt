@@ -51,7 +51,7 @@ class OverlayView(context: Context?, attrs: AttributeSet?) : View(context, attrs
     }
 
     private fun initPaints() {
-        textBackgroundPaint.color = ContextCompat.getColor(context!!, R.color.bounding_box_color)
+        textBackgroundPaint.color = ContextCompat.getColor(context!!, R.color.accent_dark_green)
         textBackgroundPaint.style = Paint.Style.FILL
         textBackgroundPaint.textSize = 50f
 
@@ -59,7 +59,7 @@ class OverlayView(context: Context?, attrs: AttributeSet?) : View(context, attrs
         textPaint.style = Paint.Style.FILL
         textPaint.textSize = 50f
 
-        boxPaint.color = ContextCompat.getColor(context!!, R.color.bounding_box_color)
+        boxPaint.color = ContextCompat.getColor(context!!, R.color.accent_dark_green)
         boxPaint.strokeWidth = 8F
         boxPaint.style = Paint.Style.STROKE
     }

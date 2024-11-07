@@ -1,24 +1,31 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="black">#FF000000</color>
-    <color name="white">#FFFFFFFF</color>
+    <color name="black">#2C2C2C</color>
+    <color name="white">#F8F9FA</color>
+    <color name="absolute_black">#000</color>
+    <color name="absolute_white">#FFF</color>
     <color name="background_green">#E8F7E5</color>
     <color name="background_white">#F8F9FA</color>
     <color name="background_brown">#E9DFCB</color>
     <color name="chip_unchecked">#DDDDDD</color>
     <color name="chip_color">#AE770F</color>
+    <color name="chip_unchecked_background">#DDDDDD</color>
+    <color name="chip_checked_background">#AE770F</color>
     <color name="dark_gray">#7A7272</color>
     <color name="gold">#FDCC0D</color>
     <color name="info_blue">#3BA6FF</color>
     <color name="danger_red">#D11A2A</color>
     <color name="transparent">#00000000</color>
-    <color name="border_color">#2C2C2C</color>
-    <color name="fab_ripple_color">#1f000000</color>
-    <color name="cta_color">#12796F</color>
-    <color name="bounding_box_color">#6200EE</color>
+    <color name="ripple_color">#1f000000</color>
+    <color name="accent_dark_green">#12796F</color>
     <color name="LightGray">#dddddd</color>
     <color name="primary_color">#6200EE</color>
     <color name="color_primary_translucent">#556200EE</color>
     <color name="border_color_login">#B3B3B3</color>
     <color name="button_green">#12796F</color>
+    <color name="active_indicator_green_translucent">#80D9F9D2</color>
+    <color name="active_indicator_green">#D9F9D2</color>
+    <color name="chip_info_color">#9A000000</color>
+    <color name="color_enabled">@color/accent_dark_green</color>
+    <color name="color_disabled">#8012796F</color>
 </resources>

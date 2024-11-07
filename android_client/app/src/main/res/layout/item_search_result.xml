@@ -11,33 +11,77 @@
     android:layout_marginTop="10dp"
     android:clickable="true"
     android:focusable="true"
-    android:backgroundTint="@color/white"
     app:cardCornerRadius="5dp"
     app:cardElevation="10dp"
     app:strokeWidth="0dp">
 
 
-    <LinearLayout
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:background="@color/absolute_white"
         android:orientation="horizontal"
         android:padding="16dp">
 
-        <ImageView
-            android:id="@+id/result_image"
-            android:layout_width="40dp"
-            android:layout_height="40dp"
-            android:layout_marginEnd="16dp"
-            android:src="@drawable/baseline_location" />
+        <LinearLayout
+            android:id="@+id/linearLayout"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
 
-        <TextView
+            <ImageView
+                android:id="@+id/result_image"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:layout_gravity="center_horizontal"
+                android:backgroundTint="@color/absolute_white"
+                android:src="@drawable/baseline_location"
+                app:layout_constraintEnd_toEndOf="@+id/distance_from_current_location"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:tint="@color/accent_dark_green" />
+
+            <com.google.android.material.textview.MaterialTextView
+                android:id="@+id/distance_from_current_location"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:backgroundTint="@color/absolute_white"
+                android:textColor="@color/accent_dark_green"
+                android:textStyle="bold"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/result_image"
+                tools:text="10 km" />
+        </LinearLayout>
+
+
+        <com.google.android.material.textview.MaterialTextView
             android:id="@+id/seller_name"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginStart="24dp"
+            android:backgroundTint="@color/absolute_white"
             android:textColor="@android:color/black"
             android:textSize="16sp"
+            android:textStyle="bold"
+            app:layout_constraintStart_toEndOf="@+id/linearLayout"
+            app:layout_constraintTop_toTopOf="@+id/linearLayout"
             tools:text="Seller Name" />
 
-    </LinearLayout>
+        <com.google.android.material.textview.MaterialTextView
+            android:id="@+id/seller_address"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="5dp"
+            android:backgroundTint="@color/absolute_white"
+            android:textColor="@color/dark_gray"
+            android:textSize="14sp"
+            app:layout_constraintStart_toStartOf="@+id/seller_name"
+            app:layout_constraintTop_toBottomOf="@+id/seller_name"
+            tools:text="Seller Address" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
 </com.google.android.material.card.MaterialCardView>

@@ -39,8 +39,17 @@
         <item name="android:adjustViewBounds">true</item>
     </style>
 
+
     <style name="CircleShapeAppearance">
         <item name="cornerFamily">rounded</item>
         <item name="cornerSize">50%</item>
+    <style name="Widget.App.BottomNavigationView" parent="Widget.Material3.BottomNavigationView">
+        <item name="materialThemeOverlay">@style/ThemeOverlay.App.BottomNavigationView</item>
+    </style>
+
+    <style name="ThemeOverlay.App.BottomNavigationView" parent="">
+        <item name="colorSecondaryContainer">@color/active_indicator_green</item>
+        <item name="colorOnSecondaryContainer">@color/absolute_black</item>
+        <item name="colorOnSurfaceVariant">@color/black</item>
     </style>
 </resources>

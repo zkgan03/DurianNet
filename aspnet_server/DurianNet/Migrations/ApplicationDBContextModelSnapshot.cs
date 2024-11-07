@@ -22,7 +22,7 @@ namespace DurianNet.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
-            modelBuilder.Entity("DurianNet.Models.DataModels.Comments", b =>
+            modelBuilder.Entity("DurianNet.Models.DataModels.Comment", b =>
                 {
                     b.Property<int>("CommentId")
                         .ValueGeneratedOnAdd()
@@ -125,6 +125,9 @@ namespace DurianNet.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
                     b.Property<double>("Latitude")
                         .HasColumnType("float");
 
@@ -138,7 +141,13 @@ namespace DurianNet.Migrations
                     b.Property<double>("Rating")
                         .HasColumnType("float");
 
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
                     b.HasKey("SellerId");
+
+                    b.HasIndex("UserId");
 
                     b.ToTable("Sellers");
                 });
@@ -371,7 +380,7 @@ namespace DurianNet.Migrations
                     b.ToTable("AspNetUserTokens", (string)null);
                 });
 
-            modelBuilder.Entity("DurianNet.Models.DataModels.Comments", b =>
+            modelBuilder.Entity("DurianNet.Models.DataModels.Comment", b =>
                 {
                     b.HasOne("DurianNet.Models.DataModels.Seller", "Seller")
                         .WithMany("Comments")
@@ -399,6 +408,17 @@ namespace DurianNet.Migrations
                         .IsRequired();
 
                     b.Navigation("DurianVideo");
+                });
+
+            modelBuilder.Entity("DurianNet.Models.DataModels.Seller", b =>
+                {
+                    b.HasOne("DurianNet.Models.DataModels.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("DurianProfileSeller", b =>

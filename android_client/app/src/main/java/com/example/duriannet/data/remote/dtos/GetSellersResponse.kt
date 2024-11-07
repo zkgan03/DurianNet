@@ -27,5 +27,3 @@ fun GetSellerResponse.toSeller(): Seller = Seller(
     rating = rating,
     latLng = LatLng(latitude, longitude),
 )
-
-

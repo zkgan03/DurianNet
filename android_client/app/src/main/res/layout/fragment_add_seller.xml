@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".presentation.seller_locator.fragments.AddSellerFragment">
+    tools:context=".presentation.seller_locator.fragments.add_seller.AddSellerFragment">
 
     <com.google.android.material.appbar.MaterialToolbar
         android:id="@+id/toolbar"
@@ -39,7 +39,8 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Types / Varieties" />
+            android:text="Types / Varieties"
+            android:textColor="@color/black" />
 
 
         <!--  Durian Types  -->
@@ -81,7 +82,8 @@
         <com.google.android.material.textfield.TextInputEditText
             android:id="@+id/editText_seller_name"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
+            android:layout_height="wrap_content"
+            android:textColor="@color/black" />
     </com.google.android.material.textfield.TextInputLayout>
 
     <com.google.android.material.textfield.TextInputLayout
@@ -97,7 +99,9 @@
         <com.google.android.material.textfield.TextInputEditText
             android:id="@+id/editText_description"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
+            android:layout_height="wrap_content"
+            android:backgroundTint="@color/absolute_white"
+            android:textColor="@color/black" />
 
     </com.google.android.material.textfield.TextInputLayout>
 

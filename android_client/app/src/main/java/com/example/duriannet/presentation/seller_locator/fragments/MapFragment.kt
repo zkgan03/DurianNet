@@ -271,7 +271,7 @@ class MapFragment : Fragment() {
     private val icon: BitmapDescriptor by lazy {
         val color = ContextCompat.getColor(
             requireContext(),
-            R.color.cta_color
+            R.color.accent_dark_green
         )
 
         BitmapHelper.vectorToBitmapDescriptor(

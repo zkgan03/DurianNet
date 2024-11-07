@@ -7,7 +7,7 @@
 
     <fragment
         android:id="@+id/manageSellerFragment"
-        android:name="com.example.duriannet.presentation.seller_locator.fragments.ManageSellerFragment"
+        android:name="com.example.duriannet.presentation.seller_locator.fragments.manage_seller.ManageSellerFragment"
         android:label="ManageSellerFragment" >
         <action
             android:id="@+id/action_manageSellerFragment_to_editSellerFragment"
@@ -15,7 +15,7 @@
     </fragment>
     <fragment
         android:id="@+id/editSellerFragment"
-        android:name="com.example.duriannet.presentation.seller_locator.fragments.EditSellerFragment"
+        android:name="com.example.duriannet.presentation.seller_locator.fragments.manage_seller.EditSellerFragment"
         android:label="fragment_edit_seller"
         tools:layout="@layout/fragment_edit_seller" />
 </navigation>

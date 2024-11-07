@@ -3,6 +3,10 @@
     <style name="Base.Theme.DurianNet" parent="Theme.Material3.Light.NoActionBar">
         <!-- Customize your light theme here. -->
         <!-- <item name="colorPrimary">@color/my_light_primary</item> -->
+        <item name="android:textColor">@color/black</item>
+        <item name="android:statusBarColor">@color/background_green</item>
+        <item name="android:windowLightStatusBar">true</item>
+        <item name="android:windowBackground">@color/white</item>
     </style>
 
     <style name="Theme.DurianNet" parent="Base.Theme.DurianNet" />

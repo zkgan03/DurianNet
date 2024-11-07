@@ -13,8 +13,11 @@ namespace DurianNet.Models.DataModels
         public double Rating { get; set; }
         public double Latitude { get; set; }
         public double Longitude { get; set; }
+        public Boolean IsDeleted { get; set; } = false;
+        public string UserId { get; set; } // userId in identity framework is string
 
+        public User User { get; set; }
         public ICollection<DurianProfile> DurianSold { get; set; }
-        public ICollection<Comments> Comments { get; set; }
+        public ICollection<Comment> Comments { get; set; }
     }
 }

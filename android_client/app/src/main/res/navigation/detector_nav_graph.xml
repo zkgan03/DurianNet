@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/detector_nav_graph"
+    app:startDestination="@id/detectorEntryFragment">
+
+    <fragment
+        android:id="@+id/detectorEntryFragment"
+        android:name="com.example.duriannet.presentation.detector.fragments.DetectorEntryFragment"
+        android:label="fragment_detector_entry"
+        tools:layout="@layout/fragment_detector_entry" >
+        <action
+            android:id="@+id/action_detectorEntryFragment_to_instantDetectViewPagerFragment"
+            app:destination="@id/instantDetectViewPagerFragment" />
+        <action
+            android:id="@+id/action_detectorEntryFragment_to_focusVisionFragment"
+            app:destination="@id/focusVisionFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/instantDetectViewPagerFragment"
+        android:name="com.example.duriannet.presentation.detector.fragments.instant_detect.InstantDetectViewPagerFragment"
+        android:label="InstantDetectViewPagerFragment" />
+    <fragment
+        android:id="@+id/focusVisionFragment"
+        android:name="com.example.duriannet.presentation.detector.fragments.focus_vision.FocusVisionFragment"
+        android:label="FocusVisionFragment" >
+        <action
+            android:id="@+id/action_focusVisionFragment_to_focusVisionResultFragment"
+            app:destination="@id/focusVisionResultFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/focusVisionResultFragment"
+        android:name="com.example.duriannet.presentation.detector.fragments.focus_vision.FocusVisionResultFragment"
+        android:label="FocusVisionResultFragment" />
+</navigation>
