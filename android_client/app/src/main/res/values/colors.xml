@@ -3,6 +3,8 @@
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
     <color name="background_green">#E8F7E5</color>
+    <color name="background_white">#F8F9FA</color>
+    <color name="background_brown">#E9DFCB</color>
     <color name="chip_unchecked">#DDDDDD</color>
     <color name="chip_color">#AE770F</color>
     <color name="dark_gray">#7A7272</color>
@@ -17,4 +19,6 @@
     <color name="LightGray">#dddddd</color>
     <color name="primary_color">#6200EE</color>
     <color name="color_primary_translucent">#556200EE</color>
+    <color name="border_color_login">#B3B3B3</color>
+    <color name="button_green">#12796F</color>
 </resources>
