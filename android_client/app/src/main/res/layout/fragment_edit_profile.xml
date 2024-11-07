@@ -1,0 +1,149 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/background_white"
+    tools:context=".presentation.account_management.fragments.EditProfileFragment">
+
+    <androidx.appcompat.widget.Toolbar
+        android:id="@+id/toolbar_change_password"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        android:layout_alignParentTop="true"
+        android:background="@color/background_white"
+        android:theme="?attr/actionBarTheme"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <TextView
+            android:id="@+id/tl_lbl_edit_profile"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:text="Edit Profile"
+            android:textColor="@color/black"
+            android:textSize="24sp"
+            tools:layout_editor_absoluteX="148dp"
+            tools:layout_editor_absoluteY="16dp" />
+    </androidx.appcompat.widget.Toolbar>
+
+    <com.google.android.material.imageview.ShapeableImageView
+        android:id="@+id/iv_profile"
+        android:layout_width="120dp"
+        android:layout_height="120dp"
+        android:layout_marginTop="16dp"
+        android:src="@drawable/unknownuser"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/toolbar_change_password"
+        app:shapeAppearanceOverlay="@style/CircleShapeAppearance" />
+
+    <TextView
+        android:id="@+id/lbl_edit_profile_img"
+        android:layout_width="290dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:text="Click the image above to change your profile image."
+        android:textSize="16sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/iv_profile" />
+
+    <EditText
+        android:id="@+id/edt_profile_username"
+        android:layout_width="290dp"
+        android:layout_height="50dp"
+        android:layout_marginTop="32dp"
+        android:background="@drawable/input_box"
+        android:drawableLeft="@drawable/ic_username"
+        android:drawablePadding="20dp"
+        android:ems="10"
+        android:text="Username"
+        android:inputType="text"
+        android:paddingLeft="10dp"
+        android:paddingTop="8dp"
+        android:paddingRight="10dp"
+        android:paddingBottom="8dp"
+        android:textSize="24sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/lbl_edit_profile_img" />
+
+    <EditText
+        android:id="@+id/edt_profile_fullname"
+        android:layout_width="0dp"
+        android:layout_height="50dp"
+        android:layout_marginTop="16dp"
+        android:background="@drawable/input_box"
+        android:drawableLeft="@drawable/ic_username"
+        android:drawablePadding="20dp"
+        android:ems="10"
+        android:inputType="text"
+        android:text="Fullname"
+        android:paddingLeft="10dp"
+        android:paddingTop="8dp"
+        android:paddingRight="10dp"
+        android:paddingBottom="8dp"
+        android:textSize="24sp"
+        app:layout_constraintEnd_toEndOf="@+id/edt_profile_username"
+        app:layout_constraintStart_toStartOf="@+id/edt_profile_username"
+        app:layout_constraintTop_toBottomOf="@+id/edt_profile_username" />
+
+    <EditText
+        android:id="@+id/edt_profile_email"
+        android:layout_width="0dp"
+        android:layout_height="50dp"
+        android:layout_marginTop="16dp"
+        android:background="@drawable/input_box"
+        android:drawableLeft="@drawable/ic_email"
+        android:drawablePadding="20dp"
+        android:ems="10"
+        android:inputType="textEmailAddress"
+        android:text="Email"
+        android:paddingLeft="10dp"
+        android:paddingTop="8dp"
+        android:paddingRight="10dp"
+        android:paddingBottom="8dp"
+        android:textSize="24sp"
+        app:layout_constraintEnd_toEndOf="@+id/edt_profile_fullname"
+        app:layout_constraintStart_toStartOf="@+id/edt_profile_fullname"
+        app:layout_constraintTop_toBottomOf="@+id/edt_profile_fullname" />
+
+    <EditText
+        android:id="@+id/edt_profile_phone_number"
+        android:layout_width="0dp"
+        android:layout_height="50dp"
+        android:layout_marginTop="16dp"
+        android:background="@drawable/input_box"
+        android:drawableLeft="@drawable/ic_phone"
+        android:drawablePadding="20dp"
+        android:ems="10"
+        android:inputType="phone"
+        android:text="Phone Number"
+        android:paddingLeft="10dp"
+        android:paddingTop="8dp"
+        android:paddingRight="10dp"
+        android:paddingBottom="8dp"
+        android:textSize="24sp"
+        app:layout_constraintEnd_toEndOf="@+id/edt_profile_email"
+        app:layout_constraintStart_toStartOf="@+id/edt_profile_email"
+        app:layout_constraintTop_toBottomOf="@+id/edt_profile_email" />
+
+    <Button
+        android:id="@+id/button"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="32dp"
+        android:background="@drawable/btn_login"
+        android:text="SAVE"
+        android:textSize="20sp"
+        android:textStyle="bold"
+        app:backgroundTint="@null"
+        app:layout_constraintEnd_toEndOf="@+id/edt_profile_phone_number"
+        app:layout_constraintStart_toStartOf="@+id/edt_profile_phone_number"
+        app:layout_constraintTop_toBottomOf="@+id/edt_profile_phone_number" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>
