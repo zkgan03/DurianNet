@@ -19,6 +19,13 @@ namespace DurianNet.Data
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
+
+            modelBuilder.Entity<Comment>()
+                .HasOne(c => c.Seller)
+                .WithMany(s => s.Comments)
+                .HasForeignKey(c => c.SellerId)
+                .OnDelete(DeleteBehavior.NoAction);
+
         }
 
     }

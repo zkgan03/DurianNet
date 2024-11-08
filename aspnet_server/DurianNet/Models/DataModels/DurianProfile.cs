@@ -5,7 +5,7 @@ namespace DurianNet.Models.DataModels
     public class DurianProfile
     {
         [Key]
-        public string DurianId { get; set; }
+        public int DurianId { get; set; }
         public string DurianName { get; set; }
         public string DurianDescription { get; set; }
         public string Characteristics { get; set; }

@@ -49,6 +49,11 @@ class FocusVisionFragment : BaseFocusVisionFragment() {
     ): View {
         _binding = FragmentFocusVisionBinding.inflate(inflater, container, false)
 
+        detectorViewModel.startDetector(
+            false,
+            this,
+            requireContext()
+        )
         accelerometerSensor = AccelerometerSensor(requireContext()) // initialize accelerometer sensor
         cameraManager = CameraManager(requireContext(), this, binding.viewFinder)
 
@@ -244,7 +249,23 @@ class FocusVisionFragment : BaseFocusVisionFragment() {
 
         bottomSheetBinding.apply {
             actvModelSelection.setOnItemClickListener { _, _, position, id ->
+                when (position) {
+                    0 -> {
+                        detectorViewModel.setDetectionModel(
+                            false,
+                            this@FocusVisionFragment,
+                            requireContext()
+                        )
+                    }
 
+                    1 -> {
+                        detectorViewModel.setDetectionModel(
+                            true,
+                            this@FocusVisionFragment,
+                            requireContext()
+                        )
+                    }
+                }
             }
 
             sliderMaxNumOfDetection.addOnChangeListener { _, value, _ ->
@@ -324,6 +345,20 @@ class FocusVisionFragment : BaseFocusVisionFragment() {
                 )
             }
         }
+    }
+
+    override fun onEmptyDetect() {
+        super.onEmptyDetect()
+        activity?.runOnUiThread {
+            if (_binding == null || !isAdded) return@runOnUiThread
+
+            binding.bottomPromptChip.text = "No object detected!"
+            binding.overlay.clear()
+        }
+    }
+
+    companion object {
+        private const val TAG = "FocusVisionFragment"
     }
 
 }

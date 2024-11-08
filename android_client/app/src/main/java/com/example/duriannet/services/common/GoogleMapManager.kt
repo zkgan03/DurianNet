@@ -91,6 +91,7 @@ class GoogleMapManager<T : ClusterItem>(
             cluster() // re-cluster / re-render
 
             setOnClusterItemClickListener { item ->
+                Log.e("GoogleMapManager", "Cluster item clicked : ${item.title}")
                 addCircleAroundPlace(item.position)
                 onMarkerSelected?.invoke(item)
                 false

@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/white"
+    tools:context=".presentation.seller_locator.fragments.AddCommentFragment">
+
+    <com.google.android.material.appbar.MaterialToolbar
+        android:id="@+id/toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        android:layout_alignParentTop="true"
+        app:layout_constraintTop_toTopOf="parent"
+        app:menu="@menu/detector_menu"
+        app:title="Add a Comment"
+        app:titleCentered="true"
+        app:titleTextColor="@color/black" />
+
+    <com.google.android.material.imageview.ShapeableImageView
+        android:id="@+id/image_user"
+        android:layout_width="70dp"
+        android:layout_height="70dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="16dp"
+        android:scaleType="centerCrop"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/toolbar"
+        app:shapeAppearanceOverlay="@style/roundedImageView"
+        tools:src="@drawable/ic_launcher_background" />
+
+
+    <RatingBar
+        android:id="@+id/rating_bar"
+        style="@style/Widget.AppCompat.RatingBar.Indicator"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:isIndicator="false"
+        android:numStars="5"
+        android:progressTint="@color/gold"
+        android:rating="0"
+        android:secondaryProgressTint="@color/transparent"
+        app:layout_constraintBottom_toBottomOf="@+id/image_user"
+        app:layout_constraintStart_toEndOf="@+id/image_user"
+        app:layout_constraintTop_toTopOf="@+id/image_user" />
+
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/textInputLayout_comment"
+        style="@style/Widget.Material3.TextInputLayout.OutlinedBox.Dense"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:hint="Comment"
+        android:paddingHorizontal="16dp"
+        app:helperText="Leave a comment here"
+        app:layout_constraintTop_toBottomOf="@+id/image_user">
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/editText_comment"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="top"
+            android:minHeight="100dp"
+            android:minLines="2"
+            android:textColor="@color/black" />
+
+    </com.google.android.material.textfield.TextInputLayout>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

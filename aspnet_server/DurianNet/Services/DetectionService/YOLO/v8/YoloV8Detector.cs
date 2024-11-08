@@ -1,6 +1,6 @@
 ﻿using Compunet.YoloV8;
 using Compunet.YoloV8.Data;
-using DurianNet.Dtos;
+using DurianNet.Hubs.Dto;
 
 namespace DurianNet.Services.DetectionService.YOLO.v8
 {

@@ -55,8 +55,11 @@ namespace DurianNet.Migrations
 
             modelBuilder.Entity("DurianNet.Models.DataModels.DurianProfile", b =>
                 {
-                    b.Property<string>("DurianId")
-                        .HasColumnType("nvarchar(450)");
+                    b.Property<int>("DurianId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("DurianId"));
 
                     b.Property<string>("Characteristics")
                         .IsRequired()
@@ -138,9 +141,6 @@ namespace DurianNet.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<double>("Rating")
-                        .HasColumnType("float");
-
                     b.Property<string>("UserId")
                         .IsRequired()
                         .HasColumnType("nvarchar(450)");
@@ -194,6 +194,10 @@ namespace DurianNet.Migrations
                     b.Property<bool>("PhoneNumberConfirmed")
                         .HasColumnType("bit");
 
+                    b.Property<string>("ProfilePicture")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("SecurityStamp")
                         .HasColumnType("nvarchar(max)");
 
@@ -219,13 +223,13 @@ namespace DurianNet.Migrations
 
             modelBuilder.Entity("DurianProfileSeller", b =>
                 {
-                    b.Property<string>("DurianSoldDurianId")
-                        .HasColumnType("nvarchar(450)");
+                    b.Property<int>("DurianProfilesDurianId")
+                        .HasColumnType("int");
 
                     b.Property<int>("SellersSellerId")
                         .HasColumnType("int");
 
-                    b.HasKey("DurianSoldDurianId", "SellersSellerId");
+                    b.HasKey("DurianProfilesDurianId", "SellersSellerId");
 
                     b.HasIndex("SellersSellerId");
 
@@ -234,15 +238,15 @@ namespace DurianNet.Migrations
 
             modelBuilder.Entity("DurianProfileUser", b =>
                 {
+                    b.Property<int>("FavoriteDurianDurianId")
+                        .HasColumnType("int");
+
                     b.Property<string>("UsersId")
                         .HasColumnType("nvarchar(450)");
 
-                    b.Property<string>("favoriteDurianDurianId")
-                        .HasColumnType("nvarchar(450)");
+                    b.HasKey("FavoriteDurianDurianId", "UsersId");
 
-                    b.HasKey("UsersId", "favoriteDurianDurianId");
-
-                    b.HasIndex("favoriteDurianDurianId");
+                    b.HasIndex("UsersId");
 
                     b.ToTable("DurianProfileUser");
                 });
@@ -385,7 +389,7 @@ namespace DurianNet.Migrations
                     b.HasOne("DurianNet.Models.DataModels.Seller", "Seller")
                         .WithMany("Comments")
                         .HasForeignKey("SellerId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
                     b.HasOne("DurianNet.Models.DataModels.User", "User")
@@ -425,7 +429,7 @@ namespace DurianNet.Migrations
                 {
                     b.HasOne("DurianNet.Models.DataModels.DurianProfile", null)
                         .WithMany()
-                        .HasForeignKey("DurianSoldDurianId")
+                        .HasForeignKey("DurianProfilesDurianId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -438,15 +442,15 @@ namespace DurianNet.Migrations
 
             modelBuilder.Entity("DurianProfileUser", b =>
                 {
-                    b.HasOne("DurianNet.Models.DataModels.User", null)
+                    b.HasOne("DurianNet.Models.DataModels.DurianProfile", null)
                         .WithMany()
-                        .HasForeignKey("UsersId")
+                        .HasForeignKey("FavoriteDurianDurianId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("DurianNet.Models.DataModels.DurianProfile", null)
+                    b.HasOne("DurianNet.Models.DataModels.User", null)
                         .WithMany()
-                        .HasForeignKey("favoriteDurianDurianId")
+                        .HasForeignKey("UsersId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });

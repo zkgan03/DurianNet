@@ -21,28 +21,33 @@ import com.example.duriannet.R
 import com.example.duriannet.databinding.FragmentAddSellerDetectionBinding
 import com.example.duriannet.models.DetectionResult
 import com.example.duriannet.models.DurianType
+import com.example.duriannet.presentation.detector.fragments.focus_vision.BaseFocusVisionFragment
+import com.example.duriannet.presentation.detector.fragments.focus_vision.FocusVisionFragment
+import com.example.duriannet.presentation.detector.fragments.focus_vision.FocusVisionFragment.Companion
 import com.example.duriannet.presentation.seller_locator.view_models.AddSellerViewModel
 import com.example.duriannet.services.common.AccelerometerSensor
 import com.example.duriannet.services.common.CameraManager
+import com.example.duriannet.services.common.GoogleMapManager
 import com.example.duriannet.services.detector.DetectionHub
 import com.example.duriannet.services.detector.enum.DetectorStatusEnum
 import com.example.duriannet.services.detector.interfaces.IDetector
 import com.example.duriannet.services.detector.interfaces.IDetectorListener
 import com.example.duriannet.services.detector.utils.Common
+import com.example.duriannet.utils.Event
+import com.example.duriannet.utils.EventBus
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
 @AndroidEntryPoint
-class AddSellerDetectionFragment : Fragment(), IDetectorListener {
+class AddSellerDetectionFragment : BaseFocusVisionFragment() {
 
     private var _binding: FragmentAddSellerDetectionBinding? = null
     private val binding get() = _binding!!
 
     private var cameraManager: CameraManager? = null
     private lateinit var accelerometerSensor: AccelerometerSensor
-
 
     private val navController: NavController by lazy { findNavController() }
 
@@ -53,6 +58,12 @@ class AddSellerDetectionFragment : Fragment(), IDetectorListener {
         savedInstanceState: Bundle?,
     ): View {
         _binding = FragmentAddSellerDetectionBinding.inflate(inflater, container, false)
+
+        detectorViewModel.startDetector(
+            true,
+            this,
+            requireContext()
+        )
 
         cameraManager = CameraManager(requireContext(), this, binding.viewFinder)
         accelerometerSensor = AccelerometerSensor(requireContext())
@@ -68,15 +79,12 @@ class AddSellerDetectionFragment : Fragment(), IDetectorListener {
         setupActionBar()
         setupUI()
         setupAccelerometerSensor()
-        setupDetector()
     }
 
 
     override fun onDestroyView() {
         super.onDestroyView()
         releaseCamera()
-        Log.e(TAG, "onDestroyView")
-        detectionResultBundle.clear()
         _binding = null
     }
 
@@ -84,19 +92,19 @@ class AddSellerDetectionFragment : Fragment(), IDetectorListener {
         accelerometerSensor = AccelerometerSensor(requireContext()) // initialize accelerometer sensor
 
         accelerometerSensor.onShakeDetected = {
-            binding.bottomPromptChip.text = "Please hold your device steady!"
-            binding.processProgress.text = "0%"
+            super.stopProcessing()
 
-            //make flip camera button and flash button visible
-            binding.flipCameraButton.visibility = View.VISIBLE
-            binding.toggleFlashButton.visibility = View.VISIBLE
+            binding.apply {
+                bottomPromptChip.text = "Please hold your device steady!"
+                processProgress.text = "0%"
+
+                //make flip camera button and flash button visible
+                flipCameraButton.visibility = View.VISIBLE
+                toggleFlashButton.visibility = View.VISIBLE
+            }
 
             Log.e(TAG, "Shake detected")
 
-            isProcessing = false
-
-            // stop the detection when shake is detected
-            detectionResultBundle.clear() // clear the detection result bundle
             cameraManager?.clearAnalyzer() // clear the image analyzer
             accelerometerSensor.stop() // stop the accelerometer sensor
             binding.overlay.clear() // clear the overlay
@@ -139,16 +147,21 @@ class AddSellerDetectionFragment : Fragment(), IDetectorListener {
         }
 
         binding.btnStartDetection.setOnClickListener {
-            binding.bottomPromptChip.text = "Processing..."
+            super.startProcessing()
 
-            cameraManager?.enableGestures(false)
+            binding.apply {
+                bottomPromptChip.text = "Processing..."
 
-            //make flip camera button and flash button invisible
-            binding.flipCameraButton.visibility = View.INVISIBLE
-            binding.toggleFlashButton.visibility = View.INVISIBLE
+                //make flip camera button and flash button invisible
+                flipCameraButton.visibility = View.INVISIBLE
+                toggleFlashButton.visibility = View.INVISIBLE
+            }
 
-            isProcessing = true
-            cameraManager?.setAnalyzer()
+            cameraManager?.apply {
+                enableGestures(false)
+                setAnalyzer()
+            }
+
             accelerometerSensor.start()
         }
     }
@@ -164,14 +177,14 @@ class AddSellerDetectionFragment : Fragment(), IDetectorListener {
             }
 
             setOnImageAnalyzedListener { bitmap ->
-                if (detector?.status() == DetectorStatusEnum.INITIALIZED) {
-                    detector?.detectLiveStream(bitmap)
+                if (detectorViewModel.isDetectorInitialized) {
+                    detectorViewModel.detector?.detectLiveStream(bitmap)
                 }
             }
 
             setOnErrorListener { error ->
-                activity?.runOnUiThread {
-                    Toast.makeText(requireActivity(), "Error: $error", Toast.LENGTH_LONG).show()
+                viewLifecycleOwner.lifecycleScope.launch {
+                    EventBus.sendEvent(Event.Toast(error))
                 }
             }
 
@@ -193,27 +206,26 @@ class AddSellerDetectionFragment : Fragment(), IDetectorListener {
         cameraManager = null
     }
 
-    /**
-     * Detector setup
-     */
 
-    private var detector: IDetector? = null
-    private var isProcessing = false
-    private val detectNumber = 20
-    private val detectionResultBundle = mutableListOf<Array<DetectionResult>>()
+    override fun onCompleteDetect(finalResults: Array<DetectionResult>, imageResult: Bitmap) {
+        accelerometerSensor.stop()
+        cameraManager?.release()
 
-    private fun setupDetector() {
-        viewLifecycleOwner.lifecycleScope.launch {
-            repeatOnLifecycle(Lifecycle.State.CREATED) {
-                withContext(Dispatchers.IO) {
-                    detector = DetectionHub(
-                        detectorListener = this@AddSellerDetectionFragment
-                    )
-                    viewModel.detectionSize = Pair(DetectionHub.DETECT_IMG_SIZE, DetectionHub.DETECT_IMG_SIZE)
-                }
-            }
+        viewModel.imageResult = imageResult
+
+        viewModel.inputSellerDurianType(hashSetOf(DurianType.MusangKing, DurianType.BlackThorn))
+
+        GoogleMapManager.getUserLocation(requireContext()) { location ->
+            viewModel.inputSellerLocation(location.latitude, location.longitude)
         }
+
+        if (navController.currentDestination?.id == R.id.addSellerDetectionFragment)
+            navController.navigate(R.id.action_addSellerDetectionFragment_to_addSellerFragment)
     }
+
+    /**
+     * Listener
+     */
 
     override fun onInitialized() {
         // run on ui / main thread
@@ -229,6 +241,8 @@ class AddSellerDetectionFragment : Fragment(), IDetectorListener {
 
     override fun onStopped() {
         activity?.runOnUiThread {
+            if (_binding == null || !isAdded) return@runOnUiThread
+
             cameraManager?.clearAnalyzer()
             binding.overlay.clear()
         }
@@ -236,6 +250,8 @@ class AddSellerDetectionFragment : Fragment(), IDetectorListener {
 
     override fun onError(error: String) {
         activity?.runOnUiThread {
+            if (_binding == null || !isAdded) return@runOnUiThread
+
             Log.e(TAG, "Error  : $error")
             binding.bottomPromptChip.text = "Error to start detection"
             Toast.makeText(requireActivity(), "Error: $error", Toast.LENGTH_LONG).show()
@@ -250,18 +266,14 @@ class AddSellerDetectionFragment : Fragment(), IDetectorListener {
         detectHeight: Int,
         inputImage: Bitmap,
     ) {
-        activity?.runOnUiThread {
+        super.onDetect(results, inferenceTime, detectWidth, detectHeight, inputImage)
 
+        activity?.runOnUiThread {
             if (_binding == null || !isAdded || !isProcessing) {
                 return@runOnUiThread
             }
 
-
-//            Log.e(TAG, "on Detect number: ${viewModel.detectionResultBundle.size}")
-            detectionResultBundle.add(results)
-
-            binding.processProgress.text = "${(detectionResultBundle.size / detectNumber.toFloat() * 100).toInt()}%"
-
+            binding.processProgress.text = "${(super.getCompletion() * 100).toInt()}%"
             binding.overlay.clear()
             binding.overlay.apply {
                 setResults(
@@ -271,104 +283,8 @@ class AddSellerDetectionFragment : Fragment(), IDetectorListener {
                     showText = false
                 )
             }
-
-            if (detectionResultBundle.size >= detectNumber) {
-                detectionCompleted(inputImage!!)
-            }
         }
     }
-
-    private fun detectionCompleted(inputImage: Bitmap) {
-        isProcessing = false
-        accelerometerSensor.stop()
-        cameraManager?.release()
-
-        Log.e(TAG, "onDetectionCompleted")
-        Toast.makeText(requireActivity(), "Detection Completed", Toast.LENGTH_SHORT).show()
-
-        processDetectionResultsBundle(inputImage)
-
-        //TODO : check if the detection result has durian or not, if not, show the error message in prompt chip, then require the user to detect again
-        //TODO : Set the input state : durian type to the view model
-        viewModel.inputSellerDurianType(setOf(DurianType.D24, DurianType.MusangKing)) // add dummy durian type
-
-        // navigate to the result fragment to show the detection result
-        if (navController.currentDestination?.id == R.id.addSellerDetectionFragment)
-            navController.navigate(R.id.action_addSellerDetectionFragment_to_addSellerFragment)
-    }
-
-    private fun processDetectionResultsBundle(
-        inputImg: Bitmap,
-        iouThreshold: Float = 0.5f,
-        detectNumberThreshold: Int = 15,
-    ) {
-        viewModel.imageResult = inputImg
-//        this.detectionResults = detectionResultBundle.last()
-
-        // apply iou threshold to check the bounding box in the frames in detection result bundle is the same bounding box or not
-        // if the bounding box is the same, keep counting and tracking
-        // then calculate the average of the bounding box probability
-        // if the number of bounding box is less than 15, remove the bounding box from the detection result bundle
-
-        // track the similar bounding box in the detection result bundle
-        // if the bounding box is the same, add into the same list
-        val trackedDetectionResults: MutableList<MutableList<DetectionResult>> = mutableListOf()
-
-        Log.e("DetectionViewModel", "detectionResultBundle: ${detectionResultBundle.size}")
-        // Iterate through the detection result bundle
-        for (frameResults in detectionResultBundle) {
-
-            Log.e("DetectionViewModel", "========================================================")
-            Log.e("DetectionViewModel", "frameResults: ${frameResults.size}")
-            for (result in frameResults) {
-
-                //print all info of result
-                Log.e(
-                    "DetectionViewModel",
-                    "result: ${result.label}, ${result.confidence}, ${result.top}, ${result.left}, ${result.width}, ${result.height}"
-                )
-
-                // Check if the bounding box is the same as the bounding box in the tracked detection results
-                var isTracked = false
-                for (trackedResults in trackedDetectionResults) {
-
-                    val iou = Common.calculateIoU(result, trackedResults.first())
-                    Log.e("DetectionViewModel", "iou: $iou")
-
-                    if (Common.calculateIoU(result, trackedResults.first()) >= iouThreshold) {
-                        trackedResults.add(result)
-                        isTracked = true
-                        break
-                    }
-                }
-
-                // If the bounding box is not the same as the bounding box in the tracked detection results, add the bounding box into the tracked detection results
-                if (!isTracked) {
-                    trackedDetectionResults.add(mutableListOf(result))
-                }
-
-            }
-        }
-
-        // eliminate the bounding boxes that is less than detectNumberThreshold
-        val filteredDetectionResults = trackedDetectionResults.filter { it.size >= detectNumberThreshold }
-
-        Log.e("DetectionViewModel", "filteredDetectionResults: ${filteredDetectionResults.size}")
-        // calculate the average of the bounding box probability
-        val averagedDetectionResults = filteredDetectionResults.map { trackedResults ->
-            DetectionResult(
-                label = trackedResults.first().label,
-                confidence = trackedResults.map { it.confidence }.average(),
-                top = trackedResults.map { it.top }.average().toInt(),
-                left = trackedResults.map { it.left }.average().toInt(),
-                width = trackedResults.map { it.width }.average().toInt(),
-                height = trackedResults.map { it.height }.average().toInt()
-            )
-        }
-
-        viewModel.detectionResults = averagedDetectionResults.toTypedArray()
-    }
-
 
     override fun onEmptyDetect() {
         activity?.runOnUiThread {

@@ -8,8 +8,16 @@ import android.graphics.Bitmap
 import android.net.Uri
 import android.os.Build
 import android.provider.MediaStore
+import android.util.Log
+import android.view.View
 import android.view.inputmethod.InputMethodManager
+import android.widget.ImageView
+import androidx.annotation.DrawableRes
+import androidx.annotation.IdRes
 import androidx.core.content.ContextCompat
+import com.bumptech.glide.Glide
+import com.example.duriannet.R
+import com.example.duriannet.utils.Constant.SERVER_BASE_URL
 import java.io.FileNotFoundException
 
 object Common {
@@ -24,6 +32,13 @@ object Common {
     fun hideKeyboard(activity: Activity) {
         val imm = activity.getSystemService(Activity.INPUT_METHOD_SERVICE) as InputMethodManager
         imm.hideSoftInputFromWindow(activity.currentFocus?.windowToken, 0)
+    }
+
+    fun showKeyboard(activity: Activity, view: View) {
+        val imm = activity.getSystemService(Activity.INPUT_METHOD_SERVICE) as InputMethodManager
+
+        if (view.requestFocus())
+            imm.showSoftInput(view, InputMethodManager.SHOW_IMPLICIT)
     }
 
 
@@ -71,5 +86,18 @@ object Common {
         }
     }
 
+    fun loadServerImageIntoView(
+        context: Context,
+        uri: String?,
+        view: ImageView,
+        @DrawableRes defaultRes: Int = R.drawable.ic_launcher_background,
+    ) {
 
+        Log.e("Common", "loadServerImageIntoView: $SERVER_BASE_URL$uri")
+
+        Glide.with(context)
+            .load(SERVER_BASE_URL + uri)
+            .placeholder(defaultRes)
+            .into(view)
+    }
 }

@@ -19,7 +19,7 @@ class MarkerInfoWindowAdapter(private val context: Context) : GoogleMap.InfoWind
         val view = LayoutInflater.from(context).inflate(R.layout.item_marker_info, null)
         view.findViewById<TextView>(R.id.text_view_title).text = seller.name
         view.findViewById<TextView>(R.id.text_view_address).text = seller.description
-        view.findViewById<TextView>(R.id.text_view_rating).text = "Rating: %.2f".format(seller.rating)
+        view.findViewById<TextView>(R.id.text_view_rating).text = "Rating: %.2f".format(seller.avgRating)
         view.findViewById<TextView>(R.id.text_view_durian_types).text = seller.durianTypes.joinToString(", ")
 
         return view

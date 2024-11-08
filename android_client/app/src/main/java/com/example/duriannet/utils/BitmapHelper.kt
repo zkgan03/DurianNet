@@ -44,4 +44,12 @@ object BitmapHelper {
         val decodedString = android.util.Base64.decode(base64String, android.util.Base64.DEFAULT)
         return BitmapFactory.decodeByteArray(decodedString, 0, decodedString.size)
     }
+
+    fun encodeBase64Image(bitmap: Bitmap): String {
+        val byteArrayOutputStream = java.io.ByteArrayOutputStream()
+        bitmap.compress(Bitmap.CompressFormat.JPEG, 80, byteArrayOutputStream)
+        val byteArray = byteArrayOutputStream.toByteArray()
+        return android.util.Base64.encodeToString(byteArray, android.util.Base64.DEFAULT)
+    }
+
 }

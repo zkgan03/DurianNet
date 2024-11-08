@@ -20,7 +20,9 @@ import androidx.navigation.fragment.findNavController
 import com.example.duriannet.R
 import com.example.duriannet.databinding.FragmentAddSellerBinding
 import com.example.duriannet.models.DurianType
+import com.example.duriannet.models.Seller
 import com.example.duriannet.presentation.seller_locator.view_models.AddSellerViewModel
+import com.google.android.gms.maps.model.LatLng
 import com.google.android.material.chip.Chip
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -56,7 +58,7 @@ class AddSellerFragment : Fragment() {
         parentActivity.setSupportActionBar(binding.toolbar)
 
         parentActivity.supportActionBar?.apply {
-            title = "Add New Seller"
+            title = "Add a New Seller"
             setDisplayHomeAsUpEnabled(true)
         }
 
@@ -74,9 +76,13 @@ class AddSellerFragment : Fragment() {
                 override fun onMenuItemSelected(menuItem: MenuItem): Boolean {
                     return when (menuItem.itemId) {
                         R.id.action_done -> {
-                            Toast.makeText(requireContext(), "Done Clicked", Toast.LENGTH_SHORT).show()
-                            viewModel.addSeller()
-                            navController.navigate(R.id.action_addSellerFragment_to_manage_seller_nav_graph)
+
+                            viewModel.addSeller {
+                                requireActivity().runOnUiThread {
+                                    navController.navigate(R.id.action_addSellerFragment_to_manage_seller_nav_graph)
+                                }
+                            }
+
                             true
                         }
 

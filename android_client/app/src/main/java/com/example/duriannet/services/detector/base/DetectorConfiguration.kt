@@ -1,5 +1,6 @@
 package com.example.duriannet.services.detector.base
 
+import android.content.res.Resources
 import com.example.duriannet.services.detector.enum.DelegateEnum
 
 data class DetectorConfiguration(

@@ -218,6 +218,15 @@ class InstantGalleryFragment : BaseInstantDetectFragment() {
         }
     }
 
+    override fun onStop() {
+        super.onStop()
+        activity?.runOnUiThread {
+            if (_galleryBinding == null || !isAdded) return@runOnUiThread
+
+            galleryBinding.progress.visibility = View.VISIBLE
+        }
+    }
+
     companion object {
         private const val TAG = "GalleryFragment"
 

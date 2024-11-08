@@ -1,7 +1,9 @@
 package com.example.duriannet.di
 
-import com.example.duriannet.data.repository.seller_locator.ISellerLocator
-import com.example.duriannet.data.repository.seller_locator.SellerLocatorRepository
+import com.example.duriannet.data.repository.comment.CommentRepository
+import com.example.duriannet.data.repository.comment.ICommentRepository
+import com.example.duriannet.data.repository.seller.ISellerRepository
+import com.example.duriannet.data.repository.seller.SellerRepository
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
@@ -20,8 +22,13 @@ abstract class RepositoryModule {
 
     @Binds
     @Singleton
-    abstract fun bindSellerLocatorRepository(
-        impl: SellerLocatorRepository,
-    ): ISellerLocator
+    abstract fun bindSellerRepository(
+        impl: SellerRepository,
+    ): ISellerRepository
 
+    @Binds
+    @Singleton
+    abstract fun bindCommentRepository(
+        impl: CommentRepository,
+    ): ICommentRepository
 }

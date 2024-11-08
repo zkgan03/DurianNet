@@ -1,5 +1,4 @@
-﻿using DurianNet.Dtos;
-using DurianNet.Hubs.Dto;
+﻿using DurianNet.Hubs.Dto;
 using DurianNet.Services.DetectionService;
 using Microsoft.AspNetCore.SignalR;
 using System.Text.Json;
@@ -33,7 +32,7 @@ namespace DurianNet.Hubs
             await Clients.Caller.SendAsync("Initialized", "Initalization Completed");
         }
 
-        public async Task<DetectionResultDto[]> DetectImage(string requestId, byte[] image)
+        public async Task<DetectionResultDto[]> DetectImage(byte[] image)
         {
             Console.WriteLine("Got image from android");
             try

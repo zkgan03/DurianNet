@@ -9,14 +9,16 @@ data class Seller(
     val name: String,
     val description: String,
     val durianTypes: HashSet<DurianType>,
-    val image: Bitmap,
-    val rating: Float,
+    val imagePath: String,
+    val avgRating: Float,
     val latLng: LatLng,
+    val userId: String,
+    val username: String,
 ) : ClusterItem {
     override fun getPosition(): LatLng = latLng
     override fun getTitle(): String = name
     override fun getSnippet(): String = description
-    override fun getZIndex(): Float = rating
+    override fun getZIndex(): Float = avgRating
 }
 
 enum class DurianType {

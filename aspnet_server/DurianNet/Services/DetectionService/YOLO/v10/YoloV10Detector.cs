@@ -1,4 +1,4 @@
-﻿using DurianNet.Dtos;
+﻿using DurianNet.Hubs.Dto;
 using DurianNet.Services.DetectionService.YOLO.v10.Base;
 using DurianNet.Services.DetectionService.YOLO.v10.Data.Detection;
 using DurianNet.Services.DetectionService.YOLO.v10.Extensions;

@@ -13,5 +13,14 @@ namespace DurianNet.Models.DataModels
 
         public User User { get; set; }
         public Seller Seller { get; set; }
+
+        public override bool Equals(object obj)
+        {
+            if (obj is Comment otherComment)
+            {
+                return this.CommentId == otherComment.CommentId;
+            }
+            return false;
+        }
     }
 }

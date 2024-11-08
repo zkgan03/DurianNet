@@ -204,7 +204,10 @@ class DetectionHub(
 
         try {
             // synchronous call
-            val result = hubConnection.invoke(Array<DetectionResult>::class.java, "DetectImage", bytes).blockingGet()
+            val response = hubConnection.invoke(Array<DetectionResultDto>::class.java, "DetectImage", bytes).blockingGet()
+
+            val result = response.map { it.toDetectionResult() }.toTypedArray()
+
             return Triple(result, DETECT_IMG_SIZE, DETECT_IMG_SIZE)
 
         } catch (e: Exception) {

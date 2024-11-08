@@ -1,5 +1,4 @@
-﻿using DurianNet.Dtos;
-using DurianNet.Hubs.Dto;
+﻿using DurianNet.Hubs.Dto;
 
 namespace DurianNet.Services.DetectionService
 {

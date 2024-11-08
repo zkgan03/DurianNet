@@ -19,6 +19,7 @@ import androidx.core.view.MenuProvider
 import androidx.core.widget.doOnTextChanged
 import androidx.hilt.navigation.fragment.hiltNavGraphViewModels
 import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -30,6 +31,8 @@ import com.example.duriannet.presentation.seller_locator.view_models.ManageSelle
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.distinctUntilChangedBy
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.mapLatest
 import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
@@ -38,7 +41,6 @@ class ManageSellerFragment : Fragment() {
     private var _binding: FragmentManageSellerBinding? = null
     private val binding get() = _binding!!
 
-    private val addedSellersAdapter by lazy { AddedSellersAdapter() }
 
     private val navController by lazy { findNavController() }
 
@@ -59,12 +61,24 @@ class ManageSellerFragment : Fragment() {
         setupActionBar()
         setupSellerAddedRecyclerView()
         setupSearchView()
+        setupObservers()
     }
 
-    private fun setupSearchView() {
+    private fun setupObservers() {
+        viewModel.addedSellers
+            .flowWithLifecycle(viewLifecycleOwner.lifecycle, Lifecycle.State.STARTED)
+            .distinctUntilChangedBy { it }
+            .mapLatest { sellers ->
+                addedSellersAdapter.submitList(sellers)
+                adapterResult.submitList(sellers)
+            }
+            .launchIn(viewLifecycleOwner.lifecycleScope)
 
+    }
+
+    private val adapterResult by lazy { AddedSellersAdapter() }
+    private fun setupSearchView() {
         // TODO : setup to make the icon clickable, or reusing the same adapter
-        val adapterResult = AddedSellersAdapter()
         binding.recyclerResults.apply {
             layoutManager = LinearLayoutManager(context)
             adapter = adapterResult
@@ -126,6 +140,8 @@ class ManageSellerFragment : Fragment() {
         }
     }
 
+
+    private val addedSellersAdapter by lazy { AddedSellersAdapter() }
     private fun setupSellerAddedRecyclerView() {
 
         addedSellersAdapter.setOnEditClickedListener { seller: Seller ->
@@ -134,12 +150,13 @@ class ManageSellerFragment : Fragment() {
         }
 
         addedSellersAdapter.setOnDeleteClickedListener { seller: Seller ->
+            viewModel.selectSeller(seller)
             val builder = AlertDialog.Builder(requireContext())
             builder.setMessage("Are you confirm to delete ${seller.name}?")
                 .setCancelable(false)
                 .setPositiveButton("Delete") { dialog, id ->
 
-                    viewModel.removeSeller(seller)
+                    viewModel.removeSeller()
 
                     // Delete the seller
                     Toast.makeText(requireContext(), "Seller ${seller.sellerId} deleted", Toast.LENGTH_SHORT).show()
@@ -147,6 +164,8 @@ class ManageSellerFragment : Fragment() {
                 }
                 .setNegativeButton("Cancel") { dialog, id ->
                     dialog.dismiss()
+
+                    viewModel.unselectSeller()
                 }
 
             val alert = builder.create()
@@ -167,17 +186,6 @@ class ManageSellerFragment : Fragment() {
             layoutManager = LinearLayoutManager(context)
             adapter = addedSellersAdapter
         }
-
-        // TODO: Replace with actual data, get from view model
-        lifecycleScope.launch {
-            viewModel
-                .addedSellers
-                .distinctUntilChangedBy { it }
-                .collectLatest { sellers ->
-                    addedSellersAdapter.submitList(sellers)
-                }
-        }
-
     }
 
     override fun onDestroyView() {

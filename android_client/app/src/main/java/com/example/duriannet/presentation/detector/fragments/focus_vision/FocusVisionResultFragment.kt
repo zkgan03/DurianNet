@@ -3,25 +3,16 @@ package com.example.duriannet.presentation.detector.fragments.focus_vision
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
-import android.view.Menu
-import android.view.MenuInflater
-import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.view.MenuProvider
-import androidx.hilt.navigation.fragment.hiltNavGraphViewModels
-import androidx.lifecycle.Lifecycle
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.navGraphViewModels
 import com.example.duriannet.R
 import com.example.duriannet.databinding.FragmentFocusVisionResultBinding
 import com.example.duriannet.presentation.detector.view_models.FocusVisionViewModel
 import com.example.duriannet.utils.Common
-import com.example.duriannet.utils.Event
-import com.example.duriannet.utils.EventBus
-
 
 class FocusVisionResultFragment : Fragment() {
 

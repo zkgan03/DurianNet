@@ -57,6 +57,7 @@ class GalleryItemAdapter : ListAdapter<MediaStoreData, GalleryItemAdapter.NewGal
 
                 // we need to get the bitmap here because the image is lazy loaded
                 override fun onResourceReady(resource: Bitmap, transition: Transition<in Bitmap>?) {
+
                     holder.imageView.setImageBitmap(resource)
 
                     val cachedColor = colorCache[mediaItem.uri.toString()] // Check if the color is cached

@@ -5,7 +5,7 @@ namespace DurianNet.Models.DataModels
 {
     public class User : IdentityUser
     {
-
-        public ICollection<DurianProfile> favoriteDurian { get; set; }
+        public string ProfilePicture { get; set; }
+        public ICollection<DurianProfile> FavoriteDurian { get; set; }
     }
 }

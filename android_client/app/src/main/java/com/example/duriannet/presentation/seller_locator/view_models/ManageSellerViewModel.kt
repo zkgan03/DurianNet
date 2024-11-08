@@ -1,15 +1,18 @@
 package com.example.duriannet.presentation.seller_locator.view_models
 
 import android.graphics.Bitmap
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.duriannet.data.repository.seller_locator.ISellerLocator
+import com.example.duriannet.data.repository.seller.ISellerRepository
 import com.example.duriannet.models.DurianType
 import com.example.duriannet.models.Seller
+import com.example.duriannet.presentation.seller_locator.state.SellerInputState
 import com.example.duriannet.utils.Event
 import com.example.duriannet.utils.EventBus
 import com.google.android.gms.maps.model.LatLng
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
@@ -18,7 +21,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class ManageSellerViewModel @Inject constructor(
-    private val sellerLocatorRepository: ISellerLocator,
+    private val sellerRepository: ISellerRepository,
 ) : ViewModel() {
 
     private val _addedSellers: MutableStateFlow<List<Seller>> = MutableStateFlow(emptyList())
@@ -31,19 +34,21 @@ class ManageSellerViewModel @Inject constructor(
 
 
     init {
+        getSellersAddedByUser()
+    }
 
+    private fun getSellersAddedByUser() {
         viewModelScope.launch {
-            val request = sellerLocatorRepository.getAllSellers()
-            if (request.isSuccess) {
-                //get only first 5 sellers for testing purposes
-                // TODO : update with actual data
-                _addedSellers.update { request.getOrNull()!!.take(5) }
+            // TODO : Replace with actual user id
+            val request = sellerRepository.getSellersAddedByUser("1")
 
+            if (request.isSuccess) {
+                Log.e("ManageSellerViewModel", "Sellers fetched successfully : ${request.getOrNull()}")
+                _addedSellers.update { request.getOrNull() ?: emptyList() }
             } else {
                 EventBus.sendEvent(Event.Toast("Failed to fetch sellers"))
             }
         }
-
     }
 
     fun filterAddedSeller(q: String): List<Seller> {
@@ -51,30 +56,73 @@ class ManageSellerViewModel @Inject constructor(
     }
 
 
-    fun removeSeller(seller: Seller) {
-        _addedSellers.update { it - seller }
-        //TODO: Remove seller from database, notify server
+    fun removeSeller() {
+        viewModelScope.launch(Dispatchers.IO) {
 
+            if (_selectedSeller.value == null) {
+                EventBus.sendEvent(Event.Toast("No seller selected to be deleted"))
+                return@launch
+            }
 
+            Log.e("ManageSellerViewModel", "Deleting seller : ${_selectedSeller.value}")
+
+            val request = sellerRepository.deleteSeller(_selectedSeller.value!!.sellerId)
+
+            if (request.isSuccess) {
+                EventBus.sendEvent(Event.Toast("Seller deleted successfully"))
+            } else {
+                EventBus.sendEvent(Event.Toast("Failed to delete seller"))
+            }
+
+            // fetch all sellers again
+            getSellersAddedByUser()
+            _selectedSeller.update { null }
+        }
     }
 
     fun selectSeller(seller: Seller) {
         _selectedSeller.update { seller }
     }
 
-    fun updateSeller() {
-        // update in added sellers list
-        _addedSellers.update {
-            it.map { seller ->
-                if (seller.sellerId == _selectedSeller.value?.sellerId) {
-                    _selectedSeller.value!!
-                } else {
-                    seller
+    fun unselectSeller() {
+        _selectedSeller.update { null }
+    }
+
+    fun updateSeller(onSuccess: () -> Unit) {
+
+        viewModelScope.launch(Dispatchers.IO) {
+            if (_selectedSeller.value == null) {
+                EventBus.sendEvent(Event.Toast("No seller selected to be updated"))
+                return@launch
+            }
+
+            _selectedSeller.value!!.apply {
+                if (name.isEmpty() || description.isEmpty() || durianTypes.isEmpty()) {
+                    EventBus.sendEvent(Event.Toast("Please fill in all fields"))
+                    return@launch
                 }
             }
-        }
 
-        // TODO : update in server side
+            Log.e("ManageSellerViewModel", "Updating seller : ${_selectedSeller.value}")
+
+            val request = sellerRepository.updateSeller(
+                _selectedSeller.value!!.sellerId,
+                _selectedSeller.value!!.name,
+                _selectedSeller.value!!.description,
+                _selectedSeller.value!!.durianTypes.toList()
+            )
+
+            if (request.isSuccess) {
+                EventBus.sendEvent(Event.Toast("Seller updated successfully"))
+                onSuccess()
+            } else {
+                EventBus.sendEvent(Event.Toast("Failed to update seller"))
+            }
+
+            // fetch all sellers again
+            getSellersAddedByUser()
+            _selectedSeller.update { null }
+        }
     }
 
 
@@ -91,54 +139,4 @@ class ManageSellerViewModel @Inject constructor(
     }
 
 
-    fun getDummySellers(): List<Seller> {
-        val dummyImage: Bitmap = Bitmap.createBitmap(1, 1, Bitmap.Config.ARGB_8888) // Placeholder image
-        return listOf(
-            Seller(
-                sellerId = 1,
-                name = "Seller 1",
-                description = "Description 1",
-                durianTypes = hashSetOf(DurianType.MusangKing),
-                image = dummyImage,
-                rating = 4.5f,
-                latLng = LatLng(1.0, 1.0)
-            ),
-            Seller(
-                sellerId = 2,
-                name = "Seller 2",
-                description = "Description 2",
-                durianTypes = hashSetOf(DurianType.D24),
-                image = dummyImage,
-                rating = 4.0f,
-                latLng = LatLng(2.0, 2.0)
-            ),
-            Seller(
-                sellerId = 3,
-                name = "Seller 3",
-                description = "Description 3",
-                durianTypes = hashSetOf(DurianType.RedPrawn),
-                image = dummyImage,
-                rating = 3.5f,
-                latLng = LatLng(3.0, 3.0)
-            ),
-            Seller(
-                sellerId = 4,
-                name = "Seller 4",
-                description = "Description 4",
-                durianTypes = hashSetOf(DurianType.BlackThorn),
-                image = dummyImage,
-                rating = 4.8f,
-                latLng = LatLng(4.0, 4.0)
-            ),
-            Seller(
-                sellerId = 5,
-                name = "Seller 5",
-                description = "Description 5",
-                durianTypes = hashSetOf(DurianType.MusangKing, DurianType.D24),
-                image = dummyImage,
-                rating = 4.2f,
-                latLng = LatLng(5.0, 5.0)
-            )
-        )
-    }
 }

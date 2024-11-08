@@ -1,7 +1,8 @@
 package com.example.duriannet.di
 
+import com.example.duriannet.data.remote.api.CommentApi
 import com.example.duriannet.utils.Constant.SERVER_BASE_URL
-import com.example.duriannet.data.remote.SellerLocatorApi
+import com.example.duriannet.data.remote.api.SellerApi
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -16,14 +17,23 @@ object AppModule {
 
     @Provides
     @Singleton
-    fun provideSellerLocatorApi(): SellerLocatorApi {
+    fun provideSellerApi(): SellerApi {
         return Retrofit.Builder()
-            .baseUrl(SERVER_BASE_URL + "api/SellerLocator/")
+            .baseUrl(SERVER_BASE_URL + "api/Seller/")
             .addConverterFactory(GsonConverterFactory.create())
             .build()
-            .create(SellerLocatorApi::class.java)
+            .create(SellerApi::class.java)
     }
 
+    @Provides
+    @Singleton
+    fun provideCommentApi(): CommentApi {
+        return Retrofit.Builder()
+            .baseUrl(SERVER_BASE_URL + "api/Comment/")
+            .addConverterFactory(GsonConverterFactory.create())
+            .build()
+            .create(CommentApi::class.java)
+    }
 
 
     /*

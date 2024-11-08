@@ -22,6 +22,7 @@ import com.example.duriannet.R
 import com.example.duriannet.databinding.FragmentEditSellerBinding
 import com.example.duriannet.models.DurianType
 import com.example.duriannet.presentation.seller_locator.view_models.ManageSellerViewModel
+import com.example.duriannet.utils.Common
 import com.google.android.material.chip.Chip
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collectLatest
@@ -54,16 +55,8 @@ class EditSellerFragment : Fragment() {
     }
 
     private fun setupObservers() {
-        viewLifecycleOwner.lifecycleScope.launch {
-            repeatOnLifecycle(Lifecycle.State.STARTED) {
-                viewModel.selectedSellerState
-                    .collectLatest { seller ->
-                        seller?.let {
 
-                        }
-                    }
-            }
-        }
+
     }
 
     private fun setupActionBar() {
@@ -91,9 +84,11 @@ class EditSellerFragment : Fragment() {
                 override fun onMenuItemSelected(menuItem: MenuItem): Boolean {
                     return when (menuItem.itemId) {
                         R.id.action_done -> {
-                            Toast.makeText(requireContext(), "Done Clicked", Toast.LENGTH_SHORT).show()
-                            viewModel.updateSeller()
-                            navController.navigateUp()
+                            viewModel.updateSeller {
+                                requireActivity().runOnUiThread {
+                                    navController.navigateUp()
+                                }
+                            }
                             true
                         }
 
@@ -108,7 +103,9 @@ class EditSellerFragment : Fragment() {
     }
 
     private fun setupUI() {
-        binding.imageViewDetectedImage.setImageBitmap(viewModel.selectedSellerState.value?.image)
+
+        val sellerImage = viewModel.selectedSellerState.value?.imagePath
+        Common.loadServerImageIntoView(requireContext(), sellerImage, binding.imageViewDetectedImage)
 
         binding.chipGroupDurianTypes.removeAllViews()
         binding.chipGroupDurianTypes.apply {

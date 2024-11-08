@@ -138,9 +138,9 @@ class YoloDetector(
     override fun stop() {
         currentStatus = DetectorStatusEnum.STOPPING
         detectorListener?.onStopped()
+        interpreter = null
 //        interpreter?.setCancelled(true)
 //        interpreter?.close()
-        interpreter = null
         currentStatus = DetectorStatusEnum.STOPPED
 
     }
@@ -188,6 +188,7 @@ class YoloDetector(
 
         if (detectionResults.isEmpty()) {
             detectorListener?.onEmptyDetect()
+            return
         }
 
         detectorListener?.onDetect(

@@ -6,6 +6,7 @@ import android.util.Log
 import android.view.View
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.navGraphViewModels
 import com.example.duriannet.R
@@ -30,7 +31,7 @@ abstract class BaseFocusVisionFragment : Fragment(), IDetectorListener {
     private val detectionResultBundle: MutableList<Array<DetectionResult>> = mutableListOf()
     private val numberOfDetection: Int = 20
 
-    protected val detectorViewModel: DetectorViewModel by navGraphViewModels(R.id.detector_nav_graph)
+    protected val detectorViewModel: DetectorViewModel by viewModels()
 
     private var finalResults: Array<DetectionResult> = emptyArray()
 
@@ -38,20 +39,13 @@ abstract class BaseFocusVisionFragment : Fragment(), IDetectorListener {
         return detectionResultBundle.size.toFloat() / numberOfDetection.toFloat()
     }
 
-
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
         detectorViewModel.apply {
             // set default values
             setConfidenceThreshold(resources.getString(R.string.default_confidence_threshold).toFloat())
             setIouThreshold(resources.getString(R.string.default_iou_threshold).toFloat())
             setMaxNumberDetection(resources.getString(R.string.default_max_number_detection).toInt())
-            startDetector(
-                false,
-                this@BaseFocusVisionFragment,
-                requireContext()
-            )
         }
     }
 
@@ -176,11 +170,7 @@ abstract class BaseFocusVisionFragment : Fragment(), IDetectorListener {
 
         finalResults = averagedDetectionResults.toTypedArray()
 
-        val detectionSize = if (detectorViewModel.detector is DetectionHub) {
-            Pair(DetectionHub.DETECT_IMG_SIZE, DetectionHub.DETECT_IMG_SIZE)
-        } else {
-            Pair(YoloDetector.DETECT_IMG_SIZE, YoloDetector.DETECT_IMG_SIZE)
-        }
+        val detectionSize = detectorViewModel.getDetectionSize()
 
         val imageResult =
             inputImg.drawResults(finalResults, detectionSize, borderColor = ContextCompat.getColor(requireContext(), R.color.accent_dark_green))

@@ -13,11 +13,12 @@ import android.view.ViewGroup
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.ContextCompat
+import androidx.core.widget.doOnTextChanged
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
-import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.NavController
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -25,8 +26,10 @@ import com.example.duriannet.R
 import com.example.duriannet.databinding.BottomSheetSellerBinding
 import com.example.duriannet.databinding.FragmentMapBinding
 import com.example.duriannet.databinding.ItemUserCommentedBinding
+import com.example.duriannet.databinding.ItemUserNotCommentedBinding
 import com.example.duriannet.utils.BitmapHelper
 import com.example.duriannet.models.Seller
+import com.example.duriannet.models.Comment
 import com.example.duriannet.presentation.seller_locator.adapter.MarkerInfoWindowAdapter
 import com.example.duriannet.presentation.seller_locator.adapter.SearchResultsAdapter
 import com.example.duriannet.presentation.seller_locator.adapter.SellerCommentsAdapter
@@ -42,8 +45,11 @@ import com.google.android.material.chip.Chip
 import com.google.maps.android.ktx.awaitMap
 import com.google.maps.android.ktx.awaitMapLoad
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.distinctUntilChangedBy
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.mapLatest
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 
 
@@ -120,29 +126,29 @@ class MapFragment : Fragment() {
     }
 
     private val adapter by lazy { SearchResultsAdapter() }
-    private lateinit var searchFragment: SearchFragment
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
         locationAccessChecker = LocationAccessChecker(requireActivity())
 
-        searchFragment = binding.searchFragmentContainer.getFragment() as SearchFragment
-        //invoke only searchFragment in onViewCreated
-        searchFragment.setOnViewCreatedListener {
-            // init search view
-            onSearchFragmentViewCreated()
-        }
-
         //
         //observe the states
+        setupUI()
         setupStateObservers()
-
         initMap()
-
-        // FABs setup
-        setupFAB()
+        setupBottomSheetDialog()
 
     }
+
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
+        bottomSheetDialog = null
+        bottomSheetBinding = null
+    }
+
 
     override fun onResume() {
         super.onResume()
@@ -154,39 +160,86 @@ class MapFragment : Fragment() {
             requestAllPermissionLauncher.launch(PERMISSIONS_REQUIRED)
         } else {
 
-            lifecycleScope.launch {
-                // observe GPS status after resumed (to get permission on location)
-                locationAccessChecker.observeGpsStatus().collectLatest { isGpsEnabled ->
+            // observe GPS status after resumed (to get permission on location)
+            locationAccessChecker.observeGpsStatus()
+                .flowWithLifecycle(viewLifecycleOwner.lifecycle, Lifecycle.State.STARTED)
+                .distinctUntilChanged()
+                .onEach { isGpsEnabled ->
                     if (!isGpsEnabled) {
                         requestLocationAccess()
                     } else {
                         isGpsSettingOpened = false
                     }
                 }
+                .launchIn(viewLifecycleOwner.lifecycleScope)
 
-            }
+
         }
     }
 
 
-    private fun onSearchFragmentViewCreated() {
-        searchFragment.apply {
-            setSearchViewAdapter(adapter)
+    private fun setupStateObservers() {
 
-            setSearchViewLayoutManager(LinearLayoutManager(requireContext()))
-
-            setSearchHint("Search for a seller") // set search hint
-
-            setOnSearchViewInputListener { input ->
-                viewModel.updateQueryAndSearch(input)
+        // collect search results
+        viewModel.searchResults
+            .flowWithLifecycle(viewLifecycleOwner.lifecycle, Lifecycle.State.STARTED)
+            .distinctUntilChangedBy { it }
+            .mapLatest { searchResults ->
+                Log.e(TAG, "collect search results: $searchResults")
+                adapter.submitList(searchResults)
             }
+            .launchIn(viewLifecycleOwner.lifecycleScope)
 
-            setOnSearchViewActionListener { query ->
-                //            viewModel.updateQueryAndSearch(query)
+        // collect query
+        viewModel.query
+            .flowWithLifecycle(viewLifecycleOwner.lifecycle, Lifecycle.State.STARTED)
+            .distinctUntilChangedBy { it }
+            .mapLatest { query ->
+                Log.e(TAG, "collect query: $query")
+                binding.searchBar.setText(query)
             }
-        }
+            .launchIn(viewLifecycleOwner.lifecycleScope)
 
-        //
+
+        // collect sellers
+        viewModel.sellers
+            .flowWithLifecycle(viewLifecycleOwner.lifecycle, Lifecycle.State.STARTED)
+            .distinctUntilChangedBy { it }
+            .mapLatest { sellers ->
+                adapter.submitList(
+                    sellers
+                )
+            }
+            .launchIn(viewLifecycleOwner.lifecycleScope)
+
+        viewModel.userComment
+            .flowWithLifecycle(viewLifecycleOwner.lifecycle, Lifecycle.State.STARTED)
+            .mapLatest { userComment ->
+                bottomSheetBinding?.userCommentSection?.removeAllViews()
+
+                Log.e(TAG, "userComment: $userComment")
+
+                if (userComment != null) {
+
+                    Log.e(TAG, "Has user comment")
+                    // show user comment in bottom sheet dialog
+                    createUserCommentedView(userComment)
+
+
+                } else {
+
+                    Log.e(TAG, "No user comment")
+
+                    // show user comment in bottom sheet dialog
+                    createUserNotCommentedView()
+
+                }
+            }
+            .launchIn(viewLifecycleOwner.lifecycleScope)
+    }
+
+    private fun setupUI() {
+
         // SearchView setup
         // search results adapter
         adapter.setOnItemClickedListener { seller ->
@@ -194,96 +247,66 @@ class MapFragment : Fragment() {
             Toast.makeText(requireContext(), "Item clicked: ${seller.name}", Toast.LENGTH_SHORT).show()
 
             viewModel.updateQuery(seller.name) // update query value
-            searchFragment.hideSearchView() // hide search view
+            binding.searchView.hide() // hide search view
             googleMapManager.moveToLocation(seller.latLng) // move to location
             googleMapManager.onSelect(seller) // select place
         }
-    }
 
-    private fun setupStateObservers() {
-        viewLifecycleOwner.lifecycleScope.launch {
-            repeatOnLifecycle(Lifecycle.State.STARTED) {
-
-                launch {
-                    // collect search results
-                    viewModel.searchResults
-                        .distinctUntilChangedBy { it }
-                        .collectLatest { searchResults ->
-                            Log.e(TAG, "collect search results: $searchResults")
-                            adapter.submitList(searchResults)
-                        }
-                }
-
-                launch {
-                    // collect query
-                    viewModel.query
-                        .distinctUntilChangedBy { it }
-                        .collectLatest { query ->
-                            Log.e(TAG, "collect query: $query")
-                            searchFragment.setSearchBarText(query)
-                        }
-                }
-
-                launch {
-                    // collect sellers
-                    viewModel.sellers
-                        .distinctUntilChangedBy { it }
-                        .collectLatest { sellers ->
-                            adapter.submitList(
-                                sellers
-                            )
-                        }
-                }
-
-
-            }
-        }
-    }
-
-    private fun setupFAB() {
         binding.apply {
+            recyclerResults.adapter = adapter
+            recyclerResults.layoutManager = LinearLayoutManager(requireContext())
+
+            searchBar.hint = "Search for a seller"
+            searchView.hint = "Search for a seller"
+
+            searchView.editText.doOnTextChanged { text, start, before, count ->
+                searchBar.setText(text.toString())
+                viewModel.updateQueryAndSearch(text.toString())
+            }
+
+            searchView.editText.setOnEditorActionListener { textView, i, keyEvent ->
+                val query = textView.text.toString()
+
+                Common.hideKeyboard(requireActivity()) // hide keyboard
+
+                return@setOnEditorActionListener true
+            }
+
             fabAddSeller.setOnClickListener {
-                // TODO : Navigate to Add Seller fragment
                 navController.navigate(R.id.action_mapFragment_to_add_seller_nav_graph)
             }
 
             fabManageSellers.setOnClickListener {
-                // TODO : Navigate to Manage Sellers fragment
                 navController.navigate(R.id.action_mapFragment_to_manage_seller_nav_graph)
             }
-        }
-    }
 
-    override fun onDestroyView() {
-        super.onDestroyView()
-        _binding = null
-        bottomSheetDialog = null
-        bottomSheetBinding = null
+        }
+
     }
 
 
     /**
      *
      * Map setup
+     *
      * */
-
-    // Create a custom icon for the marker
-    private val icon: BitmapDescriptor by lazy {
-        val color = ContextCompat.getColor(
-            requireContext(),
-            R.color.accent_dark_green
-        )
-
-        BitmapHelper.vectorToBitmapDescriptor(
-            requireContext(),
-            R.drawable.ic_durian_24,
-            color // color of the icon
-        )
-    }
-
-
-    // Initialize the map
+// Initialize the map
     private fun initMap() {
+
+        // Create a custom icon for the marker
+        val icon: BitmapDescriptor by lazy {
+            val color = ContextCompat.getColor(
+                requireContext(),
+                R.color.accent_dark_green
+            )
+
+            BitmapHelper.vectorToBitmapDescriptor(
+                requireContext(),
+                R.drawable.ic_durian_24,
+                color // color of the icon
+            )
+        }
+
         val mapFragment = binding.mapFragment.getFragment() as SupportMapFragment
 
         viewLifecycleOwner.lifecycleScope.launch {
@@ -294,23 +317,25 @@ class MapFragment : Fragment() {
 
             googleMapManager = GoogleMapManager(requireContext(), googleMap)
 
-            launch {
-                viewModel.sellers
-                    .distinctUntilChangedBy { it }
-                    .collectLatest { places ->
-                        googleMapManager.initClusteredMarkers(
-                            places,
-                            icon,
-                            MarkerInfoWindowAdapter(requireContext())
-                        )
-                    }
-            }
+            viewModel.sellers
+                .flowWithLifecycle(viewLifecycleOwner.lifecycle, Lifecycle.State.STARTED)
+                .distinctUntilChangedBy { it }
+                .mapLatest { places ->
+                    googleMapManager.initClusteredMarkers(
+                        places,
+                        icon,
+                        MarkerInfoWindowAdapter(requireContext())
+                    )
+                }
+                .launchIn(viewLifecycleOwner.lifecycleScope)
+
 
             // Handle place / item on map selected
             googleMapManager.setOnMarkerSelectedListener { seller ->
 //                val userComment = viewModel.getUserComment(seller)
 //                val allComments = viewModel.getAllComments(seller)
-                openBottomSheetDialog(seller)
+                viewModel.selectSeller(seller.sellerId)
+                openBottomSheetDialog()
             }
 
             // move to user location
@@ -337,15 +362,10 @@ class MapFragment : Fragment() {
 
     private var bottomSheetDialog: BottomSheetDialog? = null
     private var bottomSheetBinding: BottomSheetSellerBinding? = null
-    private val userCommentAdapter by lazy { SellerCommentsAdapter() }
+    private val userCommentAdapter by lazy { SellerCommentsAdapter(requireContext()) }
 
     @SuppressLint("SetTextI18n")
-    private fun openBottomSheetDialog(seller: Seller) {
-
-        if (bottomSheetDialog == null) setupBottomSheetDialog()
-
-        updateBottomSheetDialogContent(seller)
-
+    private fun openBottomSheetDialog() {
         bottomSheetDialog?.show()
     }
 
@@ -354,17 +374,14 @@ class MapFragment : Fragment() {
 
         Log.e(TAG, "seller: $seller")
 
-        viewModel.getSellerComments(seller.sellerId) // get seller comments
-
         bottomSheetBinding!!.apply {
 
-            imageViewSeller.setImageBitmap(seller.image) // set seller image
+            Common.loadServerImageIntoView(requireContext(), seller.imagePath, imageViewSeller)
 
             textViewSellerName.text = seller.name // set seller name
 
             // setup chip group
-//            chipGroupDurianTypes.removeAllViews() // clear all chips (since there is some chips already added previously)
-
+            chipGroupDurianTypes.removeAllViews()
             seller.durianTypes.forEach { durianType ->
                 val chip = layoutInflater.inflate(R.layout.chip_durian_type, chipGroupDurianTypes, false) as Chip
                 chip.text = durianType.name
@@ -375,9 +392,9 @@ class MapFragment : Fragment() {
 
             textViewDescriptions.text = seller.description // set seller description
 
-            ratingBarOverallRating.rating = seller.rating // set seller rating
+            ratingBarOverallRating.rating = seller.avgRating // set seller rating
 
-            textOverallRating.text = "(%.2f)".format(seller.rating) // set seller rating
+            textOverallRating.text = "(%.2f)".format(seller.avgRating) // set seller rating
 
             // open google map when clicked
             btnSeeInGoogleMap.setOnClickListener {
@@ -389,32 +406,6 @@ class MapFragment : Fragment() {
                     seller.name
                 )
             }
-
-            // get user comment by seller
-
-//                textUserAddedCommentTitle.visibility = if (item.userComment.isEmpty()) View.VISIBLE else View.GONE
-//                textUserNotAddedCommentTitle.visibility = if (item.userComment.isEmpty()) View.VISIBLE else View.GONE
-
-            // user comment section (check user is added comment or not, then show different view)
-            textUserAddedCommentTitle.visibility = View.GONE
-            textUserNotAddedCommentTitle.visibility = View.VISIBLE
-
-            val userCommentViewBinding = ItemUserCommentedBinding.inflate(
-                layoutInflater,
-                userCommentSection,
-                false
-            )
-
-            userCommentViewBinding.apply {
-                this.iconEdit.visibility = View.VISIBLE
-                this.iconDelete.visibility = View.VISIBLE
-                this.textComment.text = "This is a user comment"
-                this.ratingUser.rating = 4.5f
-                this.textUsername.text = "John Doe"
-                this.imageUser.setImageBitmap(seller.image)
-            }
-
-            userCommentSection.addView(userCommentViewBinding.root)
         }
     }
 
@@ -437,42 +428,143 @@ class MapFragment : Fragment() {
 
         Log.e(TAG, "setupBottomSheetDialog")
         // observe the states
-        viewLifecycleOwner.lifecycleScope.launch {
-            repeatOnLifecycle(Lifecycle.State.STARTED) {
 
-                launch {
-                    // show or hide progress indicator
-                    viewModel.bottomSheetProgress
-                        .distinctUntilChangedBy { it }
-                        .collectLatest { progressing ->
-                            Log.e(TAG, "progressing: $progressing")
-                            if (progressing)
-                                bottomSheetBinding!!.apply {
-                                    bottomSheetProgressIndicator.visibility = View.VISIBLE
-                                    contentContainer.visibility = View.GONE
-                                }
-                            else
-                                bottomSheetBinding!!.apply {
-                                    bottomSheetProgressIndicator.visibility = View.GONE
-                                    contentContainer.visibility = View.VISIBLE
-                                }
-                        }
-                }
+        // show or hide progress indicator
+        viewModel.bottomSheetProgress
+            .flowWithLifecycle(viewLifecycleOwner.lifecycle, Lifecycle.State.STARTED)
+            .distinctUntilChangedBy { it }
+            .mapLatest { progressing ->
+                Log.e(TAG, "progressing: $progressing")
+                if (progressing)
+                    bottomSheetBinding!!.apply {
+                        bottomSheetProgressIndicator.visibility = View.VISIBLE
+                        contentContainer.visibility = View.GONE
+                    }
+                else
+                    bottomSheetBinding!!.apply {
+                        bottomSheetProgressIndicator.visibility = View.GONE
+                        contentContainer.visibility = View.VISIBLE
+                    }
+            }
+            .launchIn(viewLifecycleOwner.lifecycleScope)
 
-                launch {
-                    Log.e(TAG, "observe comments")
-                    // set the recyclerView adapter
-                    viewModel.sellerComments
-                        .distinctUntilChangedBy { it }
-                        .collectLatest { comments ->
-                            userCommentAdapter.submitList(comments)
-                            bottomSheetBinding!!.textAllCommentsTitle.text = "Comments (${comments.size})"
+        Log.e(TAG, "observe comments")
+        // set the recyclerView adapter
+        viewModel.sellerComments
+            .flowWithLifecycle(viewLifecycleOwner.lifecycle, Lifecycle.State.STARTED)
+            .distinctUntilChangedBy { it }
+            .mapLatest { comments ->
+                userCommentAdapter.submitList(comments)
+                bottomSheetBinding!!.textAllCommentsTitle.text = "Comments (${comments.size})"
+            }
+            .launchIn(viewLifecycleOwner.lifecycleScope)
 
-                        }
+
+        viewModel.selectedSeller
+            .flowWithLifecycle(viewLifecycleOwner.lifecycle, Lifecycle.State.STARTED)
+            .onEach { seller ->
+                if (seller == null) return@onEach
+                updateBottomSheetDialogContent(seller)
+            }
+            .launchIn(viewLifecycleOwner.lifecycleScope)
+
+    }
+
+    private fun createUserNotCommentedView() {
+        bottomSheetBinding?.apply {
+            // clear user comment section
+            userCommentSection.removeAllViews()
+
+            // user comment section (check user is added comment or not, then show different view)
+            textUserCommentTitle.text = "Add Your Comment"
+
+            val userCommentViewBinding = ItemUserNotCommentedBinding.inflate(
+                layoutInflater,
+                userCommentSection,
+                false
+            )
+
+            userCommentViewBinding.apply {
+                // TODO : Change to current user image
+                Common.loadServerImageIntoView(
+                    requireContext(),
+                    "",
+                    imageUser
+                )
+
+
+                this.commentSection.setOnClickListener {
+
+                    bottomSheetDialog?.dismiss()
+
+                    showAddCommentFragment()
+
+//                    if (navController.currentDestination?.id == R.id.mapFragment)
+//                        navController.navigate(R.id.action_mapFragment_to_addCommentFragment)
                 }
             }
-        }
 
+
+            userCommentSection.addView(userCommentViewBinding.root)
+        }
+    }
+
+    private fun createUserCommentedView(userComment: Comment) {
+        bottomSheetBinding?.apply {
+
+            // clear user comment section
+            userCommentSection.removeAllViews()
+
+            // user comment section (check user is added comment or not, then show different view)
+            textUserCommentTitle.text = "Your Comment"
+
+            val userCommentViewBinding = ItemUserCommentedBinding.inflate(
+                layoutInflater,
+                userCommentSection,
+                false
+            )
+
+            userCommentViewBinding.apply {
+                this.textComment.text = userComment.content
+                this.ratingUser.rating = userComment.rating
+                this.textUsername.text = userComment.username
+
+                // TODO : Change to current user image
+                Common.loadServerImageIntoView(
+                    requireContext(),
+                    userComment.userImage,
+                    imageUser
+                )
+            }
+
+            userCommentSection.addView(userCommentViewBinding.root)
+        }
+    }
+
+
+    /**
+     *
+     * Add Comment Fragment
+     *
+     * */
+    private val addCommentFragment = AddCommentFragment()
+    private fun showAddCommentFragment() {
+        // Check if the fragment is already added
+        if (childFragmentManager.findFragmentById(binding.addCommentFragmnet.id) == null) {
+            childFragmentManager.beginTransaction()
+                .add(binding.addCommentFragmnet.id, addCommentFragment)
+                .addToBackStack(null) // Adds fragment to the back stack
+                .commit()
+
+            addCommentFragment.setOnBackClickListener {
+                openBottomSheetDialog()
+            }
+
+            addCommentFragment.setOnDoneClickListener { comment, rating ->
+                viewModel.addComment(comment, rating)
+                openBottomSheetDialog()
+            }
+        }
     }
 
 

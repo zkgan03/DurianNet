@@ -10,7 +10,10 @@ import com.example.duriannet.services.detector.YoloDetector
 import com.example.duriannet.services.detector.base.DetectorConfiguration
 import com.example.duriannet.services.detector.enum.DetectorStatusEnum
 import com.example.duriannet.services.detector.interfaces.IDetectorListener
+import com.example.duriannet.utils.Event
+import com.example.duriannet.utils.EventBus
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
@@ -21,8 +24,19 @@ class DetectorViewModel : ViewModel() {
         get() = _detector
 
     private var _isServerDetection = false
+    private var _isFirstInit = true
+    val isFirstInit: Boolean
+        get() = _isFirstInit
 
     private val detectorConfiguration: DetectorConfiguration = DetectorConfiguration()
+
+    fun getDetectionSize(): Pair<Int, Int> {
+        return if (_detector is DetectionHub) {
+            Pair(DetectionHub.DETECT_IMG_SIZE, DetectionHub.DETECT_IMG_SIZE)
+        } else {
+            Pair(YoloDetector.DETECT_IMG_SIZE, YoloDetector.DETECT_IMG_SIZE)
+        }
+    }
 
     fun updateListener(detectorListener: IDetectorListener) {
         _detector?.updateListener(detectorListener)
@@ -63,37 +77,44 @@ class DetectorViewModel : ViewModel() {
         detectorListener: IDetectorListener,
         context: Context,
     ) {
-        viewModelScope.launch {
-            withContext(Dispatchers.IO) {
 
-                if (_detector != null) return@withContext
+        viewModelScope.launch(Dispatchers.IO) {
+            if (isDetectorInitialized) return@launch
 
-                Log.e("detector view model", "start detector")
+            Log.e("detector view model", "start detector")
 
-                _isServerDetection = isServerDetection
+            _isServerDetection = isServerDetection
 
-                _detector = if (isServerDetection) {
+            _detector = if (isServerDetection) {
+                try {
                     DetectionHub(
                         detectorListener = detectorListener,
                         config = detectorConfiguration,
                     )
-                } else {
-                    YoloDetector(
-                        detectorListener = detectorListener,
-                        config = detectorConfiguration,
-                        context = context
-                    )
+                } catch (e: Exception) {
+
+                    Log.e("DetectorViewModel", "Error starting DetectionHub: $e")
+
+                    EventBus.sendEvent(Event.Toast("Error starting DetectionHub: $e, now using YoloDetector"))
+
+                    null
                 }
+            } else {
+                YoloDetector(
+                    detectorListener = detectorListener,
+                    config = detectorConfiguration,
+                    context = context
+                )
+
             }
         }
     }
 
     fun stopDetector() {
-        viewModelScope.launch {
-            withContext(Dispatchers.IO) {
-                _detector?.stop()
-                _detector = null
-            }
+        viewModelScope.launch(Dispatchers.IO) {
+            _detector?.stop()
+            _detector = null
+
         }
 
     }

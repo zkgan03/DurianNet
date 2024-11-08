@@ -15,7 +15,15 @@
         <action
             android:id="@+id/action_mapFragment_to_add_seller_nav_graph"
             app:destination="@id/add_seller_nav_graph" />
+        <action
+            android:id="@+id/action_mapFragment_to_addCommentFragment"
+            app:destination="@id/addCommentFragment" />
     </fragment>
     <include app:graph="@navigation/manage_seller_nav_graph" />
     <include app:graph="@navigation/add_seller_nav_graph" />
+    <fragment
+        android:id="@+id/addCommentFragment"
+        android:name="com.example.duriannet.presentation.seller_locator.fragments.AddCommentFragment"
+        android:label="fragment_add_comment"
+        tools:layout="@layout/fragment_add_comment" />
 </navigation>

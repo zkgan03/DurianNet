@@ -1,5 +1,6 @@
 package com.example.duriannet.presentation.seller_locator.adapter
 
+import android.content.Context
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -8,16 +9,18 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.example.duriannet.R
 import com.example.duriannet.databinding.ItemAllUserCommentsBinding
-import com.example.duriannet.models.SellerComment
+import com.example.duriannet.models.Comment
+import com.example.duriannet.utils.Common
 
-class SellerCommentsAdapter
-    : ListAdapter<SellerComment, SellerCommentsAdapter.SellerCommentViewHolder>(
-    object : DiffUtil.ItemCallback<SellerComment>() {
-        override fun areItemsTheSame(oldItem: SellerComment, newItem: SellerComment): Boolean {
+class SellerCommentsAdapter(
+    private val context: Context,
+) : ListAdapter<Comment, SellerCommentsAdapter.SellerCommentViewHolder>(
+    object : DiffUtil.ItemCallback<Comment>() {
+        override fun areItemsTheSame(oldItem: Comment, newItem: Comment): Boolean {
             return oldItem.commentId == newItem.commentId
         }
 
-        override fun areContentsTheSame(oldItem: SellerComment, newItem: SellerComment): Boolean {
+        override fun areContentsTheSame(oldItem: Comment, newItem: Comment): Boolean {
             return oldItem == newItem
         }
 
@@ -41,14 +44,15 @@ class SellerCommentsAdapter
     inner class SellerCommentViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         private val binding: ItemAllUserCommentsBinding = ItemAllUserCommentsBinding.bind(view)
 
-        fun bind(sellerComment: SellerComment) {
-            binding.imageUser.setImageResource(R.drawable.image_1) // TODO : Change to user image
-            binding.textUsername.text = sellerComment.user.username
+        fun bind(sellerComment: Comment) {
+            Common.loadServerImageIntoView(
+                context,
+                sellerComment.userImage,
+                binding.imageUser
+            )
+            binding.textUsername.text = sellerComment.username
             binding.textComment.text = sellerComment.content
-            binding.ratingUser.rating = sellerComment.rating
-
-            binding.iconEdit.visibility = View.GONE
-            binding.iconDelete.visibility = View.GONE
+            binding.ratingBar.rating = sellerComment.rating
         }
     }
 }

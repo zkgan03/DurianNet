@@ -12,12 +12,15 @@ import android.widget.ArrayAdapter
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.MenuProvider
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.navigation.fragment.findNavController
+import androidx.navigation.navGraphViewModels
 import com.example.duriannet.R
 import com.example.duriannet.databinding.BottomSheetDetectorSettingsBinding
 import com.example.duriannet.databinding.FragmentInstantDetectViewPagerBinding
 import com.example.duriannet.presentation.detector.adapters.InstantViewPagerAdapter
+import com.example.duriannet.presentation.detector.view_models.DetectorViewModel
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.tabs.TabLayoutMediator
 
@@ -26,6 +29,9 @@ class InstantDetectViewPagerFragment : Fragment() {
 
     private var _binding: FragmentInstantDetectViewPagerBinding? = null
     private val binding get() = _binding!!
+
+    private val viewModel: DetectorViewModel by viewModels()
+
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -40,6 +46,14 @@ class InstantDetectViewPagerFragment : Fragment() {
         setupActionBar()
         setupBottomSheetDialog()
         setupViewPager()
+        setupDetector()
+    }
+
+    private fun setupDetector() {
+        // set default values
+        viewModel.setConfidenceThreshold(resources.getString(R.string.default_confidence_threshold).toFloat())
+        viewModel.setIouThreshold(resources.getString(R.string.default_iou_threshold).toFloat())
+        viewModel.setMaxNumberDetection(resources.getString(R.string.default_max_number_detection).toInt())
     }
 
 

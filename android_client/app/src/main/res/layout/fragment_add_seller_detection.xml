@@ -98,25 +98,37 @@
         app:layout_constraintTop_toTopOf="@+id/view_finder"
         app:tint="@color/white" />
 
-    <com.google.android.material.chip.Chip
-        android:id="@+id/bottom_prompt_chip"
-        style="@style/Widget.MaterialComponents.Chip.Entry"
+
+    <com.google.android.material.card.MaterialCardView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_gravity="bottom|center_horizontal"
-        android:layout_marginBottom="28dp"
-        android:checkable="false"
-        android:clickable="false"
-        android:fontFamily="sans-serif"
-        android:textColor="@color/white"
-        android:textSize="14sp"
-        app:chipCornerRadius="8dp"
-        app:chipSurfaceColor="@color/chip_info_color"
-        app:closeIconVisible="false"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
+        android:layout_marginBottom="32dp"
+        android:backgroundTint="@color/chip_info_color"
+        app:cardCornerRadius="16dp"
+        app:cardElevation="0dp"
         app:layout_constraintBottom_toBottomOf="@+id/view_finder"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        tools:text="Keep camera steady" />
+        app:strokeWidth="0dp">
+
+        <TextView
+            android:id="@+id/bottom_prompt_chip"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginStart="16dp"
+            android:layout_marginEnd="16dp"
+            android:ellipsize="end"
+            android:gravity="center_horizontal"
+            android:maxLines="2"
+            android:paddingHorizontal="16dp"
+            android:paddingVertical="8dp"
+            android:textColor="@color/white"
+            android:textSize="14sp"
+            tools:text="custom chip" />
+    </com.google.android.material.card.MaterialCardView>
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/bottom_layout"

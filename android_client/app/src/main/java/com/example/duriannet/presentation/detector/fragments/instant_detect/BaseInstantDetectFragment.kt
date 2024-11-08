@@ -6,18 +6,17 @@ import android.util.Log
 import android.view.View
 import android.widget.Toast
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.lifecycleScope
-import androidx.navigation.navGraphViewModels
-import com.example.duriannet.R
+import androidx.fragment.app.viewModels
 import com.example.duriannet.models.DetectionResult
 import com.example.duriannet.presentation.detector.view_models.DetectorViewModel
+import com.example.duriannet.services.detector.enum.DetectorStatusEnum
 import com.example.duriannet.services.detector.interfaces.IDetectorListener
-import kotlinx.coroutines.launch
 
 abstract class BaseInstantDetectFragment : Fragment(), IDetectorListener {
 
-    protected val viewModel: DetectorViewModel by navGraphViewModels(R.id.detector_nav_graph)
-
+    protected val viewModel: DetectorViewModel by viewModels(
+        ownerProducer = { requireParentFragment() }
+    )
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -58,16 +57,12 @@ abstract class BaseInstantDetectFragment : Fragment(), IDetectorListener {
             }
         }
 
-        // set default values
-        viewModel.setConfidenceThreshold(resources.getString(R.string.default_confidence_threshold).toFloat())
-        viewModel.setIouThreshold(resources.getString(R.string.default_iou_threshold).toFloat())
-        viewModel.setMaxNumberDetection(resources.getString(R.string.default_max_number_detection).toInt())
-        viewModel.startDetector(
-            false,
-            this@BaseInstantDetectFragment,
-            requireContext()
-        )
-
+        if (viewModel.detector == null || viewModel.detector?.status() != DetectorStatusEnum.INITIALIZING)
+            viewModel.startDetector(
+                false,
+                this,
+                requireContext()
+            )
 
         Log.e(TAG, "onViewCreated")
     }
