@@ -10,6 +10,7 @@ import com.example.duriannet.models.Seller
 import com.example.duriannet.presentation.seller_locator.state.SellerInputState
 import com.example.duriannet.utils.Event
 import com.example.duriannet.utils.EventBus
+import com.example.duriannet.utils.EventBus.sendEvent
 import com.google.android.gms.maps.model.LatLng
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
@@ -92,32 +93,34 @@ class ManageSellerViewModel @Inject constructor(
 
         viewModelScope.launch(Dispatchers.IO) {
             if (_selectedSeller.value == null) {
-                EventBus.sendEvent(Event.Toast("No seller selected to be updated"))
+                sendEvent(Event.Toast("No seller selected to be updated"))
                 return@launch
             }
 
             _selectedSeller.value!!.apply {
                 if (name.isEmpty() || description.isEmpty() || durianTypes.isEmpty()) {
-                    EventBus.sendEvent(Event.Toast("Please fill in all fields"))
+                    sendEvent(Event.Toast("Please fill in all fields"))
                     return@launch
                 }
             }
 
             Log.e("ManageSellerViewModel", "Updating seller : ${_selectedSeller.value}")
 
-            val request = sellerRepository.updateSeller(
+            val result = sellerRepository.updateSeller(
                 _selectedSeller.value!!.sellerId,
                 _selectedSeller.value!!.name,
                 _selectedSeller.value!!.description,
                 _selectedSeller.value!!.durianTypes.toList()
             )
 
-            if (request.isSuccess) {
-                EventBus.sendEvent(Event.Toast("Seller updated successfully"))
+            result.onSuccess {
+                sendEvent(Event.Toast("Seller updated successfully"))
                 onSuccess()
-            } else {
-                EventBus.sendEvent(Event.Toast("Failed to update seller"))
+            }.onFailure { ex ->
+                Log.e("AddSellerViewModel", ex.message ?: "Failed to update seller")
+                sendEvent(Event.Toast(ex.message ?: "Failed to update seller"))
             }
+
 
             // fetch all sellers again
             getSellersAddedByUser()

@@ -6,6 +6,17 @@
     android:layout_height="match_parent">
 
 
+    <com.google.android.material.progressindicator.CircularProgressIndicator
+        android:id="@+id/progress"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:layout_centerInParent="true"
+        android:layout_gravity="center"
+        android:indeterminate="true"
+        android:translationZ="99dp"
+        app:indicatorColor="@color/accent_dark_green" />
+
+
     <!--  Google map  -->
     <androidx.fragment.app.FragmentContainerView
         android:id="@+id/map_fragment"

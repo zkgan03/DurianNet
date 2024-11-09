@@ -33,7 +33,7 @@ interface CommentApi {
         @Body comment: UpdateCommentRequest,
     ): Response<CommentResponse>
 
-    @DELETE("DeleteComment/{commentId}")
+    @DELETE("RemoveComment/{commentId}")
     suspend fun deleteComment(
         @Path("commentId") commentId: Int,
     ): Response<Unit>

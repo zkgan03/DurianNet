@@ -5,8 +5,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.duriannet.data.repository.comment.ICommentRepository
 import com.example.duriannet.data.repository.seller.ISellerRepository
-import com.example.duriannet.models.Seller
-import com.example.duriannet.models.Comment
+import com.example.duriannet.presentation.seller_locator.event.MapEvent
+import com.example.duriannet.presentation.seller_locator.state.MapScreenState
 import com.example.duriannet.utils.Event
 import com.example.duriannet.utils.EventBus.sendEvent
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -20,7 +20,6 @@ import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.mapLatest
-import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -32,8 +31,8 @@ class MapViewModel @Inject constructor(
     private val commentRepository: ICommentRepository,
 ) : ViewModel() {
 
-    private val _query = MutableStateFlow("")
-    val query = _query.asStateFlow()
+    private var _state = MutableStateFlow<MapScreenState>(MapScreenState.Loading)
+    val state get() = _state.asStateFlow()
 
     private val queryFlow = MutableSharedFlow<String>(
         replay = 1,
@@ -41,49 +40,65 @@ class MapViewModel @Inject constructor(
         BufferOverflow.DROP_OLDEST
     )
 
-    private val _sellers = MutableStateFlow(emptyList<Seller>())
-    val sellers = _sellers.asStateFlow()
-
-    private val _searchResults = MutableStateFlow(emptyList<Seller>())
-    val searchResults = _searchResults.asStateFlow()
-
-    private val _sellerComments = MutableStateFlow(emptyList<Comment>())
-    val sellerComments = _sellerComments.asStateFlow()
-
-    private val _userComment = MutableStateFlow<Comment?>(null)
-    val userComment = _userComment.asStateFlow()
-
-    private val _bottomSheetProgress = MutableStateFlow(false)
-    val bottomSheetProgress = _bottomSheetProgress.asStateFlow()
-
-
-    private val _selectedSeller = MutableStateFlow<Seller?>(null)
-    val selectedSeller = _selectedSeller.asStateFlow()
-
     init {
         setUpQueryFlow()
-        getAllSellers()
+        initSellers()
+    }
+
+
+    private val maxAttempts = 5
+    private val delay = 5000L
+    private fun initSellers() {
+        viewModelScope.launch(Dispatchers.IO) {
+            _state.value = MapScreenState.Loading
+
+            var currentAttempt = 0
+
+            while (currentAttempt < maxAttempts) {
+                val task = loadSellersWithRetry()
+                if (task) {
+                    break
+                }
+                delay(delay)
+                currentAttempt++
+            }
+
+            if (currentAttempt == maxAttempts) {
+                _state.value = MapScreenState.Error("Failed to load sellers")
+            }
+        }
+    }
+
+    private suspend fun loadSellersWithRetry(): Boolean {
+        val result = sellerRepository.getAllSellers()
+        result.onSuccess { sellers ->
+            _state.value = MapScreenState.Success(sellers = sellers, searchResults = sellers)
+            return true
+        }.onFailure {
+            val exception = result.exceptionOrNull()
+            Log.e("SellerLocatorViewModel", exception?.message ?: "Failed to load the sellers")
+            sendEvent(Event.Toast(exception?.message ?: "Failed to load the sellers"))
+
+            return false
+        }
+
+        return false
     }
 
     private fun getAllSellers() {
         viewModelScope.launch(Dispatchers.IO) {
             val result = sellerRepository.getAllSellers()
 
-            if (result.isSuccess) {
-                val placesResponse = result.getOrNull()
+            result.onSuccess { sellers ->
+                updateState { state ->
+                    state.copy(sellers = sellers)
+                }
 
-                updateSellers(placesResponse ?: emptyList())
-
-            } else if (result.isFailure) {
+            }.onFailure {
                 val exception = result.exceptionOrNull()
                 Log.e("SellerLocatorViewModel", exception?.message ?: "Failed to get all places")
                 sendEvent(Event.Toast(exception?.message ?: "Failed to get all places"))
-
-                // retry in 5 seconds
-                delay(5000)
-                getAllSellers()
             }
-
         }
     }
 
@@ -93,26 +108,20 @@ class MapViewModel @Inject constructor(
             .distinctUntilChanged()
             .mapLatest { query ->
 
-                if (query.isEmpty()) {
-                    updateSearchResults(sellers.value)
-                    return@mapLatest
+                val result = if (query.isEmpty()) {
+                    sellerRepository.getAllSellers()
+                } else {
+                    sellerRepository.searchSellers(query)
                 }
 
-                Log.e("SellerLocatorViewModel", "Invoked, Searching for $query")
-
-
-                val result = sellerRepository.searchSellers(query)
-
-                if (result.isSuccess) {
-                    val searchResults = result.getOrNull()
-
-                    updateSearchResults(searchResults ?: emptyList())
-
-                } else if (result.isFailure) {
-                    val exception = result.exceptionOrNull()
-                    Log.e("SellerLocatorViewModel", exception?.message ?: "Failed to search places")
-                    sendEvent(Event.Toast(exception?.message ?: "Failed to search places"))
-
+                result.onSuccess { sellers ->
+                    updateState { state ->
+                        state.copy(searchResults = sellers)
+                    }
+                }.onFailure {
+                    val exception = it
+                    Log.e("SellerLocatorViewModel", exception.message ?: "Failed to search places")
+                    sendEvent(Event.Toast(exception.message ?: "Failed to search places"))
                 }
 
                 return@mapLatest
@@ -120,121 +129,148 @@ class MapViewModel @Inject constructor(
             .launchIn(viewModelScope)
     }
 
-    fun selectSeller(sellerId: Int) {
-        viewModelScope.launch(Dispatchers.IO) {
-            _bottomSheetProgress.update {
-                true
-            }
+    fun onEvent(event: MapEvent) {
+        when (event) {
+            is MapEvent.RetryLoading -> initSellers()
+            is MapEvent.UpdateQuery -> handleQueryUpdate(event.query)
 
-            getSellerComments(sellerId)
+            is MapEvent.SelectSeller -> handleSellerSelection(event.sellerId)
+            is MapEvent.RefreshSellers -> refreshSellers()
 
-            val result = sellerRepository.getSellerById(sellerId)
-
-            if (result.isSuccess) {
-                val seller = result.getOrNull()
-
-                _selectedSeller.update {
-                    seller
-                }
-
-            } else if (result.isFailure) {
-                val exception = result.exceptionOrNull()
-                Log.e("SellerLocatorViewModel", exception?.message ?: "Failed to get seller by id")
-                sendEvent(Event.Toast(exception?.message ?: "Failed to get seller by id"))
-            }
-
-            _bottomSheetProgress.update {
-                false
-            }
+            is MapEvent.RefreshComments -> TODO("Not yet implemented")
+            is MapEvent.AddComment -> handleAddComment(event.content, event.rating)
+            is MapEvent.EditComment -> handleEditComment(event.content, event.rating)
+            is MapEvent.DeleteComment -> handleDeleteComment()
         }
-
     }
 
-    private fun getSellerComments(sellerId: Int) {
 
-        viewModelScope.launch(Dispatchers.IO) {
-
-            val result = commentRepository.getSellerComments(sellerId)
-
-            if (result.isSuccess) {
-                val comments = result.getOrNull()
-
-                //TODO: If it is current user comment, remove from the list
-                // val currentUser = getCurrentUser()
-                val (filteredComments, currentUserCommentList) = comments
-                    .orEmpty()
-                    .partition { it.userId != "1" } //TODO: Replace with currentUser.userId
-
-                _sellerComments.update {
-                    filteredComments
-                }
-
-                _userComment.update {
-                    currentUserCommentList.firstOrNull()
-                }
-
-            } else if (result.isFailure) {
-                val exception = result.exceptionOrNull()
-                Log.e("SellerLocatorViewModel", exception?.message ?: "Failed to get seller comments")
-                sendEvent(Event.Toast(exception?.message ?: "Failed to get seller comments"))
-            }
+    private fun refreshSellers() {
+        if (_state.value is MapScreenState.Success) {
+            Log.e("MapViewModel", "refreshSellers")
+            getAllSellers()
         }
-
-
     }
 
-    fun updateQueryAndSearch(query: String) {
-        _query.update {
-            query
+    // only update the state if the current state is Success
+    private fun updateState(update: (MapScreenState.Success) -> MapScreenState.Success) {
+        val currentState = _state.value as? MapScreenState.Success ?: return
+        _state.value = update(currentState)
+    }
+
+    private fun handleQueryUpdate(query: String) {
+        Log.e("MapViewModel", "handleQueryUpdate : $query")
+        updateState { state ->
+            state.copy(query = query)
         }
+
         queryFlow.tryEmit(query)
     }
 
-    fun updateQuery(query: String) {
-        _query.update {
-            query
-        }
-    }
-
-    private fun updateSellers(sellers: List<Seller>) {
-        _sellers.update {
-            sellers
-        }
-    }
-
-    private fun updateSearchResults(searchResults: List<Seller>) {
-        _searchResults.update {
-            searchResults
-        }
-    }
-
-    fun addComment(content: String, rating: Float) {
+    private fun handleSellerSelection(sellerId: Int) {
         viewModelScope.launch(Dispatchers.IO) {
-            if (_selectedSeller.value == null) {
-                sendEvent(Event.Toast("No seller selected to add comment"))
+            updateState {
+                it.copy(isBottomSheetLoading = true)
+            }
+
+            try {
+                val seller = sellerRepository.getSellerById(sellerId).getOrThrow()
+                val comments = commentRepository.getSellerComments(sellerId).getOrThrow()
+
+                val (filteredComments, userComments) = comments.partition { it.userId != "1" }
+
+                updateState {
+                    it.copy(
+                        selectedSeller = seller,
+                        sellerComments = filteredComments,
+                        userComment = userComments.firstOrNull(),
+                        isBottomSheetLoading = false
+                    )
+                }
+            } catch (e: Exception) {
+                Log.e("SellerLocatorViewModel", e.message ?: "Failed to get seller comments")
+                sendEvent(Event.Toast(e.message ?: "Failed to load seller details"))
+                updateState { it.copy(isBottomSheetLoading = false) }
+            }
+
+        }
+    }
+
+    private fun handleAddComment(content: String, rating: Float) {
+        viewModelScope.launch(Dispatchers.IO) {
+
+            val currentState = (_state.value as? MapScreenState.Success) ?: return@launch
+
+            val selectedSeller = currentState.selectedSeller ?: run {
+                sendEvent(Event.Toast("No seller selected"))
                 return@launch
             }
 
             val result = commentRepository.addComment(
                 userId = "1", //TODO : Replace with real user ID
-                sellerId = selectedSeller.value!!.sellerId,
+                sellerId = selectedSeller.sellerId,
                 content = content,
                 rating = rating
             )
 
-            if (result.isSuccess) {
+            result.onSuccess {
                 sendEvent(Event.Toast("Comment added successfully"))
-
-                getSellerComments(selectedSeller.value!!.sellerId)
-                selectSeller(selectedSeller.value!!.sellerId)
-
-            } else if (result.isFailure) {
+                handleSellerSelection(selectedSeller.sellerId)
+            }.onFailure {
                 val exception = result.exceptionOrNull()
                 Log.e("SellerLocatorViewModel", exception?.message ?: "Failed to add comment")
                 sendEvent(Event.Toast(exception?.message ?: "Failed to add comment"))
             }
+
         }
     }
 
-    //TODO : Remove and edit comment
+    private fun handleEditComment(content: String, rating: Float) {
+        viewModelScope.launch(Dispatchers.IO) {
+            val currentState = (_state.value as? MapScreenState.Success) ?: return@launch
+
+            val commentId = currentState.userComment?.commentId ?: run {
+                sendEvent(Event.Toast("No comment to edit"))
+                return@launch
+            }
+
+            val result = commentRepository.updateComment(
+                commentId = commentId,
+                content = content,
+                rating = rating
+            )
+
+            result.onSuccess {
+                sendEvent(Event.Toast("Comment updated successfully"))
+                handleSellerSelection(currentState.selectedSeller?.sellerId ?: -1)
+            }.onFailure {
+                val exception = result.exceptionOrNull()
+                Log.e("SellerLocatorViewModel", exception?.message ?: "Failed to update comment")
+                sendEvent(Event.Toast(exception?.message ?: "Failed to update comment"))
+            }
+        }
+    }
+
+    private fun handleDeleteComment() {
+
+        viewModelScope.launch(Dispatchers.IO) {
+            val currentState = (_state.value as? MapScreenState.Success) ?: return@launch
+
+            val commentId = currentState.userComment?.commentId ?: run {
+                sendEvent(Event.Toast("No comment to delete"))
+                return@launch
+            }
+
+            val result = commentRepository.deleteComment(commentId)
+
+            result.onSuccess {
+                sendEvent(Event.Toast("Comment deleted successfully"))
+                handleSellerSelection(currentState.selectedSeller?.sellerId ?: -1)
+            }.onFailure {
+                val exception = result.exceptionOrNull()
+                Log.e("SellerLocatorViewModel", exception?.message ?: "Failed to delete comment")
+                sendEvent(Event.Toast(exception?.message ?: "Failed to delete comment"))
+            }
+        }
+    }
 }

@@ -54,8 +54,6 @@ class AddSellerViewModel @Inject constructor(
                 val longitude = _inputState.value.sellerLocation.second
                 val image = BitmapHelper.encodeBase64Image(imageResult!!)
 
-
-
                 //TODO : Replace with actual user id
                 val result = sellerRepository.addSeller(
                     userId = "1",
@@ -67,15 +65,14 @@ class AddSellerViewModel @Inject constructor(
                     durianTypes = durianType.toList()
                 )
 
-                if (result.isSuccess) {
+                result.onSuccess {
                     sendEvent(Event.Toast("Seller added successfully"))
                     onSuccess()
-                } else if (result.isFailure) {
+                }.onFailure {
                     val exception = result.exceptionOrNull()
                     Log.e("AddSellerViewModel", exception?.message ?: "Failed to add seller")
                     sendEvent(Event.Toast(exception?.message ?: "Failed to add seller"))
                 }
-
             }
         }
     }

@@ -22,6 +22,7 @@ import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.LatLngBounds
 import com.google.android.gms.maps.model.Marker
 import com.google.android.gms.maps.model.MarkerOptions
+import com.google.maps.android.SphericalUtil
 import com.google.maps.android.clustering.ClusterItem
 import com.google.maps.android.clustering.ClusterManager
 import com.google.maps.android.clustering.view.DefaultClusterRenderer
@@ -29,7 +30,7 @@ import com.google.maps.android.ktx.addCircle
 
 class GoogleMapManager<T : ClusterItem>(
     val context: Context,
-    val googleMap: GoogleMap,
+    private val googleMap: GoogleMap,
 ) {
 
     private val fusedLocationClient: FusedLocationProviderClient =
@@ -71,7 +72,7 @@ class GoogleMapManager<T : ClusterItem>(
      *  NOTE : only call this method once
      * */
     fun initClusteredMarkers(
-        places: List<T>? = null,
+        place: List<T>? = null,
         icon: BitmapDescriptor,
         infoWindowAdapter: GoogleMap.InfoWindowAdapter,
     ) {
@@ -87,11 +88,11 @@ class GoogleMapManager<T : ClusterItem>(
 
             markerCollection.setInfoWindowAdapter(infoWindowAdapter)
 
-            addItems(places)
-            cluster() // re-cluster / re-render
+            addItems(place)
+            cluster()
 
             setOnClusterItemClickListener { item ->
-                Log.e("GoogleMapManager", "Cluster item clicked : ${item.title}")
+                Log.e(TAG, "Cluster item clicked : ${item.title}")
                 addCircleAroundPlace(item.position)
                 onMarkerSelected?.invoke(item)
                 false
@@ -120,14 +121,26 @@ class GoogleMapManager<T : ClusterItem>(
 
     }
 
+    fun updataAllItems(places: List<T>) {
+        Log.e(TAG, "Updating all items")
+
+        // if all items are same, do not update
+        if (clusterManager.algorithm.items.toSet() == places.toSet()) {
+            return
+        }
+
+        clusterManager.apply {
+            clearItems()
+            addItems(places)
+            cluster()
+
+            //clear circle
+            circle?.remove()
+        }
+    }
 
     fun setOnMarkerSelectedListener(onMarkerSelected: (T) -> Unit) {
         this.onMarkerSelected = onMarkerSelected
-    }
-
-    fun clearMarkers() {
-        clusterManager.clearItems()
-        clusterManager.cluster()
     }
 
 
@@ -160,11 +173,6 @@ class GoogleMapManager<T : ClusterItem>(
         return clusterManager.algorithm.items.filter { it.position == location }
     }
 
-    fun setItems(places: List<T>) {
-        clusterManager.clearItems()
-        clusterManager.addItems(places)
-        clusterManager.cluster()
-    }
 
     /**
      *  Returns the bounds of the places
@@ -254,6 +262,10 @@ class GoogleMapManager<T : ClusterItem>(
     companion object {
         private const val TAG = "GoogleMapManager"
 
+        fun calculateDistanceInMeter(lat1: Double, long1: Double, lat2: Double, long2: Double): Float {
+            return SphericalUtil.computeDistanceBetween(LatLng(lat1, long1), LatLng(lat2, long2)).toFloat()
+        }
+
         fun getUserLocation(context: Context, onLocationReceived: (Location) -> Unit) {
             val fusedLocationClient: FusedLocationProviderClient =
                 LocationServices.getFusedLocationProviderClient(context)
@@ -272,7 +284,6 @@ class GoogleMapManager<T : ClusterItem>(
             }
         }
 
-
         fun getAddress(context: Context, lat: Double, lon: Double): String {
 
             if (!Geocoder.isPresent()) {
@@ -286,7 +297,6 @@ class GoogleMapManager<T : ClusterItem>(
             val sb = StringBuilder()
             if (addresses != null) {
                 for (i in 0..addresses.maxAddressLineIndex) {
-                    Log.e("Utils", "getAddress: ${addresses.getAddressLine(i)}")
                     sb.append(addresses.getAddressLine(i) + "\n")
                 }
             }

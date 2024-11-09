@@ -1,32 +1,40 @@
-package com.example.duriannet.presentation.seller_locator.fragments
+package com.example.duriannet.presentation.seller_locator.fragments.map_locator
 
 import android.os.Bundle
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.Menu
 import android.view.MenuInflater
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
 import androidx.activity.addCallback
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.MenuProvider
+import androidx.fragment.app.Fragment
 import androidx.lifecycle.Lifecycle
 import com.example.duriannet.R
-import com.example.duriannet.databinding.FragmentAddCommentBinding
+import com.example.duriannet.databinding.FragmentCommentBinding
+import com.example.duriannet.presentation.seller_locator.state.CommentData
 import com.example.duriannet.utils.Common
 
-class AddCommentFragment : Fragment() {
+class CommentChildFragment : Fragment() {
 
-    private var _binding: FragmentAddCommentBinding? = null
+    private var _binding: FragmentCommentBinding? = null
     private val binding get() = _binding!!
+
+    private var commentData: CommentData? = null
+
+    companion object {
+        fun newInstance(commentData: CommentData? = null) = CommentChildFragment().apply {
+            this.commentData = commentData
+        }
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?,
     ): View {
-        _binding = FragmentAddCommentBinding.inflate(inflater, container, false)
+        _binding = FragmentCommentBinding.inflate(inflater, container, false)
         return binding.root
     }
 
@@ -60,7 +68,7 @@ class AddCommentFragment : Fragment() {
         parentActivity.setSupportActionBar(binding.toolbar)
 
         parentActivity.supportActionBar?.apply {
-            title = "Add a New Comment"
+            title = if (commentData?.isEdit == true) "Edit Comment" else "Add a New Comment"
             setDisplayHomeAsUpEnabled(true)
         }
 
@@ -105,7 +113,13 @@ class AddCommentFragment : Fragment() {
             //show keyboard
             editTextComment.requestFocus()
             Common.showKeyboard(requireActivity(), editTextComment)
+        }
 
+
+        // Set initial values if editing
+        commentData?.let { data ->
+            binding.editTextComment.setText(data.content)
+            binding.ratingBar.rating = data.rating
         }
     }
 
