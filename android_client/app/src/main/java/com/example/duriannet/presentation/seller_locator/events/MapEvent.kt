@@ -1,4 +1,4 @@
-package com.example.duriannet.presentation.seller_locator.event
+package com.example.duriannet.presentation.seller_locator.events
 
 sealed class MapEvent {
     data class UpdateQuery(val query: String) : MapEvent()

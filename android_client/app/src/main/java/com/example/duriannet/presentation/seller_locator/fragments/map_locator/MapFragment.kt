@@ -36,7 +36,7 @@ import com.example.duriannet.models.Seller
 import com.example.duriannet.presentation.seller_locator.adapter.MarkerInfoWindowAdapter
 import com.example.duriannet.presentation.seller_locator.adapter.SearchResultsAdapter
 import com.example.duriannet.presentation.seller_locator.adapter.SellerCommentsAdapter
-import com.example.duriannet.presentation.seller_locator.event.MapEvent
+import com.example.duriannet.presentation.seller_locator.events.MapEvent
 import com.example.duriannet.presentation.seller_locator.state.CommentData
 import com.example.duriannet.presentation.seller_locator.state.MapScreenState
 import com.example.duriannet.presentation.seller_locator.view_models.MapViewModel
@@ -145,7 +145,6 @@ class MapFragment : Fragment() {
         //observe the states
         setupUI()
         setupStateObservers()
-        initMap()
         setupBottomSheetDialog()
 
     }
@@ -171,6 +170,8 @@ class MapFragment : Fragment() {
             requestAllPermissionLauncher.launch(PERMISSIONS_REQUIRED)
         } else {
 
+            initMap()
+
             // observe GPS status after resumed (to get permission on location)
             locationAccessChecker.observeGpsStatus()
                 .flowWithLifecycle(viewLifecycleOwner.lifecycle, Lifecycle.State.STARTED)
@@ -183,8 +184,6 @@ class MapFragment : Fragment() {
                     }
                 }
                 .launchIn(viewLifecycleOwner.lifecycleScope)
-
-
         }
     }
 
@@ -343,6 +342,7 @@ class MapFragment : Fragment() {
 
     // Initialize the map
     private fun initMap() {
+        if (googleMapManager != null) return
 
         val mapFragment = binding.mapFragment.getFragment() as SupportMapFragment
 

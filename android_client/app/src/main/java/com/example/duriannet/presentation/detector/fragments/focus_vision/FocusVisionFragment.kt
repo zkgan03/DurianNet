@@ -54,8 +54,6 @@ class FocusVisionFragment : BaseFocusVisionFragment() {
             this,
             requireContext()
         )
-        accelerometerSensor = AccelerometerSensor(requireContext()) // initialize accelerometer sensor
-        cameraManager = CameraManager(requireContext(), this, binding.viewFinder)
 
         return binding.root
     }
@@ -68,6 +66,13 @@ class FocusVisionFragment : BaseFocusVisionFragment() {
         setupUI()
         setupBottomSheetDialog()
         setupAccelerometerSensor()
+    }
+
+    override fun onResume() {
+        super.onResume()
+        if (cameraManager == null) {
+            setUpCameraManager()
+        }
     }
 
     override fun onDestroyView() {
@@ -119,7 +124,6 @@ class FocusVisionFragment : BaseFocusVisionFragment() {
         )
     }
 
-
     private fun setupUI() {
         binding.flipCameraButton.setOnClickListener {
             cameraManager?.toggleCamera()
@@ -157,7 +161,6 @@ class FocusVisionFragment : BaseFocusVisionFragment() {
         }
     }
 
-
     private fun setupAccelerometerSensor() {
         accelerometerSensor = AccelerometerSensor(requireContext()) // initialize accelerometer sensor
 
@@ -181,9 +184,12 @@ class FocusVisionFragment : BaseFocusVisionFragment() {
         }
     }
 
-
     private fun setUpCameraManager() {
-        cameraManager?.apply {
+        binding.bottomPromptChip.text = "Connecting to camera..."
+
+        cameraManager = CameraManager(requireContext(), viewLifecycleOwner, binding.viewFinder)
+
+        cameraManager!!.apply {
 
             setOnInitializedListener {
                 activity?.runOnUiThread {
@@ -293,8 +299,10 @@ class FocusVisionFragment : BaseFocusVisionFragment() {
         activity?.runOnUiThread {
             // show the camera view only after the connection is establish and the camera is ready
             binding.progress.visibility = View.GONE
-            binding.bottomPromptChip.text = "Connecting to camera..."
-            setUpCameraManager()
+
+            if (cameraManager == null)
+                setUpCameraManager()
+
             binding.btnStartDetection.isEnabled = true
             binding.bottomPromptChip.text = "Hold your device steady and press the button to start detection"
         }

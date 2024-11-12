@@ -5,7 +5,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.duriannet.data.repository.comment.ICommentRepository
 import com.example.duriannet.data.repository.seller.ISellerRepository
-import com.example.duriannet.presentation.seller_locator.event.MapEvent
+import com.example.duriannet.presentation.seller_locator.events.MapEvent
 import com.example.duriannet.presentation.seller_locator.state.MapScreenState
 import com.example.duriannet.utils.Event
 import com.example.duriannet.utils.EventBus.sendEvent
@@ -87,9 +87,13 @@ class MapViewModel @Inject constructor(
 
     private fun getAllSellers() {
         viewModelScope.launch(Dispatchers.IO) {
+            val currentState = (_state.value as? MapScreenState.Success) ?: return@launch
+
             val result = sellerRepository.getAllSellers()
 
             result.onSuccess { sellers ->
+                if (sellers == currentState.sellers) return@launch // no need to update the state if the data is the same
+
                 updateState { state ->
                     state.copy(sellers = sellers)
                 }
