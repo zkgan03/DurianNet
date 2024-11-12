@@ -1,60 +1,50 @@
 package com.example.duriannet.presentation.durian_dictionary.fragments
 
 import android.os.Bundle
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import com.example.duriannet.R
+import androidx.fragment.app.Fragment
+import androidx.recyclerview.widget.LinearLayoutManager
+import com.example.duriannet.databinding.FragmentDurianChatbotBinding
+import com.example.duriannet.models.Message
+import com.example.duriannet.presentation.durian_dictionary.adapters.ChatbotAdapter
 
-// TODO: Rename parameter arguments, choose names that match
-// the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-private const val ARG_PARAM1 = "param1"
-private const val ARG_PARAM2 = "param2"
-
-/**
- * A simple [Fragment] subclass.
- * Use the [DurianChatbotFragment.newInstance] factory method to
- * create an instance of this fragment.
- */
 class DurianChatbotFragment : Fragment() {
-    // TODO: Rename and change types of parameters
-    private var param1: String? = null
-    private var param2: String? = null
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        arguments?.let {
-            param1 = it.getString(ARG_PARAM1)
-            param2 = it.getString(ARG_PARAM2)
-        }
-    }
+    private lateinit var binding: FragmentDurianChatbotBinding
+    private val messages = mutableListOf<Message>()
+    private lateinit var adapter: ChatbotAdapter
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
-        // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_durian_chatbot, container, false)
+    ): View {
+        binding = FragmentDurianChatbotBinding.inflate(inflater, container, false)
+        return binding.root
     }
 
-    companion object {
-        /**
-         * Use this factory method to create a new instance of
-         * this fragment using the provided parameters.
-         *
-         * @param param1 Parameter 1.
-         * @param param2 Parameter 2.
-         * @return A new instance of fragment DurianChatbotFragment.
-         */
-        // TODO: Rename and change types and number of parameters
-        @JvmStatic
-        fun newInstance(param1: String, param2: String) =
-            DurianChatbotFragment().apply {
-                arguments = Bundle().apply {
-                    putString(ARG_PARAM1, param1)
-                    putString(ARG_PARAM2, param2)
-                }
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+
+        adapter = ChatbotAdapter(messages)
+        binding.rvChatbot.layoutManager = LinearLayoutManager(context)
+        binding.rvChatbot.adapter = adapter
+
+        binding.send.setOnClickListener {
+            val messageText = binding.messageBox.text.toString()
+            if (messageText.isNotBlank()) {
+                val message = Message(text = messageText, isSent = true)
+                messages.add(message)
+                adapter.notifyItemInserted(messages.size - 1)
+                binding.rvChatbot.scrollToPosition(messages.size - 1)
+                binding.messageBox.text.clear()
+
+                // Simulate receiving a response
+                val response = Message(text = "Received: $messageText", isSent = false)
+                messages.add(response)
+                adapter.notifyItemInserted(messages.size - 1)
+                binding.rvChatbot.scrollToPosition(messages.size - 1)
             }
+        }
     }
 }
