@@ -8,6 +8,8 @@ import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
+import androidx.navigation.fragment.findNavController
+import com.example.duriannet.R
 import com.example.duriannet.databinding.FragmentChangePasswordBinding
 import com.example.duriannet.presentation.account_management.view_models.ChangePasswordViewModel
 import dagger.hilt.android.AndroidEntryPoint
@@ -32,6 +34,7 @@ class ChangePasswordFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        binding = FragmentChangePasswordBinding.bind(view)
 
         binding.btnSavePassword.setOnClickListener {
             val newPassword = binding.edtNewPassword.text.toString()
@@ -44,6 +47,7 @@ class ChangePasswordFragment : Fragment() {
                 if (state.isPasswordChanged) {
                     Toast.makeText(requireContext(), "Password Changed Successfully", Toast.LENGTH_SHORT).show()
                     // Navigate to the next screen or perform other actions
+                    findNavController().navigate(R.id.action_change_password_to_profile)
                 } else if (state.error.isNotEmpty()) {
                     Toast.makeText(requireContext(), state.error, Toast.LENGTH_SHORT).show()
                 }

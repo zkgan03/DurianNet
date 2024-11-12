@@ -8,6 +8,8 @@ import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
+import androidx.navigation.fragment.findNavController
+import com.example.duriannet.R
 import com.example.duriannet.databinding.FragmentSignUpBinding
 import com.example.duriannet.presentation.account_management.view_models.SignUpViewModel
 import dagger.hilt.android.AndroidEntryPoint
@@ -45,11 +47,16 @@ class SignUpFragment : Fragment() {
             signUpViewModel.signUpState.collect { state ->
                 if (state.isRegistered) {
                     Toast.makeText(requireContext(), "Registration Successful", Toast.LENGTH_SHORT).show()
-                    // Navigate to the next screen
+                    // Navigate to login fragment
+                    findNavController().navigate(R.id.action_sign_up_to_login)
                 } else if (state.error.isNotEmpty()) {
                     Toast.makeText(requireContext(), state.error, Toast.LENGTH_SHORT).show()
                 }
             }
+        }
+
+        binding.lblSignUpToLogin.setOnClickListener {
+            findNavController().navigate(R.id.action_sign_up_to_login)
         }
     }
 

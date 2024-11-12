@@ -8,6 +8,8 @@ import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
+import androidx.navigation.fragment.findNavController
+import com.example.duriannet.R
 import com.example.duriannet.databinding.FragmentEditProfileBinding
 import com.example.duriannet.presentation.account_management.view_models.EditProfileViewModel
 import dagger.hilt.android.AndroidEntryPoint
@@ -35,7 +37,7 @@ class EditProfileFragment : Fragment() {
 
         editProfileViewModel.loadProfile()
 
-        binding.button.setOnClickListener {
+        binding.btnEdtProfileSave.setOnClickListener {
             val username = binding.edtProfileUsername.text.toString()
             val fullname = binding.edtProfileFullname.text.toString()
             val email = binding.edtProfileEmail.text.toString()
@@ -47,7 +49,8 @@ class EditProfileFragment : Fragment() {
             editProfileViewModel.editProfileState.collect { state ->
                 if (state.isProfileUpdated) {
                     Toast.makeText(requireContext(), "Profile Updated Successfully", Toast.LENGTH_SHORT).show()
-                    // Navigate to the next screen or perform other actions
+                    // Navigate to profile fragment
+                    findNavController().navigate(R.id.action_edit_profile_to_profile)
                 } else if (state.error.isNotEmpty()) {
                     Toast.makeText(requireContext(), state.error, Toast.LENGTH_SHORT).show()
                 } else {

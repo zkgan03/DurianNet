@@ -8,6 +8,8 @@ import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
+import androidx.navigation.fragment.findNavController
+import com.example.duriannet.R
 import com.example.duriannet.databinding.FragmentForgetPasswordBinding
 import com.example.duriannet.presentation.account_management.view_models.ForgetPasswordViewModel
 import dagger.hilt.android.AndroidEntryPoint
@@ -43,10 +45,15 @@ class ForgetPasswordFragment : Fragment() {
                 if (state.isEmailSent) {
                     Toast.makeText(requireContext(), "Reset Email Sent", Toast.LENGTH_SHORT).show()
                     // Navigate to the next screen
+                    findNavController().navigate(R.id.action_forget_password_to_reset_password)
                 } else if (state.error.isNotEmpty()) {
                     Toast.makeText(requireContext(), state.error, Toast.LENGTH_SHORT).show()
                 }
             }
+        }
+
+        binding.lblFpToLogin.setOnClickListener {
+            findNavController().navigate(R.id.action_forget_password_to_login)
         }
     }
 

@@ -8,6 +8,8 @@ import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
+import androidx.navigation.fragment.findNavController
+import com.example.duriannet.R
 import com.example.duriannet.databinding.FragmentResetPasswordBinding
 import com.example.duriannet.presentation.account_management.view_models.ResetPasswordViewModel
 import dagger.hilt.android.AndroidEntryPoint
@@ -44,10 +46,15 @@ class ResetPasswordFragment : Fragment() {
                 if (state.isPasswordReset) {
                     Toast.makeText(requireContext(), "Password Reset Successful", Toast.LENGTH_SHORT).show()
                     // Navigate to the next screen
+                    findNavController().navigate(R.id.action_reset_password_to_login)
                 } else if (state.error.isNotEmpty()) {
                     Toast.makeText(requireContext(), state.error, Toast.LENGTH_SHORT).show()
                 }
             }
+        }
+
+        binding.lblRpToLogin.setOnClickListener {
+            findNavController().navigate(R.id.action_reset_password_to_login)
         }
     }
 

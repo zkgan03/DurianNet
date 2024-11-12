@@ -7,7 +7,10 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.example.duriannet.R
+import com.example.duriannet.databinding.FragmentChangePasswordBinding
 import com.example.duriannet.databinding.FragmentFavoriteDurianBinding
 import com.example.duriannet.presentation.account_management.view_models.FavoriteDurianViewModel
 import com.example.duriannet.presentation.account_management.adapter.AllDurianAdapter
@@ -47,6 +50,10 @@ class FavoriteDurianFragment : Fragment() {
                     adapter.submitList(state.favoriteDurians)
                 }
             }
+        }
+
+        binding.btnFdSave.setOnClickListener {
+            findNavController().navigate(R.id.action_favorite_durian_to_profile)
         }
     }
 

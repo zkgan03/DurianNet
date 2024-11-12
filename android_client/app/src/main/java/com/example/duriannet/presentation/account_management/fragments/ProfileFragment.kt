@@ -34,6 +34,7 @@ class ProfileFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        binding = FragmentProfileBinding.bind(view)
 
         val adapter = FavoriteDurianAdapter()
         binding.rvProfileFavoriteDurian.layoutManager = LinearLayoutManager(requireContext())
@@ -53,6 +54,24 @@ class ProfileFragment : Fragment() {
                     adapter.submitList(state.favoriteDurians)
                 }
             }
+        }
+
+        binding.toolbarChangePassword.setOnMenuItemClickListener { item: MenuItem ->
+            when (item.itemId) {
+                R.id.edit_profile -> {
+                    findNavController().navigate(R.id.action_profile_to_edit_profile)
+                    true
+                }
+                R.id.change_password -> {
+                    findNavController().navigate(R.id.action_profile_to_change_password)
+                    true
+                }
+                else -> false
+            }
+        }
+
+        binding.edtFdIcon.setOnClickListener {
+            findNavController().navigate(R.id.action_profile_to_favorite_durian)
         }
     }
 

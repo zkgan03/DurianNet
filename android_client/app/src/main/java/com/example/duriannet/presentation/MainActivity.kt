@@ -9,7 +9,9 @@ import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavController
 import androidx.navigation.findNavController
 import androidx.navigation.fragment.NavHostFragment
+import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
+import com.example.duriannet.R
 import com.example.duriannet.databinding.ActivityMainBinding
 import com.example.duriannet.utils.Event
 import com.example.duriannet.utils.EventBus
@@ -20,16 +22,23 @@ import kotlinx.coroutines.launch
 class MainActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityMainBinding
-
-    private var navController: NavController? = null
+    private lateinit var navController: NavController
+    //private var navController: NavController? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
+        setupNavController()
         setupBackPress()
         setupBottomNav()
         setupEventBus()
+    }
+
+    private fun setupNavController() {
+        val navHostFragment = supportFragmentManager.findFragmentById(R.id.host) as NavHostFragment
+        navController = navHostFragment.navController
+        setupActionBarWithNavController(navController)
     }
 
     private fun setupEventBus() {
@@ -70,6 +79,10 @@ class MainActivity : AppCompatActivity() {
                     }
                 }
             })
+    }
+
+    override fun onSupportNavigateUp(): Boolean {
+        return navController.navigateUp() || super.onSupportNavigateUp()
     }
 
 }
