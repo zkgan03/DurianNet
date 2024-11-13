@@ -23,6 +23,7 @@ class ForgetPasswordFragment : Fragment() {
     private val binding get() = _binding!!
 
     private val forgetPasswordViewModel: ForgetPasswordViewModel by viewModels()
+    private val navController by lazy { findNavController() }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -44,8 +45,7 @@ class ForgetPasswordFragment : Fragment() {
             forgetPasswordViewModel.forgetPasswordState.collect { state ->
                 if (state.isEmailSent) {
                     Toast.makeText(requireContext(), "Reset Email Sent", Toast.LENGTH_SHORT).show()
-                    // Navigate to the next screen
-                    findNavController().navigate(R.id.action_forget_password_to_reset_password)
+                    navController.navigate(R.id.action_forget_password_to_reset_password)
                 } else if (state.error.isNotEmpty()) {
                     Toast.makeText(requireContext(), state.error, Toast.LENGTH_SHORT).show()
                 }
@@ -53,7 +53,7 @@ class ForgetPasswordFragment : Fragment() {
         }
 
         binding.lblFpToLogin.setOnClickListener {
-            findNavController().navigate(R.id.action_forget_password_to_login)
+            navController.navigate(R.id.action_forget_password_to_login)
         }
     }
 

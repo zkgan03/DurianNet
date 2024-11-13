@@ -8,7 +8,9 @@ import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.example.duriannet.R
 import com.example.duriannet.databinding.FragmentProfileBinding
 import com.example.duriannet.presentation.account_management.adapter.FavoriteDurianAdapter
 import com.example.duriannet.presentation.account_management.view_models.ProfileViewModel
@@ -23,6 +25,7 @@ class ProfileFragment : Fragment() {
     private val binding get() = _binding!!
 
     private val profileViewModel: ProfileViewModel by viewModels()
+    private val navController by lazy { findNavController() }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -34,7 +37,6 @@ class ProfileFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        binding = FragmentProfileBinding.bind(view)
 
         val adapter = FavoriteDurianAdapter()
         binding.rvProfileFavoriteDurian.layoutManager = LinearLayoutManager(requireContext())
@@ -56,14 +58,14 @@ class ProfileFragment : Fragment() {
             }
         }
 
-        binding.toolbarChangePassword.setOnMenuItemClickListener { item: MenuItem ->
+        binding.toolbarChangePassword.setOnMenuItemClickListener { item ->
             when (item.itemId) {
                 R.id.edit_profile -> {
-                    findNavController().navigate(R.id.action_profile_to_edit_profile)
+                    navController.navigate(R.id.action_profile_to_edit_profile)
                     true
                 }
                 R.id.change_password -> {
-                    findNavController().navigate(R.id.action_profile_to_change_password)
+                    navController.navigate(R.id.action_profile_to_change_password)
                     true
                 }
                 else -> false
@@ -71,7 +73,7 @@ class ProfileFragment : Fragment() {
         }
 
         binding.edtFdIcon.setOnClickListener {
-            findNavController().navigate(R.id.action_profile_to_favorite_durian)
+            navController.navigate(R.id.action_profile_to_favorite_durian)
         }
     }
 

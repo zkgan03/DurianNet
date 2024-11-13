@@ -23,6 +23,7 @@ class ChangePasswordFragment : Fragment() {
     private val binding get() = _binding!!
 
     private val changePasswordViewModel: ChangePasswordViewModel by viewModels()
+    private val navController by lazy { findNavController() }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -34,7 +35,6 @@ class ChangePasswordFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        binding = FragmentChangePasswordBinding.bind(view)
 
         binding.btnSavePassword.setOnClickListener {
             val newPassword = binding.edtNewPassword.text.toString()
@@ -46,8 +46,7 @@ class ChangePasswordFragment : Fragment() {
             changePasswordViewModel.changePasswordState.collect { state ->
                 if (state.isPasswordChanged) {
                     Toast.makeText(requireContext(), "Password Changed Successfully", Toast.LENGTH_SHORT).show()
-                    // Navigate to the next screen or perform other actions
-                    findNavController().navigate(R.id.action_change_password_to_profile)
+                    navController.navigate(R.id.action_change_password_to_profile)
                 } else if (state.error.isNotEmpty()) {
                     Toast.makeText(requireContext(), state.error, Toast.LENGTH_SHORT).show()
                 }

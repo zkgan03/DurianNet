@@ -10,7 +10,6 @@ import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.duriannet.R
-import com.example.duriannet.databinding.FragmentChangePasswordBinding
 import com.example.duriannet.databinding.FragmentFavoriteDurianBinding
 import com.example.duriannet.presentation.account_management.view_models.FavoriteDurianViewModel
 import com.example.duriannet.presentation.account_management.adapter.AllDurianAdapter
@@ -24,6 +23,7 @@ class FavoriteDurianFragment : Fragment() {
     private val binding get() = _binding!!
 
     private val favoriteDurianViewModel: FavoriteDurianViewModel by viewModels()
+    private val navController by lazy { findNavController() }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -53,7 +53,7 @@ class FavoriteDurianFragment : Fragment() {
         }
 
         binding.btnFdSave.setOnClickListener {
-            findNavController().navigate(R.id.action_favorite_durian_to_profile)
+            navController.navigate(R.id.action_favorite_durian_to_profile)
         }
     }
 

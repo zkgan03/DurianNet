@@ -41,7 +41,7 @@ class DurianProfileFragment : Fragment() {
 
         viewLifecycleOwner.lifecycleScope.launch {
             durianProfileViewModel.durianProfileState.collect { durians ->
-                adapter.submitList(durians)
+                adapter.submitList(durians.map { it.name }) // Assuming Durian has a 'name' property
             }
         }
     }

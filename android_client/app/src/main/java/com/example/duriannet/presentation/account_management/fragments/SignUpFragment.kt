@@ -23,6 +23,7 @@ class SignUpFragment : Fragment() {
     private val binding get() = _binding!!
 
     private val signUpViewModel: SignUpViewModel by viewModels()
+    private val navController by lazy { findNavController() }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -47,8 +48,7 @@ class SignUpFragment : Fragment() {
             signUpViewModel.signUpState.collect { state ->
                 if (state.isRegistered) {
                     Toast.makeText(requireContext(), "Registration Successful", Toast.LENGTH_SHORT).show()
-                    // Navigate to login fragment
-                    findNavController().navigate(R.id.action_sign_up_to_login)
+                    navController.navigate(R.id.action_sign_up_to_login)
                 } else if (state.error.isNotEmpty()) {
                     Toast.makeText(requireContext(), state.error, Toast.LENGTH_SHORT).show()
                 }
@@ -56,7 +56,7 @@ class SignUpFragment : Fragment() {
         }
 
         binding.lblSignUpToLogin.setOnClickListener {
-            findNavController().navigate(R.id.action_sign_up_to_login)
+            navController.navigate(R.id.action_sign_up_to_login)
         }
     }
 

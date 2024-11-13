@@ -23,6 +23,7 @@ class EditProfileFragment : Fragment() {
     private val binding get() = _binding!!
 
     private val editProfileViewModel: EditProfileViewModel by viewModels()
+    private val navController by lazy { findNavController() }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -50,7 +51,7 @@ class EditProfileFragment : Fragment() {
                 if (state.isProfileUpdated) {
                     Toast.makeText(requireContext(), "Profile Updated Successfully", Toast.LENGTH_SHORT).show()
                     // Navigate to profile fragment
-                    findNavController().navigate(R.id.action_edit_profile_to_profile)
+                    navController.navigate(R.id.action_edit_profile_to_profile)
                 } else if (state.error.isNotEmpty()) {
                     Toast.makeText(requireContext(), state.error, Toast.LENGTH_SHORT).show()
                 } else {

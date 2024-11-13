@@ -23,6 +23,7 @@ class ResetPasswordFragment : Fragment() {
     private val binding get() = _binding!!
 
     private val resetPasswordViewModel: ResetPasswordViewModel by viewModels()
+    private val navController by lazy { findNavController() }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -45,8 +46,7 @@ class ResetPasswordFragment : Fragment() {
             resetPasswordViewModel.resetPasswordState.collect { state ->
                 if (state.isPasswordReset) {
                     Toast.makeText(requireContext(), "Password Reset Successful", Toast.LENGTH_SHORT).show()
-                    // Navigate to the next screen
-                    findNavController().navigate(R.id.action_reset_password_to_login)
+                    navController.navigate(R.id.action_reset_password_to_login)
                 } else if (state.error.isNotEmpty()) {
                     Toast.makeText(requireContext(), state.error, Toast.LENGTH_SHORT).show()
                 }
@@ -54,7 +54,7 @@ class ResetPasswordFragment : Fragment() {
         }
 
         binding.lblRpToLogin.setOnClickListener {
-            findNavController().navigate(R.id.action_reset_password_to_login)
+            navController.navigate(R.id.action_reset_password_to_login)
         }
     }
 

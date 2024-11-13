@@ -23,6 +23,7 @@ class LoginFragment : Fragment() {
     private val binding get() = _binding!!
 
     private val loginViewModel: LoginViewModel by viewModels()
+    private val navController by lazy { findNavController() }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -44,22 +45,20 @@ class LoginFragment : Fragment() {
         viewLifecycleOwner.lifecycleScope.launch {
             loginViewModel.loginState.collect { state ->
                 if (state.isLoggedIn) {
-                    // Navigate to profile fragment
-                    findNavController().navigate(R.id.action_login_to_profile)
-
                     Toast.makeText(requireContext(), "Login Successful", Toast.LENGTH_SHORT).show()
+                    navController.navigate(R.id.action_login_to_profile)
                 } else if (state.error.isNotEmpty()) {
                     Toast.makeText(requireContext(), state.error, Toast.LENGTH_SHORT).show()
                 }
             }
         }
 
-        binding.lblForgetPassword.setOnClickListener {
-            findNavController().navigate(R.id.action_login_to_forget_password)
+        binding.lblLoginToSignUp1.setOnClickListener {
+            navController.navigate(R.id.action_login_to_sign_up)
         }
 
-        binding.lblLoginToSignUp1.setOnClickListener {
-            findNavController().navigate(R.id.action_login_to_sign_up)
+        binding.lblForgetPassword.setOnClickListener {
+            navController.navigate(R.id.action_login_to_forget_password)
         }
     }
 

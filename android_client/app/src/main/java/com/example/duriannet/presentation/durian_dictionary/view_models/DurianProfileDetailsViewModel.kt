@@ -3,7 +3,7 @@ package com.example.duriannet.presentation.durian_dictionary.view_models
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.duriannet.data.repository.durian_dictionary.DurianRepository
-import com.example.duriannet.model.Durian
+import com.example.duriannet.models.Durian
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
