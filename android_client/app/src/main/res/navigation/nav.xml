@@ -20,10 +20,10 @@
             app:destination="@id/fragment_sign_up" />
     </fragment>
 
-    <fragment
-        android:id="@+id/fragment_profile"
-        android:name="com.example.duriannet.presentation.account_management.fragments.ProfileFragment"
-        tools:layout="@layout/fragment_profile" />
+<!--    <fragment-->
+<!--        android:id="@+id/fragment_profile"-->
+<!--        android:name="com.example.duriannet.presentation.account_management.fragments.ProfileFragment"-->
+<!--        tools:layout="@layout/fragment_profile" />-->
 
     <fragment
         android:id="@+id/fragment_sign_up"
