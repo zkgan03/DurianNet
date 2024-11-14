@@ -67,6 +67,7 @@ namespace DurianNet.Controllers.api
         }
 
 
+
         [HttpPost("AddComment")]
         public async Task<IActionResult> AddComment([FromBody] AddCommentDtoRequest request)
         {
@@ -81,6 +82,8 @@ namespace DurianNet.Controllers.api
 
             return Ok(addedComment.ToCommentDtoResponse());
         }
+
+
 
         [HttpPut("UpdateComment/{commentId}")]
         public async Task<IActionResult> UpdateComment([FromRoute] int commentId, [FromBody] UpdateCommentDtoRequest request)

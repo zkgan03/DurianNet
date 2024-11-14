@@ -53,24 +53,25 @@ class DetectionHub(
 
         hubConnection.on("DetectionResult", { requestId, result ->
 
+
+            val latestDetectedBitmap = requestBitmap[requestId]
+            requestBitmap.remove(requestId)
+
+            val inferenceTime = System.currentTimeMillis() - requestInferenceTime[requestId]!!
+            requestInferenceTime.remove(requestId)
+
             if (result.isEmpty()) {
                 detectorListener?.onEmptyDetect()
-            } else {
-
-                val latestDetectedBitmap = requestBitmap[requestId]
-                requestBitmap.remove(requestId)
-
-                val inferenceTime = System.currentTimeMillis() - requestInferenceTime[requestId]!!
-                requestInferenceTime.remove(requestId)
-
-                detectorListener?.onDetect(
-                    results = result.map { it.toDetectionResult() }.toTypedArray(),
-                    inferenceTime = inferenceTime,
-                    detectWidth = DETECT_IMG_SIZE,
-                    detectHeight = DETECT_IMG_SIZE,
-                    inputImage = latestDetectedBitmap!!
-                )
             }
+
+            detectorListener?.onDetect(
+                results = result.map { it.toDetectionResult() }.toTypedArray(),
+                inferenceTime = inferenceTime,
+                detectWidth = DETECT_IMG_SIZE,
+                detectHeight = DETECT_IMG_SIZE,
+                inputImage = latestDetectedBitmap!!
+            )
+
 
         }, String::class.java, Array<DetectionResultDto>::class.java)
 

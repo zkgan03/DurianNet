@@ -188,7 +188,6 @@ class YoloDetector(
 
         if (detectionResults.isEmpty()) {
             detectorListener?.onEmptyDetect()
-            return
         }
 
         detectorListener?.onDetect(

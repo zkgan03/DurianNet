@@ -22,7 +22,7 @@ object Common {
             while (iterator.hasNext()) {
                 val nextBox = iterator.next()
 
-                if(first.label != nextBox.label) continue // check if the classes are the same
+//                if(first.label != nextBox.label) continue // check if the classes are the same
 
                 val iou = calculateIoU(first, nextBox)
                 if (iou >= iouThreshold) {

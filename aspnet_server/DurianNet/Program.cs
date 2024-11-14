@@ -4,6 +4,7 @@ using DurianNet.Hubs;
 using DurianNet.Services.CommentService;
 using DurianNet.Services.DetectionService;
 using DurianNet.Services.DetectionService.YOLO.v10;
+using DurianNet.Services.DetectionService.YOLO.v8;
 using DurianNet.Services.SellerService;
 using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.EntityFrameworkCore;
@@ -19,7 +20,7 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 //Setup dependencies
-builder.Services.AddSingleton<IDetector, YoloV10Detector>();
+builder.Services.AddSingleton<IDetector, YoloV8Detector>();
 builder.Services.AddScoped<ISellerService, SellerService>();
 builder.Services.AddScoped<ICommentService, CommentService>();
 
