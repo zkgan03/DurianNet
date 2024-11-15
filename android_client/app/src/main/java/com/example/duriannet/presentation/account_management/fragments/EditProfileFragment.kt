@@ -39,23 +39,20 @@ class EditProfileFragment : Fragment() {
         editProfileViewModel.loadProfile()
 
         binding.btnEdtProfileSave.setOnClickListener {
-            val username = binding.edtProfileUsername.text.toString()
             val fullname = binding.edtProfileFullname.text.toString()
             val email = binding.edtProfileEmail.text.toString()
             val phoneNumber = binding.edtProfilePhoneNumber.text.toString()
-            editProfileViewModel.updateProfile(username, fullname, email, phoneNumber)
+            editProfileViewModel.updateProfile(fullname, email, phoneNumber)
         }
 
         viewLifecycleOwner.lifecycleScope.launch {
             editProfileViewModel.editProfileState.collect { state ->
                 if (state.isProfileUpdated) {
                     Toast.makeText(requireContext(), "Profile Updated Successfully", Toast.LENGTH_SHORT).show()
-                    // Navigate to profile fragment
                     navController.navigate(R.id.action_edit_profile_to_profile)
                 } else if (state.error.isNotEmpty()) {
                     Toast.makeText(requireContext(), state.error, Toast.LENGTH_SHORT).show()
                 } else {
-                    binding.edtProfileUsername.setText(state.username)
                     binding.edtProfileFullname.setText(state.fullname)
                     binding.edtProfileEmail.setText(state.email)
                     binding.edtProfilePhoneNumber.setText(state.phoneNumber)

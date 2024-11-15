@@ -37,9 +37,10 @@ class ChangePasswordFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         binding.btnSavePassword.setOnClickListener {
+            val currentPassword = binding.edtCurrentPassword.text.toString()
             val newPassword = binding.edtNewPassword.text.toString()
             val confirmPassword = binding.edtConfPassword.text.toString()
-            changePasswordViewModel.changePassword(newPassword, confirmPassword)
+            changePasswordViewModel.changePassword(currentPassword, newPassword, confirmPassword)
         }
 
         viewLifecycleOwner.lifecycleScope.launch {

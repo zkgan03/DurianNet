@@ -1,0 +1,13 @@
+﻿namespace DurianNet.Dtos.Request.DurianProfile
+{
+    public class AddDurianProfileRequestDto
+    {
+        public string DurianName { get; set; }
+        public string DurianDescription { get; set; }
+        public string Characteristics { get; set; }
+        public string TasteProfile { get; set; }
+        public string DurianImage { get; set; }
+        public string DurianVideoUrl { get; set; }
+        public string DurianVideoDescription { get; set; } // New field for video description
+    }
+}

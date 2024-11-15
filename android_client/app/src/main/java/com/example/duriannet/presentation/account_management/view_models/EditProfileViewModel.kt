@@ -25,7 +25,6 @@ class EditProfileViewModel @Inject constructor(
                 val profile = result.getOrNull()
                 _editProfileState.value = profile?.let {
                     EditProfileState(
-                        username = it.username,
                         fullname = it.fullname,
                         email = it.email,
                         phoneNumber = it.phoneNumber
@@ -37,9 +36,9 @@ class EditProfileViewModel @Inject constructor(
         }
     }
 
-    fun updateProfile(username: String, fullname: String, email: String, phoneNumber: String) {
+    fun updateProfile(fullname: String, email: String, phoneNumber: String) {
         viewModelScope.launch {
-            val result = userRepository.updateProfile(username, fullname, email, phoneNumber)
+            val result = userRepository.updateProfile(fullname, email, phoneNumber)
             if (result.isSuccess) {
                 _editProfileState.value = EditProfileState(isProfileUpdated = true)
             } else {

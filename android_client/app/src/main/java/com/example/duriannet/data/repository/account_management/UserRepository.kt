@@ -53,21 +53,14 @@ class UserRepository {
     }
 
     //editProfile
-    suspend fun updateProfile(username: String, fullname: String, email: String, phoneNumber: String): Result<Unit> {
-        return withContext(Dispatchers.IO) {
-            // Implement your profile update logic here
-            // For example, make a network request to update the profile
-            // Return Result.success(Unit) if successful, or Result.failure(exception) if failed
-        }
+    suspend fun updateProfile(fullname: String, email: String, phoneNumber: String): Result<Unit> {
+        // Implement the logic to update the profile without the username
     }
 
     //changePassword
-    suspend fun changePassword(newPassword: String): Result<Unit> {
-        return withContext(Dispatchers.IO) {
-            // Implement your password change logic here
-            // For example, make a network request to change the password
-            // Return Result.success(Unit) if successful, or Result.failure(exception) if failed
-        }
+    suspend fun changePassword(currentPassword: String, newPassword: String): Result<Unit> {
+        // Implement the logic to change the password using currentPassword and newPassword
+        // Return a Result object indicating success or failure
     }
 
     //editProfileFavoriteDurian

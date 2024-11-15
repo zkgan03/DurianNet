@@ -18,14 +18,14 @@ class ChangePasswordViewModel @Inject constructor(
     private val _changePasswordState = MutableStateFlow(ChangePasswordState())
     val changePasswordState: StateFlow<ChangePasswordState> = _changePasswordState
 
-    fun changePassword(newPassword: String, confirmPassword: String) {
+    fun changePassword(currentPassword: String, newPassword: String, confirmPassword: String) {
         viewModelScope.launch {
             if (newPassword != confirmPassword) {
                 _changePasswordState.value = ChangePasswordState(error = "Passwords do not match")
                 return@launch
             }
 
-            val result = userRepository.changePassword(newPassword)
+            val result = userRepository.changePassword(currentPassword, newPassword)
             if (result.isSuccess) {
                 _changePasswordState.value = ChangePasswordState(isPasswordChanged = true)
             } else {

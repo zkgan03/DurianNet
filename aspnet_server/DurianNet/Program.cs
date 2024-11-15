@@ -1,6 +1,8 @@
 using DurianNet.Data;
 using DurianNet.Exceptions;
 using DurianNet.Hubs;
+using DurianNet.Interfaces;
+using DurianNet.Repository;
 using DurianNet.Services.CommentService;
 using DurianNet.Services.DetectionService;
 using DurianNet.Services.DetectionService.YOLO.v10;
@@ -22,6 +24,10 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddSingleton<IDetector, YoloV10Detector>();
 builder.Services.AddScoped<ISellerService, SellerService>();
 builder.Services.AddScoped<ICommentService, CommentService>();
+builder.Services.AddScoped<IDurianProfileRepository, DurianProfileRepository>();
+builder.Services.AddScoped<IDurianVideoRepository, DurianVideoRepository>();
+builder.Services.AddScoped<IUserRepository, UserRepository>();
+
 
 
 // Setup signalR
