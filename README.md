@@ -12,5 +12,5 @@
 ## Installation Guide
 
 1. Database setup
-   - Install (SQL 2022 Express)[https://www.microsoft.com/en-my/sql-server/sql-server-downloads]
+   - Install [SQL 2022 Express](https://www.microsoft.com/en-my/sql-server/sql-server-downloads)
    - Run command `dotnet ef database update` in project directory.
