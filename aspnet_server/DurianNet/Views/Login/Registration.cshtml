@@ -1,0 +1,51 @@
+﻿@{
+    ViewData["Title"] = "Registration";
+}
+
+<div class="w-full">
+    <div class="bg-white p-8">
+        <!-- Title -->
+        <h1 class="text-black mb-6 text-3xl font-bold">Admin Registration</h1> <!-- Updated Title -->
+        <!-- Input Fields -->
+        <form method="post" action="/account/Register">
+            <div class="space-y-6 w-2/5">
+                <!-- Username Field -->
+                <div>
+                    <label for="username" class="text-black block text-lg font-bold">Username</label>
+                    <input type="text" id="username" name="username"
+                           class="mt-2 px-3 py-2 border-gray-300 w-full rounded-md border text-lg focus:outline-none focus:ring-2 focus:ring-[#12796F]"
+                           placeholder="Enter your username" required />
+                </div>
+                <!-- Email Field -->
+                <div>
+                    <label for="email" class="text-black block text-lg font-bold">Email</label>
+                    <input type="email" id="email" name="email"
+                           class="mt-2 px-3 py-2 border-gray-300 w-full rounded-md border text-lg focus:outline-none focus:ring-2 focus:ring-[#12796F]"
+                           placeholder="Enter your email" required />
+                </div>
+                <!-- Password Field -->
+                <div>
+                    <label for="password" class="text-black block text-lg font-bold">Password</label>
+                    <input type="password" id="password" name="password"
+                           class="mt-2 px-3 py-2 border-gray-300 w-full rounded-md border text-lg focus:outline-none focus:ring-2 focus:ring-[#12796F]"
+                           placeholder="Enter your password" required />
+                </div>
+                <!-- Confirm Password Field -->
+                <div>
+                    <label for="confirmPassword" class="text-black block text-lg font-bold">Confirm Password</label>
+                    <input type="password" id="confirmPassword" name="confirmPassword"
+                           class="mt-2 px-3 py-2 border-gray-300 w-full rounded-md border text-lg focus:outline-none focus:ring-2 focus:ring-[#12796F]"
+                           placeholder="Confirm your password" required />
+                </div>
+            </div>
+
+            <!-- Register Button -->
+            <div class="mt-20 w-2/5">
+                <button type="submit"
+                        class="py-2 px-6 text-white w-full rounded-md bg-[#12796F] font-bold transition hover:bg-[#0f5d57]">
+                    Register
+                </button>
+            </div>
+        </form>
+    </div>
+</div>

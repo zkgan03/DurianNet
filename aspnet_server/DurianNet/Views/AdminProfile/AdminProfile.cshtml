@@ -1,0 +1,52 @@
+﻿@{
+    ViewData["Title"] = "Admin Profile";
+}
+
+<div class="w-full">
+    <div class="bg-white p-8">
+        <!-- Title -->
+        <h1 class="text-black mb-6 text-3xl font-bold">My Profile</h1> <!-- Larger text for My Profile -->
+        <!-- Profile Picture -->
+        <div class="mb-6">
+            <img src="/images/durian.jpg" alt="Profile Picture" class="w-40 h-40 border-gray-300 rounded-full border object-cover" /> <!-- Larger profile picture -->
+        </div>
+
+        <!-- Admin Info -->
+        <div class="gap-4 mb-8 mr-auto grid w-2/5 grid-cols-2 text-lg">
+            <!-- 50% width, aligned left -->
+            <!-- Left Column -->
+            <div class="text-black font-bold">
+                <p>Username</p>
+                <p>Fullname</p>
+                <p>Email</p>
+                <p>Phone Number</p>
+            </div>
+            <!-- Right Column -->
+            <div class="text-black">
+                <p>Mina</p>
+                <p>Mina Mina</p>
+                <p>mina@gmail.com</p>
+                <p>012-3456788</p>
+            </div>
+        </div>
+
+        <!-- Action Links -->
+        <div class="space-y-4 mt-20">
+            <a href="/adminprofile/ChangePasswordPage"
+               class="py-2 px-6 text-white block w-1/5 rounded bg-[#12796F] text-center font-bold transition hover:bg-[#0f5d57]">
+                <!-- Reduced width -->
+                Change Password
+            </a>
+            <a href="/adminprofile/EditProfilePage"
+               class="py-2 px-6 text-white block w-1/5 rounded bg-[#12796F] text-center font-bold transition hover:bg-[#0f5d57]">
+                <!-- Reduced width -->
+                Edit Profile
+            </a>
+            <button type="button" onclick="window.location.href='/adminprofile/DeleteAccount'"
+                    class="py-2 px-6 text-white block w-1/5 rounded bg-[#D97706] text-center font-bold transition hover:bg-[#b45e05]">
+                <!-- Button styled as link -->
+                Delete Account
+            </button>
+        </div>
+    </div>
+</div>

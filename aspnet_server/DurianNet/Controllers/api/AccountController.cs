@@ -93,7 +93,7 @@ namespace DurianNet.Controllers.api
                 {
                     UserName = registerDto.Username,
                     Email = registerDto.Email,
-                    ProfilePicture = "default.jpg", // Set default profile picture
+                    ProfilePicture = "defaultProfilePicture.jpg", // Set default profile picture
                     UserStatus = UserStatus.Active, // Set default status
                     UserType = UserType.User // Set default type
                 };
@@ -197,32 +197,6 @@ namespace DurianNet.Controllers.api
 
             return Ok("Password reset successfully.");
         }
-
-        //[HttpPut("ChangePassword")]
-        //[Authorize]
-        //public async Task<IActionResult> ChangePassword([FromBody] ChangePasswordRequestDto dto)
-        //{
-        //    if (string.IsNullOrWhiteSpace(dto.CurrentPassword) || string.IsNullOrWhiteSpace(dto.Password))
-        //        return BadRequest("Current password or new password is missing.");
-
-        //    // Retrieve username from JwtRegisteredClaimNames.GivenName
-        //    var username = User.Claims.FirstOrDefault(c => c.Type == JwtRegisteredClaimNames.GivenName)?.Value;
-        //    //var user = await _userManager.FindByNameAsync(username);
-        //    //if (user == null)
-        //    //    return Unauthorized("User not found.");
-        //    if (string.IsNullOrEmpty(username))
-        //        return Unauthorized("User not found.");
-
-        //    var user = await _userManager.FindByNameAsync(username);
-        //    if (user == null)
-        //        return Unauthorized("User not found.");
-
-        //    var result = await _userManager.ChangePasswordAsync(user, dto.CurrentPassword, dto.Password);
-        //    if (!result.Succeeded)
-        //        return BadRequest(result.Errors);
-
-        //    return Ok("Password changed successfully.");
-        //}
 
         [HttpPut("ChangePassword")]
         [Authorize]

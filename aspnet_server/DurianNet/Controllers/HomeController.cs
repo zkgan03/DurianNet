@@ -5,9 +5,17 @@ using System.Diagnostics;
 
 namespace DurianNet.Controllers
 {
+    [Route("")]
     public class HomeController : Controller
     {
         private readonly ILogger<HomeController> _logger;
+
+
+        [HttpGet("")]
+        public IActionResult RedirectToLoginPage()
+        {
+            return RedirectToAction("LoginPage", "Account");
+        }
 
         public HomeController(ILogger<HomeController> logger)
         {
