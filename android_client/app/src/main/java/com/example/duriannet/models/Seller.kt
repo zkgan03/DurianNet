@@ -1,6 +1,6 @@
 package com.example.duriannet.models
 
-import android.graphics.Bitmap
+import com.example.duriannet.services.common.GoogleMapManager
 import com.google.android.gms.maps.model.LatLng
 import com.google.maps.android.clustering.ClusterItem
 
@@ -20,6 +20,21 @@ data class Seller(
     override fun getSnippet(): String = description
     override fun getZIndex(): Float = avgRating
 }
+
+fun Seller.toSellerSearchResult(
+    userLatLng: Pair<Double, Double>,
+): SellerSearchResult = SellerSearchResult(
+    sellerId = sellerId,
+    name = name,
+    latitude = latLng.latitude,
+    longitude = latLng.longitude,
+    distanceFromCurrentLocationInKm = GoogleMapManager.calculateDistanceInMeter(
+        userLatLng.first,
+        userLatLng.second,
+        latLng.latitude,
+        latLng.longitude,
+    ) / 1000,
+)
 
 enum class DurianType {
     MusangKing,

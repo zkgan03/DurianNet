@@ -33,6 +33,7 @@ import com.example.duriannet.databinding.ItemUserCommentedBinding
 import com.example.duriannet.databinding.ItemUserNotCommentedBinding
 import com.example.duriannet.models.Comment
 import com.example.duriannet.models.Seller
+import com.example.duriannet.models.asSeller
 import com.example.duriannet.presentation.seller_locator.adapter.MarkerInfoWindowAdapter
 import com.example.duriannet.presentation.seller_locator.adapter.SearchResultsAdapter
 import com.example.duriannet.presentation.seller_locator.adapter.SellerCommentsAdapter
@@ -95,8 +96,6 @@ class MapFragment : Fragment() {
             if (!Common.hasPermissions(requireContext(), PERMISSIONS_REQUIRED)) {
                 Toast.makeText(requireContext(), "Permission request denied", Toast.LENGTH_LONG).show()
                 requireActivity().onBackPressedDispatcher.onBackPressed() // close activity if permission denied
-            } else {
-                initMap()
             }
         }
 
@@ -184,6 +183,8 @@ class MapFragment : Fragment() {
                     }
                 }
                 .launchIn(viewLifecycleOwner.lifecycleScope)
+
+            viewModel.initViewModel()
         }
     }
 
@@ -267,25 +268,25 @@ class MapFragment : Fragment() {
 
         // SearchView setup
         // search results adapter
-        adapter.setOnItemClickedListener { seller ->
+        adapter.setOnItemClickedListener { sellerSearchResult ->
             // item clicked
-            viewModel.onEvent(MapEvent.SelectSeller(seller.sellerId)) // select seller
-            viewModel.onEvent(MapEvent.UpdateQuery(seller.name)) // update query value
+            viewModel.onEvent(MapEvent.SelectSeller(sellerSearchResult.sellerId)) // select seller
+            viewModel.onEvent(MapEvent.UpdateQuery(sellerSearchResult.name)) // update query value
 
 //            viewModel.updateQuery(seller.name) // update query value
 
             binding.searchView.hide() // hide search view
             googleMapManager?.apply {
-                moveToLocation(seller.latLng) // move to location
-                onSelect(seller) // select place
+                moveToLocation(LatLng(sellerSearchResult.latitude, sellerSearchResult.longitude)) // move to location
+                onSelect(sellerSearchResult.asSeller()) // select place
             }
 
         }
 
         binding.apply {
-            GoogleMapManager.getUserLocation(requireContext()) { location ->
-                adapter.updateUserLocation(Pair(location.latitude, location.longitude))
-            }
+//            GoogleMapManager.getUserLocation(requireContext()) { location ->
+//                adapter.updateUserLocation(Pair(location.latitude, location.longitude))
+//            }
 
             recyclerResults.adapter = adapter
             recyclerResults.layoutManager = LinearLayoutManager(requireContext())

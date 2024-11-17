@@ -274,6 +274,7 @@ class GoogleMapManager<T : ClusterItem>(
                 ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION)
                 != PackageManager.PERMISSION_GRANTED
             ) {
+                throw Exception("Location permission not granted")
                 return
             }
 

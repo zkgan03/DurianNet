@@ -1,25 +1,34 @@
 package com.example.duriannet.presentation.seller_locator.view_models
 
+import android.content.Context
 import android.util.Log
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.viewModelScope
 import com.example.duriannet.data.repository.comment.ICommentRepository
 import com.example.duriannet.data.repository.seller.ISellerRepository
+import com.example.duriannet.models.toSellerSearchResult
 import com.example.duriannet.presentation.seller_locator.events.MapEvent
 import com.example.duriannet.presentation.seller_locator.state.MapScreenState
+import com.example.duriannet.services.common.GoogleMapManager
 import com.example.duriannet.utils.Event
 import com.example.duriannet.utils.EventBus.sendEvent
 import dagger.hilt.android.lifecycle.HiltViewModel
+import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.mapLatest
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -27,6 +36,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class MapViewModel @Inject constructor(
+    @ApplicationContext private val context: Context,
     private val sellerRepository: ISellerRepository,
     private val commentRepository: ICommentRepository,
 ) : ViewModel() {
@@ -34,17 +44,33 @@ class MapViewModel @Inject constructor(
     private var _state = MutableStateFlow<MapScreenState>(MapScreenState.Loading)
     val state get() = _state.asStateFlow()
 
+    private val _currentUserLocation = MutableStateFlow<Pair<Double, Double>?>(null)
+
     private val queryFlow = MutableSharedFlow<String>(
         replay = 1,
         extraBufferCapacity = 1,
         BufferOverflow.DROP_OLDEST
     )
 
-    init {
-        setUpQueryFlow()
-        initSellers()
-    }
+    fun initViewModel() {
+        GoogleMapManager.getUserLocation(
+            context,
+            onLocationReceived = { location ->
+                Log.e("MapViewModel", "Location received : $location")
+                _currentUserLocation.value = Pair(location.latitude, location.longitude)
+            },
+        )
 
+        // wait location received
+        viewModelScope.launch {
+            _currentUserLocation.collectLatest {
+                if (it != null) {
+                    setUpQueryFlow()
+                    initSellers()
+                }
+            }
+        }
+    }
 
     private val maxAttempts = 5
     private val delay = 5000L
@@ -72,7 +98,12 @@ class MapViewModel @Inject constructor(
     private suspend fun loadSellersWithRetry(): Boolean {
         val result = sellerRepository.getAllSellers()
         result.onSuccess { sellers ->
-            _state.value = MapScreenState.Success(sellers = sellers, searchResults = sellers)
+            _state.value = MapScreenState.Success(
+                sellers = sellers,
+                searchResults = sellers.map {
+                    it.toSellerSearchResult(_currentUserLocation.value ?: Pair(0.0, 0.0))
+                }.sortedBy { it.distanceFromCurrentLocationInKm }
+            )
             return true
         }.onFailure {
             val exception = result.exceptionOrNull()
@@ -120,7 +151,12 @@ class MapViewModel @Inject constructor(
 
                 result.onSuccess { sellers ->
                     updateState { state ->
-                        state.copy(searchResults = sellers)
+                        state.copy(
+                            searchResults = sellers
+                                .map {
+                                    it.toSellerSearchResult(_currentUserLocation.value ?: Pair(0.0, 0.0))
+                                }
+                                .sortedBy { it.distanceFromCurrentLocationInKm })
                     }
                 }.onFailure {
                     val exception = it
@@ -164,6 +200,7 @@ class MapViewModel @Inject constructor(
 
     private fun handleQueryUpdate(query: String) {
         Log.e("MapViewModel", "handleQueryUpdate : $query")
+
         updateState { state ->
             state.copy(query = query)
         }
