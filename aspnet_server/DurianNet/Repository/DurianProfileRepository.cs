@@ -18,11 +18,6 @@ namespace DurianNet.Repository
             _context = context;
         }
 
-        //public async Task<List<DurianProfile>> GetAllDurianProfilesAsync()
-        //{
-        //    return await _context.DurianProfiles.Include(dp => dp.DurianVideo).ToListAsync();
-        //}
-
         public async Task<List<DurianProfile>> GetAllDurianProfilesAsync(DurianQueryObject query)
         {
             var durianProfilesQuery = _context.DurianProfiles.AsQueryable();
@@ -82,6 +77,11 @@ namespace DurianNet.Repository
                 return true;
             }
             return false;
+        }
+
+        public async Task<DurianProfile?> GetBySymbolAsync(string symbol)
+        {
+            return await _context.DurianProfiles.FirstOrDefaultAsync(s => s.DurianName == symbol);
         }
     }
 }

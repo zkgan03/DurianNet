@@ -18,11 +18,6 @@ namespace DurianNet.Repository
             _context = context;
         }
 
-        //public async Task<List<User>> GetAllUsersAsync()
-        //{
-        //    return await _context.Users.ToListAsync();
-        //}
-
         public async Task<List<User>> GetAllUsersAsync(QueryObject query)
         {
             var users = _context.Users.AsQueryable();

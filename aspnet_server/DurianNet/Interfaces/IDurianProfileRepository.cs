@@ -10,6 +10,7 @@ namespace DurianNet.Interfaces
     {
         Task<List<DurianProfile>> GetAllDurianProfilesAsync(DurianQueryObject query);
         Task<DurianProfile?> GetDurianProfileByIdAsync(int id);
+        Task<DurianProfile?> GetBySymbolAsync(string symbol);
         Task<DurianProfile> AddDurianProfileAsync(AddDurianProfileRequestDto dto);
         Task<DurianProfile?> UpdateDurianProfileAsync(int id, UpdateDurianProfileRequestDto dto);
         Task<bool> DeleteDurianProfileAsync(int id);

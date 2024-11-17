@@ -1,4 +1,6 @@
 ﻿using DurianNet.Models.DataModels;
+using DurianNet.Repository;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
@@ -15,10 +17,38 @@ namespace DurianNet.Data
         public DbSet<DurianProfile> DurianProfiles { get; set; }
         public DbSet<Comment> Comments { get; set; }
         public DbSet<Seller> Sellers { get; set; }
+        public DbSet<FavoriteDurian> FavoriteDurians { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
+
+            modelBuilder.Entity<FavoriteDurian>(x => x.HasKey(p => new { p.UserId, p.DurianId }));
+
+            modelBuilder.Entity<FavoriteDurian>()
+                .HasOne(u => u.User)
+                .WithMany(u => u.FavoriteDurians)
+                .HasForeignKey(p => p.UserId);
+
+            modelBuilder.Entity<FavoriteDurian>()
+                .HasOne(u => u.DurianProfile)
+                .WithMany(u => u.FavoriteDurians)
+                .HasForeignKey(p => p.DurianId);
+
+            List<IdentityRole> roles = new List<IdentityRole>
+            {
+                new IdentityRole
+                {
+                    Name = "Admin",
+                    NormalizedName = "ADMIN"
+                },
+                new IdentityRole
+                {
+                    Name = "User",
+                    NormalizedName = "USER"
+                },
+            };
+            modelBuilder.Entity<IdentityRole>().HasData(roles);
 
             modelBuilder.Entity<Comment>()
                 .HasOne(c => c.Seller)

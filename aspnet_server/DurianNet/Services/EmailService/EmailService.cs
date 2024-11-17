@@ -9,7 +9,7 @@ namespace DurianNet.Services.EmailService
         private const string SenderPassword = "tqbp zars jlzu wpof"; // Update to your email password or app password
         private const string UserResetLink = "https://dummy-app-reset-link.com"; // Update to your app's reset link
         private const string AdminResetLink = "https://dummy-admin-reset-link.com"; // Update to your admin web reset link
-
+        
         public static void SendPasswordRecoveryEmail(string receiverEmail, bool isAdmin)
         {
             try

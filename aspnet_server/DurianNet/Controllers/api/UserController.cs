@@ -5,6 +5,7 @@ using DurianNet.Interfaces;
 using DurianNet.Mappers;
 using DurianNet.Models.DataModels;
 using DurianNet.Services.EmailService;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -38,6 +39,7 @@ namespace DurianNet.Controllers.api
         }
 
         [HttpGet("GetAllUsers")]
+        [Authorize]
         public async Task<IActionResult> GetAllUsers([FromQuery] QueryObject query)
         {
             // Check if query is null

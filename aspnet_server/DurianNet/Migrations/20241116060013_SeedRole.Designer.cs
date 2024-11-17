@@ -4,6 +4,7 @@ using DurianNet.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace DurianNet.Migrations
 {
     [DbContext(typeof(ApplicationDBContext))]
-    partial class ApplicationDBContextModelSnapshot : ModelSnapshot
+    [Migration("20241116060013_SeedRole")]
+    partial class SeedRole
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -88,7 +91,7 @@ namespace DurianNet.Migrations
 
                     b.HasIndex("DurianVideoId");
 
-                    b.ToTable("DurianProfile");
+                    b.ToTable("DurianProfiles");
                 });
 
             modelBuilder.Entity("DurianNet.Models.DataModels.DurianVideo", b =>
@@ -231,21 +234,6 @@ namespace DurianNet.Migrations
                     b.ToTable("AspNetUsers", (string)null);
                 });
 
-            modelBuilder.Entity("DurianNet.Repository.FavoriteDurian", b =>
-                {
-                    b.Property<string>("UserId")
-                        .HasColumnType("nvarchar(450)");
-
-                    b.Property<int>("DurianId")
-                        .HasColumnType("int");
-
-                    b.HasKey("UserId", "DurianId");
-
-                    b.HasIndex("DurianId");
-
-                    b.ToTable("FavoriteDurian");
-                });
-
             modelBuilder.Entity("DurianProfileSeller", b =>
                 {
                     b.Property<int>("DurianProfilesDurianId")
@@ -305,13 +293,13 @@ namespace DurianNet.Migrations
                     b.HasData(
                         new
                         {
-                            Id = "2e6eb08c-4490-4ab2-a68e-71b75b5dea5a",
+                            Id = "5fcc3f45-60c4-4799-a6a9-956cf3f3a51a",
                             Name = "Admin",
                             NormalizedName = "ADMIN"
                         },
                         new
                         {
-                            Id = "4775cec9-0abc-4675-8fdb-ebce36ce1d8f",
+                            Id = "e9cadf98-1417-42ba-a2d2-baac1821f345",
                             Name = "User",
                             NormalizedName = "USER"
                         });
@@ -464,25 +452,6 @@ namespace DurianNet.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("DurianNet.Repository.FavoriteDurian", b =>
-                {
-                    b.HasOne("DurianNet.Models.DataModels.DurianProfile", "DurianProfile")
-                        .WithMany("FavoriteDurians")
-                        .HasForeignKey("DurianId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("DurianNet.Models.DataModels.User", "User")
-                        .WithMany("FavoriteDurians")
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("DurianProfile");
-
-                    b.Navigation("User");
-                });
-
             modelBuilder.Entity("DurianProfileSeller", b =>
                 {
                     b.HasOne("DurianNet.Models.DataModels.DurianProfile", null)
@@ -564,19 +533,9 @@ namespace DurianNet.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("DurianNet.Models.DataModels.DurianProfile", b =>
-                {
-                    b.Navigation("FavoriteDurians");
-                });
-
             modelBuilder.Entity("DurianNet.Models.DataModels.Seller", b =>
                 {
                     b.Navigation("Comments");
-                });
-
-            modelBuilder.Entity("DurianNet.Models.DataModels.User", b =>
-                {
-                    b.Navigation("FavoriteDurians");
                 });
 #pragma warning restore 612, 618
         }

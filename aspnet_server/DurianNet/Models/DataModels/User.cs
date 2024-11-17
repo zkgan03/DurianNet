@@ -1,13 +1,14 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using DurianNet.Repository;
+using Microsoft.AspNetCore.Identity;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace DurianNet.Models.DataModels
 {
+    [Table("User")]
     public class User : IdentityUser
     {
-        [Required]
-        public string FullName { get; set; } // User's full name
+        public string FullName { get; set; } = string.Empty;// User's full name
 
         public string ProfilePicture { get; set; } // Profile picture URL or path
 
@@ -19,6 +20,8 @@ namespace DurianNet.Models.DataModels
 
         // Navigation properties if needed
         public ICollection<DurianProfile> FavoriteDurian { get; set; }
+
+        public List<FavoriteDurian> FavoriteDurians { get; set; } = new List<FavoriteDurian>();
     }
 
     public enum UserType

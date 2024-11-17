@@ -1,7 +1,10 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using DurianNet.Repository;
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace DurianNet.Models.DataModels
 {
+    [Table("DurianProfile")]
     public class DurianProfile
     {
         [Key]
@@ -16,5 +19,7 @@ namespace DurianNet.Models.DataModels
         public DurianVideo DurianVideo { get; set; }
         public ICollection<Seller> Sellers { get; set; } //To indicate many to many relationship
         public ICollection<User> Users { get; set; }//To indicate many to many relationship
+
+        public List<FavoriteDurian> FavoriteDurians { get; set; } = new List<FavoriteDurian>();
     }
 }
