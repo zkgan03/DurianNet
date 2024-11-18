@@ -2,13 +2,67 @@
     ViewData["Title"] = "Durian Profile";
 }
 
-<div class="w-full">
-    <div class="bg-white p-8">
-        <!-- Title -->
-        <h1 class="text-black mb-6 text-3xl font-bold">Durian Profile</h1> <!-- Title -->
-        <!-- Content Placeholder -->
-        <div>
-            <!-- Additional content will go here in future development -->
+<div class="p-8 w-full">
+    <!-- Title -->
+    <h1 class="text-black mb-6 text-3xl font-bold">Durian Profile</h1>
+
+    <!-- Search Bar and Add Durian Button -->
+    <div class="mb-6 flex items-center justify-between">
+        <!-- Search Bar -->
+        <div class="flex w-1/2 items-center">
+            <input type="text" placeholder="Search Durian Name" class="border-gray-300 px-4 py-2 w-full rounded-md border focus:ring-[#12796F] focus:outline-none">
+            <button class="ml-2 px-3 py-2 text-white rounded-md bg-[#12796F] hover:bg-[#0f5d57]">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                    <path fill-rule="evenodd" d="M12.9 14.32a8 8 0 111.414-1.414l4.243 4.243a1 1 0 01-1.414 1.414l-4.243-4.243zM8 14a6 6 0 100-12 6 6 0 000 12z" clip-rule="evenodd" />
+                </svg>
+            </button>
         </div>
+
+        <!-- Add Durian Button -->
+        <a href="/durianprofile/AddDurianProfilePage" class="text-white px-4 py-2 rounded-md bg-[#12796F] font-bold hover:bg-[#0f5d57]">
+            + Add Durian
+        </a>
+
+    </div>
+
+    <!-- Durian Table -->
+    <div class="overflow-x-auto">
+        <table class="border-gray-300 min-w-full border-collapse border text-left text-sm">
+            <thead class="bg-gray-100">
+                <tr>
+                    <th class="border-gray-300 px-4 py-2 border font-medium">Durian Name</th>
+                    <th class="border-gray-300 px-4 py-2 border font-medium">Description</th>
+                    <th class="border-gray-300 px-4 py-2 border font-medium">Characteristic</th>
+                    <th class="border-gray-300 px-4 py-2 border font-medium">Taste Profile</th>
+                    <th class="border-gray-300 px-4 py-2 border font-medium">Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- Example Rows -->
+                @for (int i = 0; i < 10; i++)
+                {
+                    <tr class="even:bg-gray-50">
+                        <td class="border-gray-300 px-4 py-2 border">Musang King</td>
+                        <td class="border-gray-300 px-4 py-2 border">Golden flesh</td>
+                        <td class="border-gray-300 px-4 py-2 border">Small seeds</td>
+                        <td class="border-gray-300 px-4 py-2 border">Bitter-sweet</td>
+                        <td class="border-gray-300 px-4 py-2 space-x-2 flex border">
+                            <a href="/durianprofile/UpdateDurianProfileDetailsPage" class="text-white px-3 py-1 rounded-md bg-[#1D4ED8] text-sm font-bold hover:bg-[#0c3ba8]">Edit</a>
+                            <a href="/durianprofile/Delete" class="text-white px-3 py-1 rounded-md bg-[#D97706] text-sm font-bold hover:bg-[#b45e05]">Delete</a>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Pagination -->
+    <div class="mt-6 space-x-2 flex items-center justify-center">
+        <a href="#" class="px-3 py-1 bg-gray-200 text-gray-600 rounded-md hover:bg-gray-300">&laquo;</a>
+        @for (int i = 1; i <= 5; i++)
+        {
+            <a href="#" class="px-3 py-1 bg-gray-200 text-gray-600 rounded-md hover:bg-gray-300">@i</a>
+        }
+        <a href="#" class="px-3 py-1 bg-gray-200 text-gray-600 rounded-md hover:bg-gray-300">&raquo;</a>
     </div>
 </div>
