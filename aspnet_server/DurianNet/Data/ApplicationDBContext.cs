@@ -9,15 +9,14 @@ namespace DurianNet.Data
     public class ApplicationDBContext : IdentityDbContext<User>
     {
 
-        public ApplicationDBContext(DbContextOptions options) : base(options)
-        {
-        }
+        public ApplicationDBContext(DbContextOptions<ApplicationDBContext> options) : base(options) { }
 
         public DbSet<DurianVideo> DurianVideos { get; set; }
         public DbSet<DurianProfile> DurianProfiles { get; set; }
         public DbSet<Comment> Comments { get; set; }
         public DbSet<Seller> Sellers { get; set; }
         public DbSet<FavoriteDurian> FavoriteDurians { get; set; }
+        public DbSet<RefreshToken> RefreshTokens { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

@@ -32,4 +32,24 @@ public class DurianProfileWebController : Controller
         // Redirect to the Durian Profile page after deletion.
         return RedirectToAction("DurianProfilePage");
     }
+
+    [HttpPost("SaveDurianProfile")]
+    public IActionResult SaveDurianProfile(string durianName, string characteristic, string tasteProfile, string durianDescription, string videoDescription)
+    {
+        // TODO: Save the data to the database or perform other necessary logic.
+
+        // Redirect to the Durian Profile page after saving.
+        return RedirectToAction("DurianProfilePage");
+    }
+
+    [HttpPost("UpdateDurianProfile")]
+    public IActionResult UpdateDurianProfile(int id, string durianName, string characteristic, string tasteProfile, string durianDescription, string videoDescription)
+    {
+        // TODO: Implement the logic to update the durian profile in the database using the provided data.
+
+        // Redirect back to the Durian Profile page after updating.
+        return RedirectToAction("DurianProfilePage");
+    }
+
+
 }

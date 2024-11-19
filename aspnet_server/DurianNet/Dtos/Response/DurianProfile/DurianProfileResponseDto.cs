@@ -9,5 +9,6 @@
         public string TasteProfile { get; set; }
         public string DurianImage { get; set; }
         public string DurianVideoUrl { get; set; }
+        public string DurianVideoDescription { get; set; }
     }
 }

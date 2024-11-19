@@ -4,6 +4,7 @@ using DurianNet.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace DurianNet.Migrations
 {
     [DbContext(typeof(ApplicationDBContext))]
-    partial class ApplicationDBContextModelSnapshot : ModelSnapshot
+    [Migration("20241119075000_AddPasswordResetTokenToUser")]
+    partial class AddPasswordResetTokenToUser
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -341,13 +344,13 @@ namespace DurianNet.Migrations
                     b.HasData(
                         new
                         {
-                            Id = "9d3a57f8-c36c-4190-a666-01c27aa19afe",
+                            Id = "acfe71b1-1fe4-4a65-8826-554131a6a167",
                             Name = "Admin",
                             NormalizedName = "ADMIN"
                         },
                         new
                         {
-                            Id = "b9a506bb-b989-4966-ad4c-e8628198d729",
+                            Id = "1d48babd-765a-4cfa-a106-5f625a9976b6",
                             Name = "User",
                             NormalizedName = "USER"
                         });

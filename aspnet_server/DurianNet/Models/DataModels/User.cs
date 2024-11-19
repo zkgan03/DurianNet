@@ -22,6 +22,15 @@ namespace DurianNet.Models.DataModels
         public ICollection<DurianProfile> FavoriteDurian { get; set; }
 
         public List<FavoriteDurian> FavoriteDurians { get; set; } = new List<FavoriteDurian>();
+
+        public ICollection<RefreshToken> RefreshTokens { get; set; } = new List<RefreshToken>();
+
+        //no use
+        public string? PasswordResetToken { get; set; } // Make it nullable
+
+        //no use
+        public DateTime? ResetTokenExpires { get; set; }
+
     }
 
     public enum UserType

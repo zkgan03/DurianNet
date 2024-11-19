@@ -2,6 +2,6 @@
 {
     public class ResetPasswordRequestDto
     {
-        public string Password { get; set; } // Final password to reset
+        public string NewPassword { get; set; }
     }
 }

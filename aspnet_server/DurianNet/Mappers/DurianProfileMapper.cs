@@ -16,7 +16,8 @@ namespace DurianNet.Mappers
                 Characteristics = profile.Characteristics,
                 TasteProfile = profile.TasteProfile,
                 DurianImage = profile.DurianImage,
-                DurianVideoUrl = profile.DurianVideo?.VideoUrl
+                DurianVideoUrl = profile.DurianVideo?.VideoUrl,
+                DurianVideoDescription = profile.DurianVideo?.Description
             };
         }
 

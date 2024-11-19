@@ -38,40 +38,77 @@ namespace DurianNet.Controllers.api
             return Ok(userDtos);
         }
 
+        //[HttpGet("GetAllUsers")]
+        //[Authorize]
+        //public async Task<IActionResult> GetAllUsers([FromQuery] QueryObject query)
+        //{
+        //    // Check if query is null
+        //    if (query == null)
+        //    {
+        //        return BadRequest("Query parameters are missing.");
+        //    }
+
+        //    // Start with a queryable collection of users
+        //    var usersQuery = _context.Users.AsQueryable();
+
+        //    // Filter by username if provided in the query parameters
+        //    if (!string.IsNullOrWhiteSpace(query.Username))
+        //    {
+        //        usersQuery = usersQuery.Where(u => u.UserName.Contains(query.Username));
+        //    }
+
+        //    // Execute the query and get the result
+        //    var users = await usersQuery.ToListAsync();
+
+        //    // If no users found, return a NotFound response
+        //    if (users == null || !users.Any())
+        //    {
+        //        return NotFound("No users found.");
+        //    }
+
+        //    // Map the users to DTOs (assuming you have an extension method to do this)
+        //    var userDtos = users.Select(u => u.ToUserListDto()).ToList();
+
+        //    // Return the list of user DTOs
+        //    return Ok(userDtos);
+        //}
+
         [HttpGet("GetAllUsers")]
-        [Authorize]
         public async Task<IActionResult> GetAllUsers([FromQuery] QueryObject query)
         {
-            // Check if query is null
             if (query == null)
             {
                 return BadRequest("Query parameters are missing.");
             }
 
-            // Start with a queryable collection of users
+            Console.WriteLine($"Query.Username: {query.Username}"); // Debugging
+
             var usersQuery = _context.Users.AsQueryable();
 
-            // Filter by username if provided in the query parameters
             if (!string.IsNullOrWhiteSpace(query.Username))
             {
-                usersQuery = usersQuery.Where(u => u.UserName.Contains(query.Username));
+                usersQuery = usersQuery.Where(u => u.UserName.ToLower().Contains(query.Username.ToLower())); // Case-insensitive
             }
 
-            // Execute the query and get the result
             var users = await usersQuery.ToListAsync();
 
-            // If no users found, return a NotFound response
             if (users == null || !users.Any())
             {
                 return NotFound("No users found.");
             }
 
-            // Map the users to DTOs (assuming you have an extension method to do this)
-            var userDtos = users.Select(u => u.ToUserListDto()).ToList();
-
-            // Return the list of user DTOs
-            return Ok(userDtos);
+            try
+            {
+                var userDtos = users.Select(u => u.ToUserListDto()).ToList();
+                return Ok(userDtos);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error in DTO mapping: {ex.Message}"); // Debugging
+                return StatusCode(500, "An error occurred while processing the data.");
+            }
         }
+
 
 
 
@@ -109,21 +146,20 @@ namespace DurianNet.Controllers.api
             return Ok(user.ToUserDetailsDto());
         }
 
-        [HttpPost("ForgotPassword")]
+
+[HttpPost("ForgotPassword")]
         public async Task<IActionResult> ForgotPassword([FromBody] ForgotPasswordRequestDto dto)
         {
-            // Validate the input
             if (string.IsNullOrEmpty(dto.Email))
-            {
                 return BadRequest("Email cannot be empty.");
-            }
 
-            // Check if the email exists in the database
+            // Find the user by email
             var user = await _context.Users.FirstOrDefaultAsync(u => u.Email == dto.Email);
             if (user == null)
-            {
                 return NotFound("No user found with the provided email address.");
-            }
+
+            // Save the email in the session
+            HttpContext.Session.SetString("ResetPasswordEmail", dto.Email);
 
             // Determine whether the user is an admin or regular user
             bool isAdmin = user.UserType == UserType.Admin || user.UserType == UserType.SuperAdmin;
@@ -142,6 +178,20 @@ namespace DurianNet.Controllers.api
                 return StatusCode(500, $"An error occurred while sending the email: {ex.Message}");
             }
         }
+
+        
+        
+        [HttpGet("GetSessionEmail")]
+        public IActionResult GetSessionEmail()
+        {
+            var email = HttpContext.Session.GetString("ResetPasswordEmail");
+            if (string.IsNullOrEmpty(email))
+                return NotFound("No email found in session.");
+
+            return Ok($"Email in session: {email}");
+        }
+
+
 
 
 

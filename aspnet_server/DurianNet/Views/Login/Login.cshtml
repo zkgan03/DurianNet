@@ -21,21 +21,22 @@
 
         <div class="mx-auto w-[50%]">
             <h3 class="mb-8 text-gray-800 text-center text-4xl font-bold">Admin Login</h3>
-            <form method="post" action="~/account/LoginAction">
+            <!-- Login Form -->
+            <form id="loginForm" method="post">
                 <div class="mb-6">
                     <label for="username" class="text-gray-700 block text-lg font-medium">Username</label>
-                    <input type="text" id="username" name="username"
+                    <input type="text" id="username" name="username" required
                            class="mt-2 px-4 py-3 border-gray-300 block w-full rounded-md border text-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-[#12796F]"
-                           placeholder="Enter your username" required />
+                           placeholder="Enter your username" />
                 </div>
                 <div class="mb-6">
                     <label for="password" class="text-gray-700 block text-lg font-medium">Password</label>
-                    <input type="password" id="password" name="password"
+                    <input type="password" id="password" name="password" required
                            class="mt-2 px-4 py-3 border-gray-300 block w-full rounded-md border text-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-[#12796F]"
-                           placeholder="Enter your password" required />
+                           placeholder="Enter your password" />
                 </div>
                 <div class="mb-6">
-                    <button type="submit"
+                    <button type="button" onclick="login()"
                             class="py-3 text-white w-full rounded-md bg-[#12796F] text-lg font-bold transition hover:bg-[#0f5d57]">
                         Login
                     </button>
@@ -45,8 +46,49 @@
                         Forgot Password?
                     </a>
                 </div>
+                <div id="errorMessage" class="text-red-600 mt-4 text-lg"></div>
             </form>
         </div>
     </div>
+
+    <script>
+        async function login() {
+            const username = document.getElementById("username").value;
+            const password = document.getElementById("password").value;
+            const errorMessage = document.getElementById("errorMessage");
+
+            errorMessage.textContent = ""; // Clear previous error message
+
+            try {
+                const response = await fetch('/api/account/loginAdmin', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ username, password })
+                });
+
+                if (!response.ok) {
+                    try {
+                        // Attempt to parse JSON error message
+                        const error = await response.json();
+                        errorMessage.textContent = error.message || "Invalid username or password.";
+                    } catch (parseError) {
+                        // Handle non-JSON error responses
+                        errorMessage.textContent = "Invalid username or password.";
+                    }
+                    return;
+                }
+
+                const data = await response.json();
+                alert("Login successful!"); // You can customize this message
+                window.location.href = "/adminprofile/ProfilePage"; // Redirect to admin profile
+            } catch (networkError) {
+                // Handle network errors
+                errorMessage.textContent = "An unexpected error occurred. Please check your connection.";
+            }
+        }
+
+
+    </script>
+
 </body>
 </html>

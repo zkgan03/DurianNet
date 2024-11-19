@@ -6,9 +6,79 @@
     <div class="bg-white p-8">
         <!-- Title -->
         <h1 class="text-black mb-6 text-3xl font-bold">Update Durian Profile Details</h1>
-        <!-- Content Placeholder -->
-        <div>
-            <p class="text-gray-700">This is the Update Durian Profile Details page.</p>
-        </div>
+
+        <!-- Form -->
+        <form method="post" action="/durianprofile/UpdateDurianProfile" enctype="multipart/form-data">
+            <!-- Level 1 -->
+            <div class="gap-6 mb-6 flex">
+                <!-- Durian Name -->
+                <div class="w-1/2">
+                    <label for="durianName" class="text-black block text-lg font-bold">Durian Name</label>
+                    <input type="text" id="durianName" name="durianName"
+                           class="mt-2 px-4 py-3 border-gray-300 w-full rounded-md border text-lg focus:outline-none focus:ring-2 focus:ring-[#12796F]"
+                           placeholder="Enter Durian Name" value="@ViewData["DurianName"]" required />
+                </div>
+                <!-- Durian Image -->
+                <div class="w-1/2">
+                    <label for="durianImage" class="text-black block text-lg font-bold">Durian Image</label>
+                    <input type="file" id="durianImage" name="durianImage"
+                           class="mt-2 px-4 py-3 border-gray-300 w-full rounded-md border text-lg focus:outline-none focus:ring-2 focus:ring-[#12796F]"
+                           accept="image/*" />
+                </div>
+            </div>
+
+            <!-- Level 2 -->
+            <div class="gap-6 mb-6 flex">
+                <!-- Characteristic -->
+                <div class="w-1/2">
+                    <label for="characteristic" class="text-black block text-lg font-bold">Characteristic</label>
+                    <input type="text" id="characteristic" name="characteristic"
+                           class="mt-2 px-4 py-3 border-gray-300 w-full rounded-md border text-lg focus:outline-none focus:ring-2 focus:ring-[#12796F]"
+                           placeholder="Enter Characteristic" value="@ViewData["Characteristic"]" required />
+                </div>
+                <!-- Taste Profile -->
+                <div class="w-1/2">
+                    <label for="tasteProfile" class="text-black block text-lg font-bold">Taste Profile</label>
+                    <input type="text" id="tasteProfile" name="tasteProfile"
+                           class="mt-2 px-4 py-3 border-gray-300 w-full rounded-md border text-lg focus:outline-none focus:ring-2 focus:ring-[#12796F]"
+                           placeholder="Enter Taste Profile" value="@ViewData["TasteProfile"]" required />
+                </div>
+            </div>
+
+            <!-- Level 3 -->
+            <div class="mb-6">
+                <!-- Durian Description -->
+                <label for="durianDescription" class="text-black block text-lg font-bold">Durian Description</label>
+                <input type="text" id="durianDescription" name="durianDescription"
+                       class="mt-2 px-4 py-3 border-gray-300 w-full rounded-md border text-lg focus:outline-none focus:ring-2 focus:ring-[#12796F]"
+                       placeholder="Enter Durian Description" value="@ViewData["DurianDescription"]" required />
+            </div>
+
+            <!-- Level 4 -->
+            <div class="gap-6 mb-6 flex">
+                <!-- Durian Video -->
+                <div class="w-1/2">
+                    <label for="durianVideo" class="text-black block text-lg font-bold">Durian Video</label>
+                    <input type="file" id="durianVideo" name="durianVideo"
+                           class="mt-2 px-4 py-3 border-gray-300 w-full rounded-md border text-lg focus:outline-none focus:ring-2 focus:ring-[#12796F]"
+                           accept="video/*" />
+                </div>
+                <!-- Video Description -->
+                <div class="w-1/2">
+                    <label for="videoDescription" class="text-black block text-lg font-bold">Video Description</label>
+                    <input type="text" id="videoDescription" name="videoDescription"
+                           class="mt-2 px-4 py-3 border-gray-300 w-full rounded-md border text-lg focus:outline-none focus:ring-2 focus:ring-[#12796F]"
+                           placeholder="Enter Video Description" value="@ViewData["VideoDescription"]" required />
+                </div>
+            </div>
+
+            <!-- Save Button -->
+            <div class="mt-8">
+                <button type="submit"
+                        class="py-3 px-6 text-white w-full rounded-md bg-[#12796F] font-bold transition hover:bg-[#0f5d57]">
+                    Update
+                </button>
+            </div>
+        </form>
     </div>
 </div>

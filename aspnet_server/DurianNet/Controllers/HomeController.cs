@@ -1,37 +1,34 @@
-using DurianNet.Models;
 using DurianNet.Models.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 using System.Diagnostics;
 
 namespace DurianNet.Controllers
 {
+    [ApiExplorerSettings(IgnoreApi = true)] // Exclude the whole controller from Swagger
     [Route("")]
     public class HomeController : Controller
     {
         private readonly ILogger<HomeController> _logger;
-
-
-        [HttpGet("")]
-        public IActionResult RedirectToLoginPage()
-        {
-            return RedirectToAction("LoginPage", "Account");
-        }
 
         public HomeController(ILogger<HomeController> logger)
         {
             _logger = logger;
         }
 
-        public IActionResult Index()
+        [HttpGet("")]
+        public IActionResult RedirectToLoginPage()
         {
-            return View();
+            // Redirect to the login page
+            return RedirectToAction("LoginPage", "Account");
         }
 
+        [HttpGet("privacy")]
         public IActionResult Privacy()
         {
             return View();
         }
 
+        [HttpGet("error")]
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
         public IActionResult Error()
         {
