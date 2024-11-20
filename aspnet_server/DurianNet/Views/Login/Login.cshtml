@@ -52,6 +52,41 @@
     </div>
 
     <script>
+        // async function login() {
+        //     const username = document.getElementById("username").value;
+        //     const password = document.getElementById("password").value;
+        //     const errorMessage = document.getElementById("errorMessage");
+
+        //     errorMessage.textContent = ""; // Clear previous error message
+
+        //     try {
+        //         const response = await fetch('/api/account/loginAdmin', {
+        //             method: 'POST',
+        //             headers: { 'Content-Type': 'application/json' },
+        //             body: JSON.stringify({ username, password })
+        //         });
+
+        //         if (!response.ok) {
+        //             try {
+        //                 // Attempt to parse JSON error message
+        //                 const error = await response.json();
+        //                 errorMessage.textContent = error.message || "Invalid username or password.";
+        //             } catch (parseError) {
+        //                 // Handle non-JSON error responses
+        //                 errorMessage.textContent = "Invalid username or password.";
+        //             }
+        //             return;
+        //         }
+
+        //         const data = await response.json();
+        //         alert("Login successful!"); // You can customize this message
+        //         window.location.href = "/adminprofile/ProfilePage"; // Redirect to admin profile
+        //     } catch (networkError) {
+        //         // Handle network errors
+        //         errorMessage.textContent = "An unexpected error occurred. Please check your connection.";
+        //     }
+        // }
+
         async function login() {
             const username = document.getElementById("username").value;
             const password = document.getElementById("password").value;
@@ -63,29 +98,24 @@
                 const response = await fetch('/api/account/loginAdmin', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ username, password })
+                    body: JSON.stringify({ username, password }),
+                    credentials: 'include' // Include cookies in the request
                 });
 
                 if (!response.ok) {
-                    try {
-                        // Attempt to parse JSON error message
-                        const error = await response.json();
-                        errorMessage.textContent = error.message || "Invalid username or password.";
-                    } catch (parseError) {
-                        // Handle non-JSON error responses
-                        errorMessage.textContent = "Invalid username or password.";
-                    }
+                    const error = await response.json();
+                    errorMessage.textContent = error.message || "Invalid username or password.";
                     return;
                 }
 
-                const data = await response.json();
-                alert("Login successful!"); // You can customize this message
-                window.location.href = "/adminprofile/ProfilePage"; // Redirect to admin profile
+                // On success, redirect to the profile page
+                alert("Login successful!");
+                window.location.href = "/adminprofile/ProfilePage";
             } catch (networkError) {
-                // Handle network errors
-                errorMessage.textContent = "An unexpected error occurred. Please check your connection.";
+                errorMessage.textContent = "An unexpected error occurred. Please try again.";
             }
         }
+
 
 
     </script>

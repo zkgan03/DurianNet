@@ -9,6 +9,8 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
 
 namespace DurianNet.Controllers.api
 {
@@ -37,41 +39,6 @@ namespace DurianNet.Controllers.api
 
             return Ok(userDtos);
         }
-
-        //[HttpGet("GetAllUsers")]
-        //[Authorize]
-        //public async Task<IActionResult> GetAllUsers([FromQuery] QueryObject query)
-        //{
-        //    // Check if query is null
-        //    if (query == null)
-        //    {
-        //        return BadRequest("Query parameters are missing.");
-        //    }
-
-        //    // Start with a queryable collection of users
-        //    var usersQuery = _context.Users.AsQueryable();
-
-        //    // Filter by username if provided in the query parameters
-        //    if (!string.IsNullOrWhiteSpace(query.Username))
-        //    {
-        //        usersQuery = usersQuery.Where(u => u.UserName.Contains(query.Username));
-        //    }
-
-        //    // Execute the query and get the result
-        //    var users = await usersQuery.ToListAsync();
-
-        //    // If no users found, return a NotFound response
-        //    if (users == null || !users.Any())
-        //    {
-        //        return NotFound("No users found.");
-        //    }
-
-        //    // Map the users to DTOs (assuming you have an extension method to do this)
-        //    var userDtos = users.Select(u => u.ToUserListDto()).ToList();
-
-        //    // Return the list of user DTOs
-        //    return Ok(userDtos);
-        //}
 
         [HttpGet("GetAllUsers")]
         public async Task<IActionResult> GetAllUsers([FromQuery] QueryObject query)
@@ -109,9 +76,7 @@ namespace DurianNet.Controllers.api
             }
         }
 
-
-
-
+        //GetUser
         [HttpGet("GetUser/{id}")]
         public async Task<IActionResult> GetUserById(string id)
         {
@@ -123,6 +88,34 @@ namespace DurianNet.Controllers.api
             return Ok(user.ToUserDetailsDto());
         }
 
+
+        [HttpGet("GetUserByUsername/{username?}")]
+        public async Task<IActionResult> GetUserByUsername(string? username)
+        {
+            // If username is not provided in the route, use the session value
+            if (string.IsNullOrEmpty(username))
+            {
+                username = HttpContext.Session.GetString("Username");
+
+                if (string.IsNullOrEmpty(username))
+                {
+                    return Unauthorized("Session expired or username not found.");
+                }
+            }
+
+            // Find the user by username
+            var user = await _context.Users.SingleOrDefaultAsync(u => u.UserName == username);
+
+            if (user == null)
+            {
+                return NotFound("User not found.");
+            }
+
+            return Ok(user.ToUserDetailsDto());
+        }
+
+
+
         [HttpPost("Register")]
         public async Task<IActionResult> Register([FromBody] RegisterRequestDto dto)
         {
@@ -132,6 +125,7 @@ namespace DurianNet.Controllers.api
             return Ok(user.ToUserDetailsDto());
         }
 
+        //UpdateUserByUsername
         [HttpPut("UpdateUser/{id}")]
         public async Task<IActionResult> UpdateUser(string id, [FromBody] UpdateUserProfileRequestDto dto)
         {
@@ -146,8 +140,35 @@ namespace DurianNet.Controllers.api
             return Ok(user.ToUserDetailsDto());
         }
 
+        
+        [HttpPut("UpdateUserByUsername/{username?}")]
+        public async Task<IActionResult> UpdateUserByUsername(string? username, [FromBody] UpdateUserProfileRequestDto dto)
+        {
+            if (string.IsNullOrEmpty(username))
+            {
+                username = HttpContext.Session.GetString("Username");
+                if (string.IsNullOrEmpty(username)) return Unauthorized("Session expired or username not found.");
+            }
 
-[HttpPost("ForgotPassword")]
+            var user = await _context.Users.SingleOrDefaultAsync(u => u.UserName == username);
+            if (user == null) return NotFound("User not found");
+
+            // Update fields
+            user.FullName = dto.FullName;
+            user.Email = dto.Email;
+            user.PhoneNumber = dto.PhoneNumber;
+
+            // Update profile picture
+            if (!string.IsNullOrEmpty(dto.ProfilePicture))
+            {
+                user.ProfilePicture = dto.ProfilePicture; // Save Base64 string or store it in a file
+            }
+
+            await _context.SaveChangesAsync();
+            return Ok(user.ToUserDetailsDto());
+        }
+
+        [HttpPost("ForgotPassword")]
         public async Task<IActionResult> ForgotPassword([FromBody] ForgotPasswordRequestDto dto)
         {
             if (string.IsNullOrEmpty(dto.Email))

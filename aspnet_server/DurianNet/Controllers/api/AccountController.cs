@@ -31,101 +31,6 @@ namespace DurianNet.Controllers.api
             _userRepository = userRepository;
         }
 
-        //    [HttpPost("login")]
-        //    public async Task<IActionResult> Login(LoginDto loginDto)
-        //    {
-        //        if (!ModelState.IsValid)
-        //            return BadRequest(ModelState);
-
-        //        var user = await _userManager.Users.FirstOrDefaultAsync(x => x.UserName == loginDto.Username.ToLower());
-
-        //        if (user == null) return Unauthorized("Invalid username!");
-
-        //        if (user.UserType != UserType.User)
-        //            return Unauthorized("Only regular users can log in to the app.");
-
-        //        var result = await _signinManager.CheckPasswordSignInAsync(user, loginDto.Password, false);
-
-        //        if (!result.Succeeded) return Unauthorized("Username not found and/or password incorrect");
-
-        //        // Create cookie
-        //        var claims = new List<Claim>
-        //{
-        //    new Claim(ClaimTypes.Name, user.UserName),
-        //    new Claim(ClaimTypes.NameIdentifier, user.Id),
-        //    new Claim(ClaimTypes.Role, user.UserType.ToString())
-        //};
-
-        //        var identity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
-        //        var principal = new ClaimsPrincipal(identity);
-
-        //        await HttpContext.SignInAsync(
-        //            CookieAuthenticationDefaults.AuthenticationScheme,
-        //            principal,
-        //            new AuthenticationProperties
-        //            {
-        //                IsPersistent = true,  // Keep the cookie across sessions
-        //                ExpiresUtc = DateTime.UtcNow.AddMinutes(30)  // Cookie expiration
-        //            });
-
-        //        return Ok(
-        //            new NewUserDto
-        //            {
-        //                UserName = user.UserName,
-        //                Email = user.Email,
-        //                Token = _tokenService.CreateToken(user)
-        //            }
-        //        );
-        //    }
-
-
-        //    [HttpPost("loginAdmin")]
-        //    public async Task<IActionResult> LoginAdmin(LoginDto loginDto)
-        //    {
-        //        if (!ModelState.IsValid)
-        //            return BadRequest(ModelState);
-
-        //        var user = await _userManager.Users.FirstOrDefaultAsync(x => x.UserName == loginDto.Username.ToLower());
-
-        //        if (user == null) return Unauthorized("Invalid username!");
-
-        //        if (user.UserType != UserType.Admin && user.UserType != UserType.SuperAdmin)
-        //            return Unauthorized("Only admins and super admins can log in to the admin web interface.");
-
-        //        var result = await _signinManager.CheckPasswordSignInAsync(user, loginDto.Password, false);
-
-        //        if (!result.Succeeded) return Unauthorized("Username not found and/or password incorrect");
-
-        //        // Create cookie
-        //        var claims = new List<Claim>
-        //{
-        //    new Claim(ClaimTypes.Name, user.UserName),
-        //    new Claim(ClaimTypes.NameIdentifier, user.Id),
-        //    new Claim(ClaimTypes.Role, user.UserType.ToString())
-        //};
-
-        //        var identity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
-        //        var principal = new ClaimsPrincipal(identity);
-
-        //        await HttpContext.SignInAsync(
-        //            CookieAuthenticationDefaults.AuthenticationScheme,
-        //            principal,
-        //            new AuthenticationProperties
-        //            {
-        //                IsPersistent = true,  // Keep the cookie across sessions
-        //                ExpiresUtc = DateTime.UtcNow.AddMinutes(30)  // Cookie expiration
-        //            });
-
-        //        return Ok(
-        //            new NewUserDto
-        //            {
-        //                UserName = user.UserName,
-        //                Email = user.Email,
-        //                Token = _tokenService.CreateToken(user)
-        //            }
-        //        );
-        //    }
-
         [HttpPost("login")]
         public async Task<IActionResult> Login(LoginDto loginDto)
         {
@@ -200,50 +105,29 @@ namespace DurianNet.Controllers.api
 
             var result = await _signinManager.CheckPasswordSignInAsync(user, loginDto.Password, false);
 
-            if (!result.Succeeded) return Unauthorized("Username not found and/or password incorrect");
+            if (!result.Succeeded) return Unauthorized("Invalid username or password!");
 
-            // Generate Token
+            // Generate JWT token
             var token = _tokenService.CreateToken(user);
 
-            // Create cookie for session-based authentication
-            var claims = new List<Claim>
-        {
-            new Claim(ClaimTypes.Name, user.UserName),
-            new Claim(ClaimTypes.NameIdentifier, user.Id),
-            new Claim(ClaimTypes.Role, user.UserType.ToString())
-        };
+            // Set the session cookie with the username
+            HttpContext.Session.SetString("Username", user.UserName);
 
-            var identity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
-            var principal = new ClaimsPrincipal(identity);
-
-            await HttpContext.SignInAsync(
-                CookieAuthenticationDefaults.AuthenticationScheme,
-                principal,
-                new AuthenticationProperties
-                {
-                    IsPersistent = true,  // Keep the cookie across sessions
-                    ExpiresUtc = DateTime.UtcNow.AddMinutes(30)  // Cookie expiration
-                });
-
-            // Save JWT in a secure HTTP-only cookie
+            // Save the token in an HTTP-only cookie
             HttpContext.Response.Cookies.Append("AuthToken", token, new CookieOptions
             {
-                HttpOnly = true, // Prevent access via JavaScript
-                Secure = true,   // Use HTTPS
-                SameSite = SameSiteMode.Strict, // Strict SameSite policy
-                Expires = DateTime.UtcNow.AddMinutes(30) // Matches the session expiration
+                HttpOnly = true, // Prevents JavaScript access
+                Secure = true,   // Use HTTPS in production
+                SameSite = SameSiteMode.Strict,
+                Expires = DateTime.UtcNow.AddMinutes(30)
             });
 
-            return Ok(
-                new NewUserDto
-                {
-                    UserName = user.UserName,
-                    Email = user.Email,
-                    Token = token // Return token to the client as well
-                }
-            );
+            return Ok(new
+            {
+                UserName = user.UserName,
+                Email = user.Email
+            });
         }
-
 
         [HttpPost("register")]
         public async Task<IActionResult> Register([FromBody] RegisterDto registerDto)
@@ -386,28 +270,37 @@ namespace DurianNet.Controllers.api
             }
         }
 
-        [HttpPut("ChangePassword")]
-        [Authorize]
-        public async Task<IActionResult> ChangePassword([FromBody] ChangePasswordRequestDto dto)
+        [HttpPut("ChangePassword/{username?}")]
+        public async Task<IActionResult> ChangePassword(string? username, [FromBody] ChangePasswordRequestDto dto)
         {
             if (string.IsNullOrWhiteSpace(dto.CurrentPassword) || string.IsNullOrWhiteSpace(dto.Password))
                 return BadRequest("Current password or new password is missing.");
 
-            // Retrieve the username from ClaimTypes.Name
-            var username = User.Identity?.Name;
+            // If the username is not provided in the route, retrieve it from the session
             if (string.IsNullOrEmpty(username))
-                return Unauthorized("User not found1.");
+            {
+                username = HttpContext.Session.GetString("Username");
+                if (string.IsNullOrEmpty(username))
+                    return Unauthorized("User not found.");
+            }
 
+            // Find the user by username
             var user = await _userManager.FindByNameAsync(username);
             if (user == null)
-                return Unauthorized("User not found.");
+                return NotFound("User not found.");
 
+            // Attempt to change the password
             var result = await _userManager.ChangePasswordAsync(user, dto.CurrentPassword, dto.Password);
             if (!result.Succeeded)
+            {
+                var errorMessages = string.Join(", ", result.Errors.Select(e => e.Description));
+                Console.WriteLine($"Change password failed: {errorMessages}");
                 return BadRequest(result.Errors);
+            }
 
             return Ok("Password changed successfully.");
         }
+
 
         [HttpPost("refresh-token")]
         public async Task<IActionResult> RefreshToken([FromBody] RefreshTokenRequestDto request)
@@ -432,31 +325,25 @@ namespace DurianNet.Controllers.api
 
             return Ok(new { AccessToken = newAccessToken, RefreshToken = newRefreshToken.Token });
         }
-
+        
         [HttpPost("logout")]
-        public async Task<IActionResult> Logout([FromBody] LogoutRequestDto request)
+        public async Task<IActionResult> Logout()
         {
-            // Get the current user from the UserManager
-            var user = await _userManager.GetUserAsync(User);
+            // Retrieve the username from session
+            var username = HttpContext.Session.GetString("Username");
+            if (string.IsNullOrEmpty(username))
+                return Unauthorized("User not logged in.");
 
-            if (user == null)
-                return Unauthorized("User not found or not logged in.");
+            // Clear session data
+            HttpContext.Session.Remove("Username");
+            HttpContext.Session.Remove("ResetPasswordEmail");
 
-            // Revoke the refresh token (if applicable)
-            if (!string.IsNullOrEmpty(request.RefreshToken))
-            {
-                await _tokenService.RevokeRefreshToken(user, request.RefreshToken);
-            }
-
-            // Sign out the user and remove the authentication cookie
-            await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
-
-            // Delete the AuthToken cookie
+            // Sign out and remove cookies
+            //await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
             HttpContext.Response.Cookies.Delete("AuthToken");
 
             return Ok("Logged out successfully.");
         }
-
 
         [Authorize(Policy = "AdminPolicy")]
         [HttpGet("admin-action")]
