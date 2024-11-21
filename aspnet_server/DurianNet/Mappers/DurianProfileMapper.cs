@@ -31,26 +31,33 @@ namespace DurianNet.Mappers
             };
         }
 
-        public static DurianProfile ToDurianProfileFromAddRequest(this AddDurianProfileRequestDto dto, int videoId)
+        public static DurianProfile ToDurianProfileFromAddRequest(this AddDurianProfileRequestDto dto, string imagePath, int videoId)
         {
             return new DurianProfile
             {
+                //DurianName = dto.DurianName,
+                //DurianDescription = dto.DurianDescription,
+                //Characteristics = dto.Characteristics,
+                //TasteProfile = dto.TasteProfile,
+                //DurianImage = dto.DurianImage,
+                //DurianVideoId = videoId
+
                 DurianName = dto.DurianName,
                 DurianDescription = dto.DurianDescription,
-                Characteristics = dto.Characteristics,
+                Characteristics = dto.Characteristics, // Match property names
                 TasteProfile = dto.TasteProfile,
-                DurianImage = dto.DurianImage,
+                DurianImage = imagePath, // Use the uploaded image's URL
                 DurianVideoId = videoId
             };
         }
 
-        public static void UpdateDurianProfileFromDto(this DurianProfile profile, UpdateDurianProfileRequestDto dto, int videoId)
+        public static void UpdateDurianProfileFromDto(this DurianProfile profile, UpdateDurianProfileRequestDto dto, string imagePath, int videoId)
         {
             profile.DurianName = dto.DurianName;
             profile.DurianDescription = dto.DurianDescription;
             profile.Characteristics = dto.Characteristics;
             profile.TasteProfile = dto.TasteProfile;
-            profile.DurianImage = dto.DurianImage;
+            profile.DurianImage = imagePath;
             profile.DurianVideoId = videoId;
         }
 

@@ -1,4 +1,5 @@
-﻿@{
+﻿
+@{
     ViewData["Title"] = "Add Durian Profile";
 }
 
@@ -8,7 +9,7 @@
         <h1 class="text-black mb-6 text-3xl font-bold">Add Durian Profile</h1>
 
         <!-- Form -->
-        <form method="post" action="/durianprofile/SaveDurianProfile" enctype="multipart/form-data">
+        <form id="addDurianForm" enctype="multipart/form-data">
             <!-- Level 1 -->
             <div class="gap-6 mb-6 flex">
                 <!-- Durian Name -->
@@ -31,10 +32,11 @@
             <div class="gap-6 mb-6 flex">
                 <!-- Characteristic -->
                 <div class="w-1/2">
-                    <label for="characteristic" class="text-black block text-lg font-bold">Characteristic</label>
-                    <input type="text" id="characteristic" name="characteristic"
+                    <label for="characteristics" class="text-black block text-lg font-bold">Characteristics</label>
+                    <input type="text" id="characteristics" name="Characteristics"
                            class="mt-2 px-4 py-3 border-gray-300 w-full rounded-md border text-lg focus:outline-none focus:ring-2 focus:ring-[#12796F]"
-                           placeholder="Enter Characteristic" required />
+                           placeholder="Enter Characteristics" required />
+
                 </div>
                 <!-- Taste Profile -->
                 <div class="w-1/2">
@@ -82,3 +84,30 @@
         </form>
     </div>
 </div>
+
+<script>
+    document.getElementById('addDurianForm').addEventListener('submit', async function (event) {
+        event.preventDefault();
+
+        const formData = new FormData(this);
+
+        try {
+            const response = await fetch('/api/durianprofile/AddDurianProfile', {
+                method: 'POST',
+                body: formData
+            });
+
+            if (!response.ok) {
+                const error = await response.text();
+                alert(`Failed to add durian profile: ${error}`);
+                return;
+            }
+
+            alert("Durian profile uploaded successfully!");
+            window.location.href = '/durianprofile/DurianProfilePage'; // Redirect to the Durian Profile page
+        } catch (error) {
+            console.error(error);
+            alert("An error occurred while uploading the durian profile. Please try again.");
+        }
+    });
+</script>

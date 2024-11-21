@@ -25,10 +25,16 @@ namespace DurianNet.Controllers.api
             _context = context;
         }
 
+        //user only
         [HttpGet("GetEverythingFromUsers")]
         public async Task<IActionResult> GetEverythingFromUsers()
         {
-            var users = await _context.Users.ToListAsync();  // Retrieve all users
+            //var users = await _context.Users.ToListAsync();  // Retrieve all users
+            // Retrieve all users with UserType = User
+            var users = await _context.Users
+                                      .Where(user => user.UserType == UserType.User)
+                                      .ToListAsync();
+
             if (users == null || !users.Any())
             {
                 return NotFound("No users found.");
@@ -40,6 +46,7 @@ namespace DurianNet.Controllers.api
             return Ok(userDtos);
         }
 
+        //search username
         [HttpGet("GetAllUsers")]
         public async Task<IActionResult> GetAllUsers([FromQuery] QueryObject query)
         {
@@ -50,7 +57,9 @@ namespace DurianNet.Controllers.api
 
             Console.WriteLine($"Query.Username: {query.Username}"); // Debugging
 
-            var usersQuery = _context.Users.AsQueryable();
+            //var usersQuery = _context.Users.AsQueryable();
+            // Initialize the query with the condition UserType = User
+            var usersQuery = _context.Users.Where(u => u.UserType == UserType.User);
 
             if (!string.IsNullOrWhiteSpace(query.Username))
             {
@@ -80,6 +89,7 @@ namespace DurianNet.Controllers.api
         [HttpGet("GetUser/{id}")]
         public async Task<IActionResult> GetUserById(string id)
         {
+
             var user = await _context.Users.FindAsync(id);
             if (user == null)
             {
@@ -310,9 +320,5 @@ namespace DurianNet.Controllers.api
             // Return success response with updated user status
             return Ok(user.ToUserDetailsDto());
         }
-
-
-
-
     }
 }

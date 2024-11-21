@@ -16,19 +16,22 @@ namespace DurianNet.Mappers
             };
         }
 
-        public static DurianVideo ToDurianVideoFromAddRequest(this AddDurianProfileRequestDto dto)
+        public static DurianVideo ToDurianVideoFromAddRequest(this AddDurianProfileRequestDto dto, string videoPath)
         {
             return new DurianVideo
             {
-                VideoUrl = dto.DurianVideoUrl,
-                Description = dto.DurianVideoDescription
+                //VideoUrl = dto.DurianVideoUrl,
+                //Description = dto.DurianVideoDescription
+
+                VideoUrl = videoPath, // Use the uploaded video's URL
+                Description = dto.VideoDescription
             };
         }
 
-        public static void UpdateDurianVideoFromDto(this DurianVideo video, UpdateDurianProfileRequestDto dto)
+        public static void UpdateDurianVideoFromDto(this DurianVideo video, UpdateDurianProfileRequestDto dto, string videoPath)
         {
-            video.VideoUrl = dto.DurianVideoUrl;
-            video.Description = dto.DurianVideoDescription;
+            video.VideoUrl = videoPath;
+            video.Description = dto.VideoDescription;
         }
     }
 }

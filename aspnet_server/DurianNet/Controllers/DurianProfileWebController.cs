@@ -25,6 +25,24 @@ public class DurianProfileWebController : Controller
         return View("~/Views/DurianProfile/UpdateDurianProfileDetails.cshtml");
     }
 
+    //[HttpGet("UpdateDurianProfileDetailsPage")]
+    //public IActionResult UpdateDurianProfileDetailsPage(int id)
+    //{
+    //    ViewData["DurianId"] = id; // Pass the ID to the view
+    //    return View("~/Views/DurianProfile/UpdateDurianProfileDetails.cshtml");
+    //}
+
+    //[HttpGet("UpdateDurianProfileDetailsPage")]
+    //public IActionResult UpdateDurianProfileDetailsPage(int id)
+    //{
+    //    // The `id` will be passed to the view for further use.
+    //    ViewData["DurianId"] = id; // Store the ID in ViewData to use in the Razor page.
+    //    return View("~/Views/DurianProfile/UpdateDurianProfileDetails.cshtml");
+    //}
+
+
+
+
     [HttpGet("Delete")]
     public IActionResult Delete(int id)
     {

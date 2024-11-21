@@ -28,22 +28,6 @@ namespace DurianNet.Controllers
             return RedirectToAction("LoginPage", "Account");
         }
 
-        //[HttpGet("dashboard")]
-        //public IActionResult Dashboard()
-        //{
-        //    var username = HttpContext.Session.GetString("Username");
-        //    if (!string.IsNullOrEmpty(username))
-        //    {
-        //        var user = _context.Users.FirstOrDefault(u => u.UserName == username);
-        //        if (user != null)
-        //        {
-        //            ViewData["IsSuperAdmin"] = user.UserType == UserType.SuperAdmin;
-        //        }
-        //    }
-
-        //    return View();
-        //}
-
         [HttpGet("privacy")]
         public IActionResult Privacy()
         {

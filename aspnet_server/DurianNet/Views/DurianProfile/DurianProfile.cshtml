@@ -10,8 +10,8 @@
     <div class="mb-6 flex items-center justify-between">
         <!-- Search Bar -->
         <div class="flex w-1/2 items-center">
-            <input type="text" placeholder="Search Durian Name" class="border-gray-300 px-4 py-2 w-full rounded-md border focus:ring-[#12796F] focus:outline-none">
-            <button class="ml-2 px-3 py-2 text-white rounded-md bg-[#12796F] hover:bg-[#0f5d57]">
+            <input type="text" id="searchDurian" placeholder="Search Durian Name" class="border-gray-300 px-4 py-2 w-full rounded-md border focus:ring-[#12796F] focus:outline-none">
+            <button id="searchButton" class="ml-2 px-3 py-2 text-white rounded-md bg-[#12796F] hover:bg-[#0f5d57]">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
                     <path fill-rule="evenodd" d="M12.9 14.32a8 8 0 111.414-1.414l4.243 4.243a1 1 0 01-1.414 1.414l-4.243-4.243zM8 14a6 6 0 100-12 6 6 0 000 12z" clip-rule="evenodd" />
                 </svg>
@@ -22,12 +22,11 @@
         <a href="/durianprofile/AddDurianProfilePage" class="text-white px-4 py-2 rounded-md bg-[#12796F] font-bold hover:bg-[#0f5d57]">
             + Add Durian
         </a>
-
     </div>
 
     <!-- Durian Table -->
     <div class="overflow-x-auto">
-        <table class="border-gray-300 min-w-full border-collapse border text-left text-sm">
+        <table id="durianTable" class="border-gray-300 min-w-full border-collapse border text-left text-sm">
             <thead class="bg-gray-100">
                 <tr>
                     <th class="border-gray-300 px-4 py-2 border font-medium">Durian Name</th>
@@ -38,31 +37,89 @@
                 </tr>
             </thead>
             <tbody>
-                <!-- Example Rows -->
-                @for (int i = 0; i < 10; i++)
-                {
-                    <tr class="even:bg-gray-50">
-                        <td class="border-gray-300 px-4 py-2 border">Musang King</td>
-                        <td class="border-gray-300 px-4 py-2 border">Golden flesh</td>
-                        <td class="border-gray-300 px-4 py-2 border">Small seeds</td>
-                        <td class="border-gray-300 px-4 py-2 border">Bitter-sweet</td>
-                        <td class="border-gray-300 px-4 py-2 space-x-2 flex border">
-                            <a href="/durianprofile/UpdateDurianProfileDetailsPage" class="text-white px-3 py-1 rounded-md bg-[#1D4ED8] text-sm font-bold hover:bg-[#0c3ba8]">Edit</a>
-                            <a href="/durianprofile/Delete" class="text-white px-3 py-1 rounded-md bg-[#D97706] text-sm font-bold hover:bg-[#b45e05]">Delete</a>
-                        </td>
-                    </tr>
-                }
+                <!-- Table rows will be dynamically populated -->
             </tbody>
         </table>
     </div>
-
-    <!-- Pagination -->
-    <div class="mt-6 space-x-2 flex items-center justify-center">
-        <a href="#" class="px-3 py-1 bg-gray-200 text-gray-600 rounded-md hover:bg-gray-300">&laquo;</a>
-        @for (int i = 1; i <= 5; i++)
-        {
-            <a href="#" class="px-3 py-1 bg-gray-200 text-gray-600 rounded-md hover:bg-gray-300">@i</a>
-        }
-        <a href="#" class="px-3 py-1 bg-gray-200 text-gray-600 rounded-md hover:bg-gray-300">&raquo;</a>
-    </div>
 </div>
+
+<script>
+    async function fetchDurianProfiles(query = '') {
+        try {
+            const response = await fetch(`/api/durianprofile/GetAllDurianProfiles?DurianName=${encodeURIComponent(query)}`);
+            if (!response.ok) {
+                if (response.status === 404) {
+                    alert("No results found.");
+                    populateTable([]); // Clear the table if no results are found
+                    return;
+                }
+                throw new Error('Failed to fetch durian profiles.');
+            }
+            const durians = await response.json();
+            populateTable(durians);
+        } catch (error) {
+            console.error(error);
+            alert("Failed to load durian profiles. Please try again later.");
+        }
+    }
+
+    function populateTable(durians) {
+        const tableBody = document.querySelector('#durianTable tbody');
+        tableBody.innerHTML = ''; // Clear any existing rows
+
+        if (durians.length === 0) {
+            const noDataRow = document.createElement('tr');
+            noDataRow.innerHTML = `
+                    <td colspan="5" class="py-4 text-gray-500 text-center">No data available</td>
+                `;
+            tableBody.appendChild(noDataRow);
+            return;
+        }
+
+        durians.forEach(durian => {
+            const row = document.createElement('tr');
+            row.className = 'even:bg-gray-50';
+
+            row.innerHTML = `
+                        <td class="border-gray-300 px-4 py-2 border">${durian.durianName}</td>
+                        <td class="border-gray-300 px-4 py-2 border">${durian.durianDescription}</td>
+                        <td class="border-gray-300 px-4 py-2 border">${durian.characteristics}</td>
+                        <td class="border-gray-300 px-4 py-2 border">${durian.tasteProfile}</td>
+                        <td class="border-gray-300 px-4 py-2 space-x-2 flex border">
+                            <a href="/durianprofile/UpdateDurianProfileDetailsPage?id=${durian.durianId}" class="text-white px-3 py-1 rounded-md bg-[#1D4ED8] text-sm font-bold hover:bg-[#0c3ba8]">Edit</a>
+                            <button onclick="deleteDurian(${durian.durianId})" class="text-white px-3 py-1 rounded-md bg-[#D97706] text-sm font-bold hover:bg-[#b45e05]">Delete</button>
+                        </td>
+                    `;
+            tableBody.appendChild(row);
+        });
+    }
+
+    async function deleteDurian(id) {
+        if (!confirm("Are you sure you want to delete this durian profile?")) {
+            return;
+        }
+        try {
+            const response = await fetch(`/api/durianprofile/DeleteDurianProfile/${id}`, {
+                method: 'DELETE'
+            });
+            if (response.ok) {
+                alert("Durian profile deleted successfully!");
+                fetchDurianProfiles(); // Refresh the table
+            } else {
+                throw new Error('Failed to delete durian profile.');
+            }
+        } catch (error) {
+            console.error(error);
+            alert("Failed to delete durian profile. Please try again.");
+        }
+    }
+
+    document.getElementById('searchButton').addEventListener('click', () => {
+        const query = document.getElementById('searchDurian').value.trim();
+        fetchDurianProfiles(query);
+    });
+
+    // Initialize the table on page load
+    document.addEventListener('DOMContentLoaded', () => fetchDurianProfiles());
+</script>
+

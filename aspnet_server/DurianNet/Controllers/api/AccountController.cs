@@ -11,6 +11,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
+using System.Text.RegularExpressions;
 
 namespace DurianNet.Controllers.api
 {
@@ -185,48 +186,70 @@ namespace DurianNet.Controllers.api
         {
             try
             {
+                // Check if ModelState is valid
                 if (!ModelState.IsValid)
                 {
-                    return BadRequest(ModelState);
+                    return BadRequest("Invalid input.");
                 }
 
+                // Validate username length
+                if (registerDto.Username.Length < 5)
+                {
+                    return BadRequest("Username must be at least 5 characters long.");
+                }
+
+                // Validate password strength
+                var passwordPattern = @"^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)(?=.*[@$!%*?&_])[A-Za-z\d@$!%*?&_]{8,}$";
+
+                if (!Regex.IsMatch(registerDto.Password, passwordPattern))
+                {
+                    return BadRequest("Password must be at least 8 characters long and include at least one uppercase letter, one lowercase letter, one number, and one special character.");
+                }
+
+                // Check if username or email already exists
+                if (await _userManager.Users.AnyAsync(u => u.UserName == registerDto.Username))
+                {
+                    return BadRequest("Username is already taken.");
+                }
+                if (await _userManager.Users.AnyAsync(u => u.Email == registerDto.Email))
+                {
+                    return BadRequest("Email is already in use.");
+                }
+
+                // Create user
                 var appUser = new User
                 {
                     UserName = registerDto.Username,
                     Email = registerDto.Email,
-                    ProfilePicture = "default.jpg", // Set default profile picture
-                    UserStatus = UserStatus.Active, // Set default status
-                    UserType = UserType.Admin // Set default type for admin
+                    ProfilePicture = "default.jpg", // Default profile picture
+                    UserStatus = UserStatus.Active,
+                    UserType = UserType.Admin
                 };
 
                 var createdUser = await _userManager.CreateAsync(appUser, registerDto.Password);
 
-                if (createdUser.Succeeded)
-                {
-                    var roleResult = await _userManager.AddToRoleAsync(appUser, "Admin");
-                    if (roleResult.Succeeded)
-                    {
-                        return Ok(
-                        new NewUserDto
-                        {
-                            UserName = appUser.UserName,
-                            Email = appUser.Email,
-                            Token = _tokenService.CreateToken(appUser)
-                        });
-                    }
-                    else
-                    {
-                        return StatusCode(500, roleResult.Errors);
-                    }
-                }
-                else
+                if (!createdUser.Succeeded)
                 {
                     return StatusCode(500, createdUser.Errors);
                 }
+
+                // Add user to Admin role
+                var roleResult = await _userManager.AddToRoleAsync(appUser, "Admin");
+                if (!roleResult.Succeeded)
+                {
+                    return StatusCode(500, roleResult.Errors);
+                }
+
+                return Ok(new NewUserDto
+                {
+                    UserName = appUser.UserName,
+                    Email = appUser.Email,
+                    Token = _tokenService.CreateToken(appUser)
+                });
             }
-            catch (Exception e)
+            catch (Exception ex)
             {
-                Console.WriteLine($"Error during admin registration: {e.Message}");
+                Console.WriteLine($"Error during admin registration: {ex.Message}");
                 return StatusCode(500, "An unexpected error occurred during admin registration.");
             }
         }
@@ -269,6 +292,9 @@ namespace DurianNet.Controllers.api
                 return StatusCode(500, "An unexpected error occurred while resetting the password.");
             }
         }
+
+        
+
 
         [HttpPut("ChangePassword/{username?}")]
         public async Task<IActionResult> ChangePassword(string? username, [FromBody] ChangePasswordRequestDto dto)

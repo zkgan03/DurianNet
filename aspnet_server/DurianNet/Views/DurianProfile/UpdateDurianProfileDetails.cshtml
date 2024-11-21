@@ -1,4 +1,5 @@
-﻿@{
+﻿
+@{
     ViewData["Title"] = "Update Durian Profile Details";
 }
 
@@ -8,7 +9,7 @@
         <h1 class="text-black mb-6 text-3xl font-bold">Update Durian Profile Details</h1>
 
         <!-- Form -->
-        <form method="post" action="/durianprofile/UpdateDurianProfile" enctype="multipart/form-data">
+        <form id="updateDurianForm" enctype="multipart/form-data">
             <!-- Level 1 -->
             <div class="gap-6 mb-6 flex">
                 <!-- Durian Name -->
@@ -16,7 +17,7 @@
                     <label for="durianName" class="text-black block text-lg font-bold">Durian Name</label>
                     <input type="text" id="durianName" name="durianName"
                            class="mt-2 px-4 py-3 border-gray-300 w-full rounded-md border text-lg focus:outline-none focus:ring-2 focus:ring-[#12796F]"
-                           placeholder="Enter Durian Name" value="@ViewData["DurianName"]" required />
+                           placeholder="Enter Durian Name" required />
                 </div>
                 <!-- Durian Image -->
                 <div class="w-1/2">
@@ -34,14 +35,14 @@
                     <label for="characteristic" class="text-black block text-lg font-bold">Characteristic</label>
                     <input type="text" id="characteristic" name="characteristic"
                            class="mt-2 px-4 py-3 border-gray-300 w-full rounded-md border text-lg focus:outline-none focus:ring-2 focus:ring-[#12796F]"
-                           placeholder="Enter Characteristic" value="@ViewData["Characteristic"]" required />
+                           placeholder="Enter Characteristic" required />
                 </div>
                 <!-- Taste Profile -->
                 <div class="w-1/2">
                     <label for="tasteProfile" class="text-black block text-lg font-bold">Taste Profile</label>
                     <input type="text" id="tasteProfile" name="tasteProfile"
                            class="mt-2 px-4 py-3 border-gray-300 w-full rounded-md border text-lg focus:outline-none focus:ring-2 focus:ring-[#12796F]"
-                           placeholder="Enter Taste Profile" value="@ViewData["TasteProfile"]" required />
+                           placeholder="Enter Taste Profile" required />
                 </div>
             </div>
 
@@ -51,7 +52,7 @@
                 <label for="durianDescription" class="text-black block text-lg font-bold">Durian Description</label>
                 <input type="text" id="durianDescription" name="durianDescription"
                        class="mt-2 px-4 py-3 border-gray-300 w-full rounded-md border text-lg focus:outline-none focus:ring-2 focus:ring-[#12796F]"
-                       placeholder="Enter Durian Description" value="@ViewData["DurianDescription"]" required />
+                       placeholder="Enter Durian Description" required />
             </div>
 
             <!-- Level 4 -->
@@ -68,7 +69,7 @@
                     <label for="videoDescription" class="text-black block text-lg font-bold">Video Description</label>
                     <input type="text" id="videoDescription" name="videoDescription"
                            class="mt-2 px-4 py-3 border-gray-300 w-full rounded-md border text-lg focus:outline-none focus:ring-2 focus:ring-[#12796F]"
-                           placeholder="Enter Video Description" value="@ViewData["VideoDescription"]" required />
+                           placeholder="Enter Video Description" required />
                 </div>
             </div>
 
@@ -82,3 +83,125 @@
         </form>
     </div>
 </div>
+
+
+<script>
+    // Load existing durian profile details
+    async function loadDurianDetails() {
+        const urlParams = new URLSearchParams(window.location.search);
+        const durianId = urlParams.get('id'); // Extract Durian ID from URL
+
+        if (!durianId) {
+            alert("Durian ID is missing.");
+            return;
+        }
+
+        try {
+            const response = await fetch(`/api/durianprofile/GetDurianProfile/${durianId}`);
+            if (!response.ok) throw new Error("Failed to load durian details.");
+
+            const data = await response.json();
+
+            // Populate form fields
+            document.getElementById('durianName').value = data.durianName || '';
+            document.getElementById('characteristic').value = data.characteristics || '';
+            document.getElementById('tasteProfile').value = data.tasteProfile || '';
+            document.getElementById('durianDescription').value = data.durianDescription || '';
+            document.getElementById('videoDescription').value = data.durianVideoDescription || '';
+        } catch (error) {
+            console.error(error);
+            alert("Failed to load durian details.");
+        }
+    }
+
+    // Submit the updated durian profile
+    async function submitUpdateDurianProfileForm(event) {
+        event.preventDefault(); // Prevent the default form submission
+
+        const urlParams = new URLSearchParams(window.location.search);
+        const durianId = urlParams.get('id'); // Extract Durian ID from URL
+
+        if (!durianId) {
+            alert("Durian ID is missing.");
+            return;
+        }
+
+        // // Construct the payload
+        // const payload = {
+        //     durianName: document.getElementById('durianName').value.trim(),
+        //     characteristic: document.getElementById('characteristic').value.trim(),
+        //     tasteProfile: document.getElementById('tasteProfile').value.trim(),
+        //     durianDescription: document.getElementById('durianDescription').value.trim(),
+        //     videoDescription: document.getElementById('videoDescription').value.trim(),
+        // };
+
+        const formData = new FormData();
+        formData.append("durianName", document.getElementById("durianName").value.trim());
+        formData.append("characteristic", document.getElementById("characteristic").value.trim());
+        formData.append("tasteProfile", document.getElementById("tasteProfile").value.trim());
+        formData.append("durianDescription", document.getElementById("durianDescription").value.trim());
+        formData.append("videoDescription", document.getElementById("videoDescription").value.trim());
+
+        const durianImage = document.getElementById("durianImage").files[0];
+        if (durianImage) {
+            formData.append("durianImage", durianImage);
+        }
+
+        const durianVideo = document.getElementById("durianVideo").files[0];
+        if (durianVideo) {
+            formData.append("durianVideo", durianVideo);
+        }
+
+
+        // // Make sure all fields are filled
+        // if (
+        //     !payload.durianName ||
+        //     !payload.characteristic ||
+        //     !payload.tasteProfile ||
+        //     !payload.durianDescription ||
+        //     !payload.videoDescription
+        // ) {
+        //     alert("All fields are required.");
+        //     return;
+        // }
+
+        try {
+
+            // const response = await fetch(`/api/durianprofile/UpdateDurianProfile/${durianId}`, {
+            //     method: 'PUT',
+            //     headers: { 'Content-Type': 'application/json' },
+            //     body: JSON.stringify(payload),
+            // });
+
+            const response = await fetch(`/api/durianprofile/UpdateDurianProfile/${durianId}`, {
+                method: "PUT",
+                body: formData,
+            });
+
+
+            if (!response.ok) {
+                let errorMessage = "Failed to update durian profile.";
+                try {
+                    const error = await response.json();
+                    errorMessage = error.message || errorMessage;
+                } catch (e) {
+                    console.error("Error parsing server response:", e);
+                }
+                alert(errorMessage);
+                return;
+            }
+
+            alert("Durian profile updated successfully!");
+            window.location.href = '/durianprofile/DurianProfilePage'; // Redirect to Durian Profile page
+        } catch (error) {
+            console.error(error);
+            alert("An error occurred while updating the durian profile.");
+        }
+    }
+
+    // Initialize the page
+    document.addEventListener('DOMContentLoaded', loadDurianDetails);
+
+    // Add submit event to the form
+    document.getElementById('updateDurianForm').addEventListener('submit', submitUpdateDurianProfileForm);
+</script>
