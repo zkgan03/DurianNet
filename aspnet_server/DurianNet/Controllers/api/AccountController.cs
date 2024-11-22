@@ -91,22 +91,69 @@ namespace DurianNet.Controllers.api
             );
         }
 
+        //[HttpPost("loginAdmin")]
+        //public async Task<IActionResult> LoginAdmin(LoginDto loginDto)
+        //{
+        //    if (!ModelState.IsValid)
+        //        return BadRequest(ModelState);
+
+        //    var user = await _userManager.Users.FirstOrDefaultAsync(x => x.UserName == loginDto.Username.ToLower());
+
+        //    if (user == null) return Unauthorized("Invalid username!");
+
+        //    if (user.UserType != UserType.Admin && user.UserType != UserType.SuperAdmin)
+        //        return Unauthorized("Only admins and super admins can log in to the admin web interface.");
+
+        //    if (user.UserStatus == UserStatus.Deleted)
+        //        return Unauthorized("This admin account is deleted.");
+
+        //    var result = await _signinManager.CheckPasswordSignInAsync(user, loginDto.Password, false);
+
+        //    if (!result.Succeeded) return Unauthorized("Invalid username or password!");
+
+        //    // Generate JWT token
+        //    var token = _tokenService.CreateToken(user);
+
+        //    // Set the session cookie with the username
+        //    HttpContext.Session.SetString("Username", user.UserName);
+
+        //    // Save the token in an HTTP-only cookie
+        //    HttpContext.Response.Cookies.Append("AuthToken", token, new CookieOptions
+        //    {
+        //        HttpOnly = true, // Prevents JavaScript access
+        //        Secure = true,   // Use HTTPS in production
+        //        SameSite = SameSiteMode.Strict,
+        //        Expires = DateTime.UtcNow.AddMinutes(30)
+        //    });
+
+        //    return Ok(new
+        //    {
+        //        UserName = user.UserName,
+        //        Email = user.Email
+        //    });
+        //}
+
         [HttpPost("loginAdmin")]
         public async Task<IActionResult> LoginAdmin(LoginDto loginDto)
         {
             if (!ModelState.IsValid)
-                return BadRequest(ModelState);
+                return BadRequest(new { message = "Invalid input. Please check your username and password." });
 
-            var user = await _userManager.Users.FirstOrDefaultAsync(x => x.UserName == loginDto.Username.ToLower());
+            var user = await _userManager.Users.FirstOrDefaultAsync(x => x.UserName.ToLower() == loginDto.Username.ToLower());
 
-            if (user == null) return Unauthorized("Invalid username!");
+            if (user == null)
+                return Unauthorized(new { message = "Invalid username!" });
 
             if (user.UserType != UserType.Admin && user.UserType != UserType.SuperAdmin)
-                return Unauthorized("Only admins and super admins can log in to the admin web interface.");
+                return Unauthorized(new { message = "Only admins and super admins can log in to the admin web interface." });
+
+            if (user.UserStatus == UserStatus.Deleted)
+                return Unauthorized(new { message = "This admin account is deleted." });
 
             var result = await _signinManager.CheckPasswordSignInAsync(user, loginDto.Password, false);
 
-            if (!result.Succeeded) return Unauthorized("Invalid username or password!");
+            if (!result.Succeeded)
+                return Unauthorized(new { message = "Invalid username or password!" });
 
             // Generate JWT token
             var token = _tokenService.CreateToken(user);
@@ -117,18 +164,15 @@ namespace DurianNet.Controllers.api
             // Save the token in an HTTP-only cookie
             HttpContext.Response.Cookies.Append("AuthToken", token, new CookieOptions
             {
-                HttpOnly = true, // Prevents JavaScript access
-                Secure = true,   // Use HTTPS in production
+                HttpOnly = true,
+                Secure = true,
                 SameSite = SameSiteMode.Strict,
                 Expires = DateTime.UtcNow.AddMinutes(30)
             });
 
-            return Ok(new
-            {
-                UserName = user.UserName,
-                Email = user.Email
-            });
+            return Ok(new { UserName = user.UserName, Email = user.Email });
         }
+
 
         [HttpPost("register")]
         public async Task<IActionResult> Register([FromBody] RegisterDto registerDto)

@@ -5,6 +5,7 @@ using DurianNet.Mappers;
 using DurianNet.Models.DataModels;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 using Newtonsoft.Json;
 
 namespace DurianNet.Controllers.api
@@ -52,6 +53,10 @@ namespace DurianNet.Controllers.api
             {
                 return NotFound("Durian profile not found");
             }
+
+            // Store the Durian ID in session
+            HttpContext.Session.SetInt32("DurianId", id);
+
             return Ok(durianProfile.ToDurianProfileDto());
         }
 
@@ -128,55 +133,123 @@ namespace DurianNet.Controllers.api
         //}
 
 
-        [HttpPut("UpdateDurianProfile/{id}")]
-        public async Task<IActionResult> UpdateDurianProfile(int id, [FromForm] UpdateDurianProfileRequestDto dto)
+        //[HttpPut("UpdateDurianProfile/{id}")]
+        //public async Task<IActionResult> UpdateDurianProfile(int id, [FromForm] UpdateDurianProfileRequestDto dto)
+        //{
+        //    // Retrieve DurianId from session
+        //    var durianId = HttpContext.Session.GetInt32("DurianId");
+
+        //    //var profile = await _context.DurianProfiles.Include(p => p.DurianVideo).FirstOrDefaultAsync(p => p.DurianId == id);
+
+        //    if (!durianId.HasValue)
+        //    {
+        //        return BadRequest("Durian ID is missing from the session.");
+        //    }
+
+        //    var profile = await _context.DurianProfiles.Include(p => p.DurianVideo).FirstOrDefaultAsync(p => p.DurianId == durianId.Value);
+
+
+
+        //    if (profile == null)
+        //    {
+        //        return NotFound("Durian profile not found");
+        //    }
+
+        //    // Update Durian Image if provided
+        //    if (dto.DurianImage != null)
+        //    {
+        //        string imageDirectory = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/images");
+        //        if (!Directory.Exists(imageDirectory))
+        //        {
+        //            Directory.CreateDirectory(imageDirectory);
+        //        }
+        //        string imagePath = Path.Combine(imageDirectory, dto.DurianImage.FileName);
+        //        using (var stream = new FileStream(imagePath, FileMode.Create))
+        //        {
+        //            await dto.DurianImage.CopyToAsync(stream);
+        //        }
+        //        profile.DurianImage = $"/images/{dto.DurianImage.FileName}";
+        //    }
+
+        //    // Update Durian Video if provided
+        //    if (dto.DurianVideo != null)
+        //    {
+        //        string videoDirectory = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/videos");
+        //        if (!Directory.Exists(videoDirectory))
+        //        {
+        //            Directory.CreateDirectory(videoDirectory);
+        //        }
+        //        string videoPath = Path.Combine(videoDirectory, dto.DurianVideo.FileName);
+        //        using (var stream = new FileStream(videoPath, FileMode.Create))
+        //        {
+        //            await dto.DurianVideo.CopyToAsync(stream);
+        //        }
+        //        profile.DurianVideo.VideoUrl = $"/videos/{dto.DurianVideo.FileName}";
+        //    }
+
+        //    // Update Video Description if provided
+        //    if (!string.IsNullOrEmpty(dto.VideoDescription) && profile.DurianVideo != null)
+        //    {
+        //        profile.DurianVideo.Description = dto.VideoDescription;
+        //    }
+
+        //    // Update other fields
+        //    profile.DurianName = dto.DurianName;
+        //    profile.Characteristics = dto.Characteristics;
+        //    profile.TasteProfile = dto.TasteProfile;
+        //    profile.DurianDescription = dto.DurianDescription;
+
+        //    await _context.SaveChangesAsync();
+        //    return Ok(profile.ToDurianProfileDto());
+        //}
+
+        [HttpPut("UpdateDurianProfile")]
+        public async Task<IActionResult> UpdateDurianProfile([FromBody] UpdateDurianProfileRequestDto dto)
         {
+            // Retrieve DurianId from session
+            var durianId = HttpContext.Session.GetInt32("DurianId");
+            if (!durianId.HasValue)
+            {
+                return BadRequest("Durian ID is missing from the session.");
+            }
 
-            Console.WriteLine($"Received Durian ID: {id}");
-            Console.WriteLine($"Payload received: {JsonConvert.SerializeObject(dto)}");
+            var profile = await _context.DurianProfiles.Include(p => p.DurianVideo).FirstOrDefaultAsync(p => p.DurianId == durianId.Value);
 
-            var profile = await _context.DurianProfiles.Include(p => p.DurianVideo).FirstOrDefaultAsync(p => p.DurianId == id);
             if (profile == null)
             {
                 return NotFound("Durian profile not found");
             }
 
             // Update Durian Image if provided
-            if (dto.DurianImage != null)
+            if (!string.IsNullOrEmpty(dto.DurianImage))
             {
                 string imageDirectory = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/images");
                 if (!Directory.Exists(imageDirectory))
                 {
                     Directory.CreateDirectory(imageDirectory);
                 }
-                string imagePath = Path.Combine(imageDirectory, dto.DurianImage.FileName);
-                using (var stream = new FileStream(imagePath, FileMode.Create))
-                {
-                    await dto.DurianImage.CopyToAsync(stream);
-                }
-                profile.DurianImage = $"/images/{dto.DurianImage.FileName}";
+
+                string imageName = $"durian_{durianId.Value}_{DateTime.Now.Ticks}.png"; // Unique file name
+                string imagePath = Path.Combine(imageDirectory, imageName);
+                var imageBytes = Convert.FromBase64String(dto.DurianImage.Split(',')[1]); // Remove metadata prefix
+                await System.IO.File.WriteAllBytesAsync(imagePath, imageBytes);
+                profile.DurianImage = $"/images/{imageName}";
             }
 
             // Update Durian Video if provided
-            if (dto.DurianVideo != null)
+            if (!string.IsNullOrEmpty(dto.DurianVideo))
             {
                 string videoDirectory = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/videos");
                 if (!Directory.Exists(videoDirectory))
                 {
                     Directory.CreateDirectory(videoDirectory);
                 }
-                string videoPath = Path.Combine(videoDirectory, dto.DurianVideo.FileName);
-                using (var stream = new FileStream(videoPath, FileMode.Create))
-                {
-                    await dto.DurianVideo.CopyToAsync(stream);
-                }
-                profile.DurianVideo.VideoUrl = $"/videos/{dto.DurianVideo.FileName}";
-            }
 
-            // Update Video Description if provided
-            if (!string.IsNullOrEmpty(dto.VideoDescription) && profile.DurianVideo != null)
-            {
-                profile.DurianVideo.Description = dto.VideoDescription;
+                string videoName = $"durian_{durianId.Value}_{DateTime.Now.Ticks}.mp4"; // Unique file name
+                string videoPath = Path.Combine(videoDirectory, videoName);
+                var videoBytes = Convert.FromBase64String(dto.DurianVideo.Split(',')[1]); // Remove metadata prefix
+                await System.IO.File.WriteAllBytesAsync(videoPath, videoBytes);
+                profile.DurianVideo.VideoUrl = $"/videos/{videoName}";
             }
 
             // Update other fields
@@ -185,9 +258,18 @@ namespace DurianNet.Controllers.api
             profile.TasteProfile = dto.TasteProfile;
             profile.DurianDescription = dto.DurianDescription;
 
+            // Update video description if provided
+            if (!string.IsNullOrEmpty(dto.VideoDescription) && profile.DurianVideo != null)
+            {
+                profile.DurianVideo.Description = dto.VideoDescription;
+            }
+
             await _context.SaveChangesAsync();
             return Ok(profile.ToDurianProfileDto());
         }
+
+
+
 
 
 

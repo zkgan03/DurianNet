@@ -1,57 +1,4 @@
-﻿@* @{
-    ViewData["Title"] = "Admin Profile";
-}
-
-<div class="w-full">
-    <div class="bg-white p-8">
-        <!-- Title -->
-        <h1 class="text-black mb-6 text-3xl font-bold">My Profile</h1> <!-- Larger text for My Profile -->
-        <!-- Profile Picture -->
-        <div class="mb-6">
-            <img src="/images/durian.jpg" alt="Profile Picture" class="w-40 h-40 border-gray-300 rounded-full border object-cover" /> <!-- Larger profile picture -->
-        </div>
-
-        <!-- Admin Info -->
-        <div class="gap-4 mb-8 mr-auto grid w-2/5 grid-cols-2 text-lg">
-            <!-- 50% width, aligned left -->
-            <!-- Left Column -->
-            <div class="text-black font-bold">
-                <p>Username</p>
-                <p>Fullname</p>
-                <p>Email</p>
-                <p>Phone Number</p>
-            </div>
-            <!-- Right Column -->
-            <div class="text-black">
-                <p>Mina</p>
-                <p>Mina Mina</p>
-                <p>mina@gmail.com</p>
-                <p>012-3456788</p>
-            </div>
-        </div>
-
-        <!-- Action Links -->
-        <div class="space-y-4 mt-20">
-            <a href="/adminprofile/ChangePasswordPage"
-               class="py-2 px-6 text-white block w-1/5 rounded bg-[#12796F] text-center font-bold transition hover:bg-[#0f5d57]">
-                <!-- Reduced width -->
-                Change Password
-            </a>
-            <a href="/adminprofile/EditProfilePage"
-               class="py-2 px-6 text-white block w-1/5 rounded bg-[#12796F] text-center font-bold transition hover:bg-[#0f5d57]">
-                <!-- Reduced width -->
-                Edit Profile
-            </a>
-            <button type="button" onclick="window.location.href='/adminprofile/DeleteAccount'"
-                    class="py-2 px-6 text-white block w-1/5 rounded bg-[#D97706] text-center font-bold transition hover:bg-[#b45e05]">
-                <!-- Button styled as link -->
-                Delete Account
-            </button>
-        </div>
-    </div>
-</div>
- *@
-
+﻿@* 
 @{
     ViewData["Title"] = "Admin Profile";
 }
@@ -103,83 +50,6 @@
 </div>
 
 <script>
-    // async function fetchAdminProfile() {
-    //     try {
-    //         const response = await fetch('/api/User/GetUser', {
-    //             method: 'GET',
-    //             credentials: 'include', // Include cookies in the request
-    //             headers: {
-    //                 'Content-Type': 'application/json'
-    //             }
-    //         });
-
-    //         if (!response.ok) {
-    //             throw new Error("Failed to load admin profile");
-    //         }
-
-    //         const data = await response.json();
-
-    //         console.log(data); // Log the data for debugging
-
-    //         // Populate the profile fields dynamically
-    //         document.querySelector("[alt='Profile Picture']").src = data.profilePicture || "/images/default.jpg";
-    //         document.querySelector("div.text-black:nth-of-type(2) p:nth-child(1)").textContent = data.username;
-    //         document.querySelector("div.text-black:nth-of-type(2) p:nth-child(2)").textContent = data.fullName;
-    //         document.querySelector("div.text-black:nth-of-type(2) p:nth-child(3)").textContent = data.email;
-    //         document.querySelector("div.text-black:nth-of-type(2) p:nth-child(4)").textContent = data.phoneNumber;
-    //     } catch (error) {
-    //         console.error("Error fetching admin profile:", error);
-    //         alert("Failed to load admin profile. Please try again.");
-    //     }
-    // }
-
-    // // Call the function on page load
-    // document.addEventListener("DOMContentLoaded", fetchAdminProfile);
-
-    // async function fetchAdminProfile() {
-    //     try {
-    //         // Get token from cookie
-    //         const token = document.cookie
-    //             .split('; ')
-    //             .find((row) => row.startsWith('AuthToken='))
-    //             ?.split('=')[1];
-
-    //         if (!token) {
-    //             alert('You are not authenticated.');
-    //             return;
-    //         }
-
-    //         // Fetch admin profile
-    //         const response = await fetch('/api/User/GetUserById', {
-    //             method: 'GET',
-    //             headers: {
-    //                 'Authorization': `Bearer ${token}`,
-    //                 'Content-Type': 'application/json',
-    //             },
-    //         });
-
-    //         if (!response.ok) {
-    //             const errorData = await response.json();
-    //             console.error("Error response:", errorData);
-    //             throw new Error(`Failed to load admin profile: ${response.statusText}`);
-    //         }
-
-    //         const data = await response.json();
-
-    //         console.log("Fetched profile data:", data);
-
-    //         // Update UI with fetched data
-    //         document.querySelector("[alt='Profile Picture']").src = data.profilePicture || '/images/default.jpg';
-    //         document.querySelector("div.text-black:nth-of-type(2) p:nth-child(1)").textContent = data.username;
-    //         document.querySelector("div.text-black:nth-of-type(2) p:nth-child(2)").textContent = data.fullName;
-    //         document.querySelector("div.text-black:nth-of-type(2) p:nth-child(3)").textContent = data.email;
-    //         document.querySelector("div.text-black:nth-of-type(2) p:nth-child(4)").textContent = data.phoneNumber;
-    //     } catch (error) {
-    //         console.error("Error fetching admin profile:", error);
-    //         alert("Failed to load admin profile. Please try again.");
-    //     }
-    // }
-
     async function fetchAdminProfile() {
         console.log("Fetching admin profile...");
 
@@ -221,4 +91,113 @@
 
 
 
+</script>
+ *@
+@{
+    ViewData["Title"] = "Admin Profile";
+}
+
+<div class="w-full">
+    <div class="bg-white p-8">
+        <!-- Title -->
+        <h1 class="text-black mb-6 text-3xl font-bold">My Profile</h1> <!-- Larger text for My Profile -->
+        <!-- Profile Picture -->
+        <div class="mb-6">
+            <img src="@ViewData["ProfilePicture"]" alt="Profile Picture" class="w-40 h-40 border-gray-300 rounded-full border object-cover" /> <!-- Dynamic profile picture -->
+        </div>
+
+        <!-- Admin Info -->
+        <div class="gap-4 mb-8 mr-auto grid w-2/5 grid-cols-2 text-lg">
+            <!-- 50% width, aligned left -->
+            <!-- Left Column -->
+            <div class="text-black font-bold">
+                <p>Username</p>
+                <p>Fullname</p>
+                <p>Email</p>
+                <p>Phone Number</p>
+            </div>
+            <!-- Right Column -->
+            <div class="text-black">
+                <p>@ViewData["Username"]</p>
+                <p>@ViewData["Fullname"]</p>
+                <p>@ViewData["Email"]</p>
+                <p>@ViewData["PhoneNumber"]</p>
+            </div>
+        </div>
+
+        <!-- Action Links -->
+        <div class="space-y-4 mt-20">
+            <a href="/adminprofile/ChangePasswordPage"
+               class="py-2 px-6 text-white block w-1/5 rounded bg-[#12796F] text-center font-bold transition hover:bg-[#0f5d57]">
+                Change Password
+            </a>
+            <a href="/adminprofile/EditProfilePage"
+               class="py-2 px-6 text-white block w-1/5 rounded bg-[#12796F] text-center font-bold transition hover:bg-[#0f5d57]">
+                Edit Profile
+            </a>
+            <button type="button" onclick="confirmDeleteAccount()"
+                    class="py-2 px-6 text-white block w-1/5 rounded bg-[#D97706] text-center font-bold transition hover:bg-[#b45e05]">
+                Delete Account
+            </button>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Fetch admin profile data on page load
+    async function fetchAdminProfile() {
+        try {
+            const response = await fetch('/api/User/GetUserByUsername', {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+            });
+
+            if (!response.ok) throw new Error('Failed to fetch admin profile.');
+
+            const data = await response.json();
+
+            // Update UI with fetched data
+            document.querySelector("[alt='Profile Picture']").src = data.profilePicture || '/images/default.jpg';
+            document.querySelector("div.text-black:nth-of-type(2) p:nth-child(1)").textContent = data.username;
+            document.querySelector("div.text-black:nth-of-type(2) p:nth-child(2)").textContent = data.fullName;
+            document.querySelector("div.text-black:nth-of-type(2) p:nth-child(3)").textContent = data.email;
+            document.querySelector("div.text-black:nth-of-type(2) p:nth-child(4)").textContent = data.phoneNumber;
+        } catch (error) {
+            console.error("Error fetching admin profile:", error);
+            alert("Failed to load admin profile. Please try again.");
+        }
+    }
+
+    // Confirm before deleting the account
+    async function confirmDeleteAccount() {
+        const confirmation = confirm("Are you sure you want to delete your account? This action cannot be undone.");
+        if (confirmation) {
+            deleteAccount();
+        }
+    }
+
+    // Call the API to delete the admin account
+    async function deleteAccount() {
+        try {
+            const response = await fetch('/api/User/DeleteAdmin', {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+            });
+
+            if (!response.ok) throw new Error('Failed to delete the account.');
+
+            alert("Account deleted successfully. Redirecting to login page.");
+            window.location.href = '/Account/LoginPage'; // Redirect to login page
+        } catch (error) {
+            console.error("Error deleting account:", error);
+            alert("Failed to delete account. Please try again.");
+        }
+    }
+
+    // Load admin profile data when the page is ready
+    document.addEventListener("DOMContentLoaded", fetchAdminProfile);
 </script>

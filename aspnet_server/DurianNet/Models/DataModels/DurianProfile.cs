@@ -21,5 +21,7 @@ namespace DurianNet.Models.DataModels
         public ICollection<User> Users { get; set; }//To indicate many to many relationship
 
         public List<FavoriteDurian> FavoriteDurians { get; set; } = new List<FavoriteDurian>();
+
+        
     }
 }

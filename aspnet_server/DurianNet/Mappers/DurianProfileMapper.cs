@@ -16,8 +16,8 @@ namespace DurianNet.Mappers
                 Characteristics = profile.Characteristics,
                 TasteProfile = profile.TasteProfile,
                 DurianImage = profile.DurianImage,
-                DurianVideoUrl = profile.DurianVideo?.VideoUrl,
-                DurianVideoDescription = profile.DurianVideo?.Description
+                DurianVideoUrl = profile.DurianVideo.VideoUrl,
+                DurianVideoDescription = profile.DurianVideo.Description
             };
         }
 
@@ -60,6 +60,7 @@ namespace DurianNet.Mappers
             profile.DurianImage = imagePath;
             profile.DurianVideoId = videoId;
         }
+
 
         public static DurianProfileForUserResponseDto ToDurianProfileForUserDto(this DurianProfile profile)
         {

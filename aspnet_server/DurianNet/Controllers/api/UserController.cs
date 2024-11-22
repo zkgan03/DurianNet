@@ -25,6 +25,23 @@ namespace DurianNet.Controllers.api
             _context = context;
         }
 
+        //for testing
+        [HttpGet("GetEverything")]
+        public async Task<IActionResult> GetEverything()
+        {
+            var users = await _context.Users.ToListAsync();  // Retrieve all users
+
+            if (users == null || !users.Any())
+            {
+                return NotFound("No users found.");
+            }
+
+            // Map the users to a list of UserDetailsDto
+            var userDtos = users.Select(user => user.UserDetailsDto()).ToList();
+
+            return Ok(userDtos);
+        }
+
         //user only
         [HttpGet("GetEverythingFromUsers")]
         public async Task<IActionResult> GetEverythingFromUsers()
@@ -274,6 +291,7 @@ namespace DurianNet.Controllers.api
             return Ok(admin.ToUserDetailsDto());
         }
 
+        //user account
         [HttpPut("DeleteUser/{id}")]
         public async Task<IActionResult> DeleteUser(string id)
         {
@@ -294,6 +312,44 @@ namespace DurianNet.Controllers.api
             return Ok(user.ToUserDetailsDto());
         }
 
+        //admin profile
+        [HttpPut("DeleteAdmin/{username?}")]
+        public async Task<IActionResult> DeleteAdminByUsername(string? username)
+        {
+            // Retrieve username from session if not provided in the route
+            if (string.IsNullOrEmpty(username))
+            {
+                username = HttpContext.Session.GetString("Username");
+                if (string.IsNullOrEmpty(username))
+                {
+                    return Unauthorized("Session expired or username not found.");
+                }
+            }
+
+            // Find the user by username
+            var user = await _context.Users.SingleOrDefaultAsync(u => u.UserName == username);
+            if (user == null)
+            {
+                return NotFound("User not found");
+            }
+
+            // Clear session data
+            HttpContext.Session.Remove("Username");
+            HttpContext.Session.Remove("ResetPasswordEmail");
+            HttpContext.Response.Cookies.Delete("AuthToken");
+
+            // Change the user status to "deleted"
+            user.UserStatus = UserStatus.Deleted; 
+
+            // Save the changes to the database
+            await _context.SaveChangesAsync();
+
+            // Return success response with the updated user details
+            return Ok(user.ToUserDetailsDto());
+        }
+
+
+        //user account
         [HttpPut("RecoverUser/{id}")]
         public async Task<IActionResult> RecoverUser(string id)
         {

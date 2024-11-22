@@ -9,7 +9,7 @@
         <h1 class="text-black mb-6 text-3xl font-bold">Update Durian Profile Details</h1>
 
         <!-- Form -->
-        <form id="updateDurianForm" enctype="multipart/form-data">
+        <form id="updateDurianForm" enctype="multipart/form-data" onsubmit="submitUpdateDurianProfileForm(event)">
             <!-- Level 1 -->
             <div class="gap-6 mb-6 flex">
                 <!-- Durian Name -->
@@ -86,7 +86,6 @@
 
 
 <script>
-    // Load existing durian profile details
     async function loadDurianDetails() {
         const urlParams = new URLSearchParams(window.location.search);
         const durianId = urlParams.get('id'); // Extract Durian ID from URL
@@ -95,6 +94,9 @@
             alert("Durian ID is missing.");
             return;
         }
+
+        // Save durianId in a cookie
+        document.cookie = `durianId=${durianId};path=/`;
 
         try {
             const response = await fetch(`/api/durianprofile/GetDurianProfile/${durianId}`);
@@ -114,94 +116,115 @@
         }
     }
 
-    // Submit the updated durian profile
+    // async function submitUpdateDurianProfileForm(event) {
+    //     event.preventDefault();
+
+    //     // Extract form fields
+    //     const formData = new FormData();
+    //     formData.append('durianName', document.getElementById('durianName').value.trim());
+    //     formData.append('characteristics', document.getElementById('characteristic').value.trim());
+    //     formData.append('tasteProfile', document.getElementById('tasteProfile').value.trim());
+    //     formData.append('durianDescription', document.getElementById('durianDescription').value.trim());
+    //     formData.append('videoDescription', document.getElementById('videoDescription').value.trim());
+
+    //     const durianImage = document.getElementById('durianImage').files[0];
+    //     if (durianImage) {
+    //         formData.append('durianImage', durianImage);
+    //     }
+
+    //     const durianVideo = document.getElementById('durianVideo').files[0];
+    //     if (durianVideo) {
+    //         formData.append('durianVideo', durianVideo);
+    //     }
+
+    //     try {
+    //         const response = await fetch(`/api/durianprofile/UpdateDurianProfile`, {
+    //             method: 'PUT',
+    //             body: formData,
+    //         });
+
+    //         if (!response.ok) {
+    //             const error = await response.json();
+    //             alert(error.message || "Failed to update durian profile.");
+    //             return;
+    //         }
+
+    //         alert("Durian profile updated successfully!");
+    //         window.location.href = '/durianprofile/DurianProfilePage';
+    //     } catch (error) {
+    //         console.error(error);
+    //         alert("An error occurred. Please try again.");
+    //     }
+    // }
+
     async function submitUpdateDurianProfileForm(event) {
-        event.preventDefault(); // Prevent the default form submission
+        event.preventDefault();
 
-        const urlParams = new URLSearchParams(window.location.search);
-        const durianId = urlParams.get('id'); // Extract Durian ID from URL
+        const durianName = document.getElementById('durianName').value.trim();
+        const characteristics = document.getElementById('characteristic').value.trim();
+        const tasteProfile = document.getElementById('tasteProfile').value.trim();
+        const durianDescription = document.getElementById('durianDescription').value.trim();
+        const videoDescription = document.getElementById('videoDescription').value.trim();
 
-        if (!durianId) {
-            alert("Durian ID is missing.");
-            return;
+        let durianImageBase64 = null;
+        let durianVideoBase64 = null;
+
+        // Convert image to Base64 if provided
+        const durianImageFile = document.getElementById('durianImage').files[0];
+        if (durianImageFile) {
+            durianImageBase64 = await toBase64(durianImageFile);
         }
 
-        // // Construct the payload
-        // const payload = {
-        //     durianName: document.getElementById('durianName').value.trim(),
-        //     characteristic: document.getElementById('characteristic').value.trim(),
-        //     tasteProfile: document.getElementById('tasteProfile').value.trim(),
-        //     durianDescription: document.getElementById('durianDescription').value.trim(),
-        //     videoDescription: document.getElementById('videoDescription').value.trim(),
-        // };
-
-        const formData = new FormData();
-        formData.append("durianName", document.getElementById("durianName").value.trim());
-        formData.append("characteristic", document.getElementById("characteristic").value.trim());
-        formData.append("tasteProfile", document.getElementById("tasteProfile").value.trim());
-        formData.append("durianDescription", document.getElementById("durianDescription").value.trim());
-        formData.append("videoDescription", document.getElementById("videoDescription").value.trim());
-
-        const durianImage = document.getElementById("durianImage").files[0];
-        if (durianImage) {
-            formData.append("durianImage", durianImage);
+        // Convert video to Base64 if provided
+        const durianVideoFile = document.getElementById('durianVideo').files[0];
+        if (durianVideoFile) {
+            durianVideoBase64 = await toBase64(durianVideoFile);
         }
 
-        const durianVideo = document.getElementById("durianVideo").files[0];
-        if (durianVideo) {
-            formData.append("durianVideo", durianVideo);
-        }
-
-
-        // // Make sure all fields are filled
-        // if (
-        //     !payload.durianName ||
-        //     !payload.characteristic ||
-        //     !payload.tasteProfile ||
-        //     !payload.durianDescription ||
-        //     !payload.videoDescription
-        // ) {
-        //     alert("All fields are required.");
-        //     return;
-        // }
+        const payload = {
+            durianName,
+            characteristics,
+            tasteProfile,
+            durianDescription,
+            videoDescription,
+            durianImage: durianImageBase64,
+            durianVideo: durianVideoBase64,
+        };
 
         try {
-
-            // const response = await fetch(`/api/durianprofile/UpdateDurianProfile/${durianId}`, {
-            //     method: 'PUT',
-            //     headers: { 'Content-Type': 'application/json' },
-            //     body: JSON.stringify(payload),
-            // });
-
-            const response = await fetch(`/api/durianprofile/UpdateDurianProfile/${durianId}`, {
-                method: "PUT",
-                body: formData,
+            const response = await fetch(`/api/durianprofile/UpdateDurianProfile`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload),
             });
 
-
             if (!response.ok) {
-                let errorMessage = "Failed to update durian profile.";
-                try {
-                    const error = await response.json();
-                    errorMessage = error.message || errorMessage;
-                } catch (e) {
-                    console.error("Error parsing server response:", e);
-                }
-                alert(errorMessage);
+                const error = await response.json();
+                alert(error.message || "Failed to update durian profile.");
                 return;
             }
 
             alert("Durian profile updated successfully!");
-            window.location.href = '/durianprofile/DurianProfilePage'; // Redirect to Durian Profile page
+            window.location.href = '/durianprofile/DurianProfilePage';
         } catch (error) {
             console.error(error);
-            alert("An error occurred while updating the durian profile.");
+            alert("An error occurred. Please try again.");
         }
     }
+
+    // Helper function to convert files to Base64
+    function toBase64(file) {
+        return new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.onload = () => resolve(reader.result);
+            reader.onerror = reject;
+            reader.readAsDataURL(file);
+        });
+    }
+
+
 
     // Initialize the page
     document.addEventListener('DOMContentLoaded', loadDurianDetails);
 
-    // Add submit event to the form
-    document.getElementById('updateDurianForm').addEventListener('submit', submitUpdateDurianProfileForm);
 </script>
