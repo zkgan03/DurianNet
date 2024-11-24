@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Authorization;
 
 [Route("account")]
 public class AccountWebController : Controller
@@ -84,6 +85,7 @@ public class AccountWebController : Controller
     }
 
     // TODO : add admin policy
+    [Authorize(policy: "AdminPolicy")]
     [HttpPost("loginAdmin")]
     public async Task<IActionResult> LoginAdmin(LoginDto loginDto)
     {
@@ -136,7 +138,10 @@ public class AccountWebController : Controller
                 ExpiresUtc = DateTime.UtcNow.AddMinutes(30)
             });
 
-        return RedirectToAction("DurianProfilePage", "durianprofile");
+        // Pass success message using TempData
+        //TempData["SuccessMessage"] = "Successfully logged in!";
+        //return RedirectToAction("DurianProfilePage", "durianprofile");
+        return Ok(new { message = "Login successful!", UserName = user.UserName, Email = user.Email });
     }
 
 }

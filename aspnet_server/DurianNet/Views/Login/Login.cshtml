@@ -52,7 +52,7 @@
         </div>
     </div>
 
-    @* <script>
+   @*  <script>
         async function login() {
             const username = document.getElementById("username").value;
             const password = document.getElementById("password").value;
@@ -69,8 +69,9 @@
                 });
 
                 if (!response.ok) {
-                    const error = await response.json();
-                    errorMessage.textContent = error.message || "Invalid username or password.";
+                    // Extract and display the error message from the response
+                    const errorData = await response.json();
+                    errorMessage.textContent = errorData.message || "Invalid username or password.";
                     return;
                 }
 
@@ -81,41 +82,73 @@
                 errorMessage.textContent = "An unexpected error occurred. Please try again.";
             }
         }
+    </script> *@
 
+    @* <script>
+        document.getElementById("loginForm").addEventListener("submit", async function (event) {
+            event.preventDefault(); // Prevent default form submission
 
+            const username = document.getElementById("username").value;
+            const password = document.getElementById("password").value;
+            const errorMessage = document.getElementById("errorMessage");
 
+            errorMessage.textContent = ""; // Clear any previous error messages
+
+            try {
+                const response = await fetch('/account/loginAdmin', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ username, password })
+                });
+
+                if (!response.ok) {
+                    // Show error message from the server response
+                    const errorData = await response.json();
+                    errorMessage.textContent = errorData.message || "An error occurred. Please try again.";
+                    return;
+                }
+
+                const data = await response.json();
+                alert(data.message); // Show success message
+
+                // Redirect to the provided URL on success
+                window.location.href = data.redirectUrl;
+            } catch (err) {
+                errorMessage.textContent = "An unexpected error occurred. Please try again.";
+            }
+        });
     </script> *@
 
     <script>
-        // async function login() {
-        //     const username = document.getElementById("username").value;
-        //     const password = document.getElementById("password").value;
-        //     const errorMessage = document.getElementById("errorMessage");
+        document.getElementById("loginForm").addEventListener("submit", function (event) {
+            event.preventDefault(); // Prevent the form from submitting the default way
 
-        //     errorMessage.textContent = ""; // Clear previous error message
+            const form = event.target;
+            const formData = new FormData(form);
+            const errorMessageDiv = document.getElementById("errorMessage");
 
-        //     try {
-        //         const response = await fetch('/api/account/loginAdmin', {
-        //             method: 'POST',
-        //             headers: { 'Content-Type': 'application/json' },
-        //             body: JSON.stringify({ username, password }),
-        //             credentials: 'include' // Include cookies in the request
-        //         });
-
-        //         if (!response.ok) {
-        //             // Extract and display the error message from the response
-        //             const errorData = await response.json();
-        //             errorMessage.textContent = errorData.message || "Invalid username or password.";
-        //             return;
-        //         }
-
-        //         // On success, redirect to the profile page
-        //         alert("Login successful!");
-        //         window.location.href = "/adminprofile/ProfilePage";
-        //     } catch (networkError) {
-        //         errorMessage.textContent = "An unexpected error occurred. Please try again.";
-        //     }
-        // }
+            fetch(form.action, {
+                method: "POST",
+                body: formData,
+            })
+                .then(async (response) => {
+                    if (response.ok) {
+                        // If login is successful
+                        const result = await response.json();
+                        alert(result.message || "Login successful!");
+                        window.location.href = "/durianprofile/DurianProfilePage";
+                    } else {
+                        // If login fails, display the error message
+                        const errorData = await response.json();
+                        errorMessageDiv.textContent = errorData.message || "An unexpected error occurred.";
+                    }
+                })
+                .catch((error) => {
+                    // Handle network or other unexpected errors
+                    errorMessageDiv.textContent = "An unexpected error occurred. Please try again.";
+                    console.error("Login error:", error);
+                });
+        });
     </script>
 
 

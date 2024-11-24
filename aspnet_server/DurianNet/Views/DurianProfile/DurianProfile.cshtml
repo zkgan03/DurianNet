@@ -3,6 +3,14 @@
 }
 
 <div class="p-8 w-full">
+    @* <!-- Success Message -->
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success text-center">
+            @TempData["SuccessMessage"]
+        </div>
+    } *@
+
     <!-- Title -->
     <h1 class="text-black mb-6 text-3xl font-bold">Durian Profile</h1>
 

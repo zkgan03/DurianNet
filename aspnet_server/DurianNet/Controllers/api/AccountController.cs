@@ -196,7 +196,7 @@ namespace DurianNet.Controllers.api
             //    Expires = DateTime.UtcNow.AddMinutes(30)
             //});
 
-            return Ok(new { UserName = user.UserName, Email = user.Email });
+            return Ok(new { UserName = user.UserName, Email = user.Email, message = "Login successful!" });
         }
 
         [Authorize(policy: "AdminPolicy")]
