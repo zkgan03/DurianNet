@@ -22,7 +22,7 @@
         <div class="mx-auto w-[50%]">
             <h3 class="mb-8 text-gray-800 text-center text-4xl font-bold">Admin Login</h3>
             <!-- Login Form -->
-            <form id="loginForm" method="post">
+            <form id="loginForm" method="post" asp-action="LoginAdmin">
                 <div class="mb-6">
                     <label for="username" class="text-gray-700 block text-lg font-medium">Username</label>
                     <input type="text" id="username" name="username" required
@@ -36,7 +36,8 @@
                            placeholder="Enter your password" />
                 </div>
                 <div class="mb-6">
-                    <button type="button" onclick="login()"
+                    <button type="submit"
+                        @* onclick="login()" *@
                             class="py-3 text-white w-full rounded-md bg-[#12796F] text-lg font-bold transition hover:bg-[#0f5d57]">
                         Login
                     </button>
@@ -86,35 +87,35 @@
     </script> *@
 
     <script>
-        async function login() {
-            const username = document.getElementById("username").value;
-            const password = document.getElementById("password").value;
-            const errorMessage = document.getElementById("errorMessage");
+        // async function login() {
+        //     const username = document.getElementById("username").value;
+        //     const password = document.getElementById("password").value;
+        //     const errorMessage = document.getElementById("errorMessage");
 
-            errorMessage.textContent = ""; // Clear previous error message
+        //     errorMessage.textContent = ""; // Clear previous error message
 
-            try {
-                const response = await fetch('/api/account/loginAdmin', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ username, password }),
-                    credentials: 'include' // Include cookies in the request
-                });
+        //     try {
+        //         const response = await fetch('/api/account/loginAdmin', {
+        //             method: 'POST',
+        //             headers: { 'Content-Type': 'application/json' },
+        //             body: JSON.stringify({ username, password }),
+        //             credentials: 'include' // Include cookies in the request
+        //         });
 
-                if (!response.ok) {
-                    // Extract and display the error message from the response
-                    const errorData = await response.json();
-                    errorMessage.textContent = errorData.message || "Invalid username or password.";
-                    return;
-                }
+        //         if (!response.ok) {
+        //             // Extract and display the error message from the response
+        //             const errorData = await response.json();
+        //             errorMessage.textContent = errorData.message || "Invalid username or password.";
+        //             return;
+        //         }
 
-                // On success, redirect to the profile page
-                alert("Login successful!");
-                window.location.href = "/adminprofile/ProfilePage";
-            } catch (networkError) {
-                errorMessage.textContent = "An unexpected error occurred. Please try again.";
-            }
-        }
+        //         // On success, redirect to the profile page
+        //         alert("Login successful!");
+        //         window.location.href = "/adminprofile/ProfilePage";
+        //     } catch (networkError) {
+        //         errorMessage.textContent = "An unexpected error occurred. Please try again.";
+        //     }
+        // }
     </script>
 
 

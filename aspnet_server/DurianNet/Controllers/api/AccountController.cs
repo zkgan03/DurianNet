@@ -53,33 +53,33 @@ namespace DurianNet.Controllers.api
             var token = _tokenService.CreateToken(user);
 
             // Create cookie for session-based authentication
-            var claims = new List<Claim>
-    {
-        new Claim(ClaimTypes.Name, user.UserName),
-        new Claim(ClaimTypes.NameIdentifier, user.Id),
-        new Claim(ClaimTypes.Role, user.UserType.ToString())
-    };
+    //        var claims = new List<Claim>
+    //{
+    //    new Claim(ClaimTypes.Name, user.UserName),
+    //    new Claim(ClaimTypes.NameIdentifier, user.Id),
+    //    new Claim(ClaimTypes.Role, user.UserType.ToString())
+    //};
 
-            var identity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
-            var principal = new ClaimsPrincipal(identity);
+    //        var identity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
+    //        var principal = new ClaimsPrincipal(identity);
 
-            await HttpContext.SignInAsync(
-                CookieAuthenticationDefaults.AuthenticationScheme,
-                principal,
-                new AuthenticationProperties
-                {
-                    IsPersistent = true,  // Keep the cookie across sessions
-                    ExpiresUtc = DateTime.UtcNow.AddMinutes(30)  // Cookie expiration
-                });
+            //await HttpContext.SignInAsync(
+            //    CookieAuthenticationDefaults.AuthenticationScheme,
+            //    principal,
+            //    new AuthenticationProperties
+            //    {
+            //        IsPersistent = true,  // Keep the cookie across sessions
+            //        ExpiresUtc = DateTime.UtcNow.AddMinutes(30)  // Cookie expiration
+            //    });
 
-            // Save JWT in a secure HTTP-only cookie
-            HttpContext.Response.Cookies.Append("AuthToken", token, new CookieOptions
-            {
-                HttpOnly = true, // Prevent access via JavaScript
-                Secure = true,   // Use HTTPS
-                SameSite = SameSiteMode.Strict, // Strict SameSite policy
-                Expires = DateTime.UtcNow.AddMinutes(30) // Matches the session expiration
-            });
+            //// Save JWT in a secure HTTP-only cookie
+            //HttpContext.Response.Cookies.Append("AuthToken", token, new CookieOptions
+            //{
+            //    HttpOnly = true, // Prevent access via JavaScript
+            //    Secure = true,   // Use HTTPS
+            //    SameSite = SameSiteMode.Strict, // Strict SameSite policy
+            //    Expires = DateTime.UtcNow.AddMinutes(30) // Matches the session expiration
+            //});
 
             return Ok(
                 new NewUserDto
@@ -139,7 +139,8 @@ namespace DurianNet.Controllers.api
             if (!ModelState.IsValid)
                 return BadRequest(new { message = "Invalid input. Please check your username and password." });
 
-            var user = await _userManager.Users.FirstOrDefaultAsync(x => x.UserName.ToLower() == loginDto.Username.ToLower());
+            var user = await _userManager.Users
+                .FirstOrDefaultAsync(x => x.UserName.ToLower() == loginDto.Username.ToLower());
 
             if (user == null)
                 return Unauthorized(new { message = "Invalid username!" });
@@ -161,16 +162,63 @@ namespace DurianNet.Controllers.api
             // Set the session cookie with the username
             HttpContext.Session.SetString("Username", user.UserName);
 
-            // Save the token in an HTTP-only cookie
-            HttpContext.Response.Cookies.Append("AuthToken", token, new CookieOptions
+            // create claims
+            var claims = new List<Claim>
             {
-                HttpOnly = true,
-                Secure = true,
-                SameSite = SameSiteMode.Strict,
-                Expires = DateTime.UtcNow.AddMinutes(30)
-            });
+                new Claim(ClaimTypes.Name, user.UserName),
+                new Claim(ClaimTypes.NameIdentifier, user.Id),
+                new Claim(ClaimTypes.Role, user.UserType.ToString())
+            };
+
+            // create identity
+            var identity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
+
+            // create principal
+            var principal = new ClaimsPrincipal(identity);
+
+            // sign in
+            await HttpContext.SignInAsync(
+                CookieAuthenticationDefaults.AuthenticationScheme,
+                principal,
+                new AuthenticationProperties
+                {
+                    IsPersistent = true,
+                    ExpiresUtc = DateTime.UtcNow.AddMinutes(30)
+                });
+
+
+            //// Save the token in an HTTP-only cookie
+            //HttpContext.Response.Cookies.Append("AuthToken", token, new CookieOptions
+            //{
+            //    HttpOnly = true,
+            //    Secure = true,
+            //    SameSite = SameSiteMode.Strict,
+            //    Expires = DateTime.UtcNow.AddMinutes(30)
+            //});
 
             return Ok(new { UserName = user.UserName, Email = user.Email });
+        }
+
+        [Authorize(policy: "AdminPolicy")]
+        [HttpGet("authorizedAction")]
+        public IActionResult AuthorizedAction()
+        {
+            Console.WriteLine("Authorized action called");
+
+            //Get everything from the token
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var email = User.FindFirstValue(ClaimTypes.Email);
+            var jti = User.FindFirstValue(JwtRegisteredClaimNames.Jti);
+            var exp = User.FindFirstValue(JwtRegisteredClaimNames.Exp);
+
+            // return as anonymous object
+            return Ok(new
+            {
+                userId,
+                email,
+                jti,
+                exp
+            });
         }
 
 
@@ -337,7 +385,7 @@ namespace DurianNet.Controllers.api
             }
         }
 
-        
+
 
 
         [HttpPut("ChangePassword/{username?}")]
@@ -395,14 +443,28 @@ namespace DurianNet.Controllers.api
 
             return Ok(new { AccessToken = newAccessToken, RefreshToken = newRefreshToken.Token });
         }
-        
+
+
+
+        //This is admin logout
+        [Authorize(policy: "AdminPolicy")]
         [HttpPost("logout")]
         public async Task<IActionResult> Logout()
         {
             // Retrieve the username from session
-            var username = HttpContext.Session.GetString("Username");
-            if (string.IsNullOrEmpty(username))
+            //var username = HttpContext.Session.GetString("Username");
+            //if (string.IsNullOrEmpty(username))
+            //    return Unauthorized("User not logged in.");
+
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+            // get the user
+            var user = await _userManager.FindByIdAsync(userId);
+
+            if (user == null)
+            {
                 return Unauthorized("User not logged in.");
+            }
 
             // Clear session data
             HttpContext.Session.Remove("Username");
@@ -411,6 +473,8 @@ namespace DurianNet.Controllers.api
             // Sign out and remove cookies
             //await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
             HttpContext.Response.Cookies.Delete("AuthToken");
+
+            await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
 
             return Ok("Logged out successfully.");
         }

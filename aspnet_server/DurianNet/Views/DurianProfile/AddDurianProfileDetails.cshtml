@@ -86,28 +86,94 @@
 </div>
 
 <script>
+    // document.getElementById('addDurianForm').addEventListener('submit', async function (event) {
+    //     event.preventDefault();
+
+    //     const formData = new FormData(this);
+
+    //     try {
+    //         const response = await fetch('/api/durianprofile/AddDurianProfile', {
+    //             method: 'POST',
+    //             body: formData
+    //         });
+
+    //         if (!response.ok) {
+    //             const error = await response.text();
+    //             alert(`Failed to add durian profile: ${error}`);
+    //             return;
+    //         }
+
+    //         alert("Durian profile uploaded successfully!");
+    //         window.location.href = '/durianprofile/DurianProfilePage'; // Redirect to the Durian Profile page
+    //     } catch (error) {
+    //         console.error(error);
+    //         alert("An error occurred while uploading the durian profile. Please try again.");
+    //     }
+    // });
+
     document.getElementById('addDurianForm').addEventListener('submit', async function (event) {
         event.preventDefault();
 
-        const formData = new FormData(this);
+        const durianName = document.getElementById('durianName').value.trim();
+        const characteristics = document.getElementById('characteristics').value.trim();
+        const tasteProfile = document.getElementById('tasteProfile').value.trim();
+        const durianDescription = document.getElementById('durianDescription').value.trim();
+        const videoDescription = document.getElementById('videoDescription').value.trim();
+
+        let durianImageBase64 = null;
+        let durianVideoBase64 = null;
+
+        // Convert image to Base64
+        const durianImageFile = document.getElementById('durianImage').files[0];
+        if (durianImageFile) {
+            durianImageBase64 = await toBase64(durianImageFile);
+        }
+
+        // Convert video to Base64
+        const durianVideoFile = document.getElementById('durianVideo').files[0];
+        if (durianVideoFile) {
+            durianVideoBase64 = await toBase64(durianVideoFile);
+        }
+
+        const payload = {
+            durianName,
+            characteristics,
+            tasteProfile,
+            durianDescription,
+            videoDescription,
+            durianImage: durianImageBase64,
+            durianVideo: durianVideoBase64,
+        };
 
         try {
             const response = await fetch('/api/durianprofile/AddDurianProfile', {
                 method: 'POST',
-                body: formData
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload),
             });
 
             if (!response.ok) {
-                const error = await response.text();
-                alert(`Failed to add durian profile: ${error}`);
+                const error = await response.json();
+                alert(error.message || "Failed to add durian profile.");
                 return;
             }
 
-            alert("Durian profile uploaded successfully!");
-            window.location.href = '/durianprofile/DurianProfilePage'; // Redirect to the Durian Profile page
+            alert("Durian profile added successfully!");
+            window.location.href = '/durianprofile/DurianProfilePage'; // Redirect to Durian Profile page
         } catch (error) {
             console.error(error);
-            alert("An error occurred while uploading the durian profile. Please try again.");
+            alert("An error occurred while adding the durian profile.");
         }
     });
+
+    // Helper function to convert files to Base64
+    function toBase64(file) {
+        return new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.onload = () => resolve(reader.result);
+            reader.onerror = reject;
+            reader.readAsDataURL(file);
+        });
+    }
+
 </script>

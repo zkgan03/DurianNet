@@ -4,13 +4,13 @@ using DurianNet.Hubs;
 using DurianNet.Interfaces;
 using DurianNet.Models.DataModels;
 using DurianNet.Repository;
-using DurianNet.Services;
 using DurianNet.Services.CommentService;
 using DurianNet.Services.DetectionService;
 using DurianNet.Services.DetectionService.YOLO.v10;
 using DurianNet.Services.SellerService;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -64,7 +64,7 @@ builder.Services.AddScoped<IDurianProfileRepository, DurianProfileRepository>();
 builder.Services.AddScoped<IDurianVideoRepository, DurianVideoRepository>();
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<ITokenService, TokenService>();
-builder.Services.AddScoped<IFavoriteDurian,  FavoriteDurianRepository>();
+builder.Services.AddScoped<IFavoriteDurian, FavoriteDurianRepository>();
 
 // Setup signalR
 builder.Services.AddSignalR(option =>
@@ -90,14 +90,21 @@ builder.Services.AddIdentity<User, IdentityRole>(options =>
     options.Password.RequireNonAlphanumeric = true;
     options.Password.RequiredLength = 12;
 })
-.AddEntityFrameworkStores<ApplicationDBContext>();
+.AddEntityFrameworkStores<ApplicationDBContext>()
+.AddDefaultTokenProviders();
 
 builder.Services.AddAuthorization(options =>
 {
+
+    options.DefaultPolicy = new AuthorizationPolicyBuilder(JwtBearerDefaults.AuthenticationScheme)
+    .RequireAuthenticatedUser()
+    .Build();
+
     options.AddPolicy("AdminPolicy", policy =>
     {
+        policy.AddAuthenticationSchemes(CookieAuthenticationDefaults.AuthenticationScheme);
         policy.RequireAuthenticatedUser();
-        policy.RequireRole("Admin");
+        //policy.RequireRole("Admin");
     });
 });
 
@@ -164,7 +171,10 @@ builder.Services.AddAuthorization(options =>
 //});
 
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-    .AddJwtBearer(options =>
+    .AddCookie(CookieAuthenticationDefaults.AuthenticationScheme, options =>
+    {
+        options.LoginPath = "/Account/LoginPage";
+    }).AddJwtBearer(options =>
     {
         options.TokenValidationParameters = new TokenValidationParameters
         {

@@ -1,8 +1,26 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using DurianNet.Dtos.Account;
+using DurianNet.Interfaces;
+using DurianNet.Models.DataModels;
+using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
+using Microsoft.EntityFrameworkCore;
 
 [Route("account")]
 public class AccountWebController : Controller
 {
+
+    private readonly UserManager<User> _userManager;
+    private readonly SignInManager<User> _signinManager;
+
+    public AccountWebController(UserManager<User> userManager, SignInManager<User> signinManager)
+    {
+        _userManager = userManager;
+        _signinManager = signinManager;
+    }
+
     [HttpGet("LoginPage")]
     public IActionResult LoginPage()
     {
@@ -63,6 +81,62 @@ public class AccountWebController : Controller
         // For now, assume login is successful.
 
         // Redirect to DurianProfile page after successful login.
+        return RedirectToAction("DurianProfilePage", "durianprofile");
+    }
+
+    // TODO : add admin policy
+    [HttpPost("loginAdmin")]
+    public async Task<IActionResult> LoginAdmin(LoginDto loginDto)
+    {
+        if (!ModelState.IsValid)
+            return BadRequest(new { message = "Invalid input. Please check your username and password." });
+
+        var user = await _userManager
+            .Users
+            .FirstOrDefaultAsync(x => x.UserName.ToLower() == loginDto.Username.ToLower());
+
+        if (user == null)
+            return Unauthorized(new { message = "Invalid username!" });
+
+        if (user.UserType != UserType.Admin && user.UserType != UserType.SuperAdmin)
+            return Unauthorized(new { message = "Only admins and super admins can log in to the admin web interface." });
+
+        if (user.UserStatus == UserStatus.Deleted)
+            return Unauthorized(new { message = "This admin account is deleted." });
+
+        var result = await _signinManager.CheckPasswordSignInAsync(user, loginDto.Password, false);
+
+        if (!result.Succeeded)
+            return Unauthorized(new { message = "Invalid username or password!" });
+
+
+        // Set the session cookie with the username
+        HttpContext.Session.SetString("Username", user.UserName);
+
+        // create claims
+        var claims = new List<Claim>
+            {
+                new Claim(ClaimTypes.Name, user.UserName),
+                new Claim(ClaimTypes.NameIdentifier, user.Id),
+                new Claim(ClaimTypes.Role, user.UserType.ToString())
+            };
+
+        // create identity
+        var identity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
+
+        // create principal
+        var principal = new ClaimsPrincipal(identity);
+
+        // sign in
+        await HttpContext.SignInAsync(
+            CookieAuthenticationDefaults.AuthenticationScheme,
+            principal,
+            new AuthenticationProperties
+            {
+                IsPersistent = true,
+                ExpiresUtc = DateTime.UtcNow.AddMinutes(30)
+            });
+
         return RedirectToAction("DurianProfilePage", "durianprofile");
     }
 
