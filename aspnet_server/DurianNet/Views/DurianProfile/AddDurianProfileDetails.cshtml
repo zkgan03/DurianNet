@@ -48,12 +48,21 @@
             </div>
 
             <!-- Level 3 -->
-            <div class="mb-6">
+            <div class="gap-6 mb-6 flex">
                 <!-- Durian Description -->
-                <label for="durianDescription" class="text-black block text-lg font-bold">Durian Description</label>
-                <input type="text" id="durianDescription" name="durianDescription"
-                       class="mt-2 px-4 py-3 border-gray-300 w-full rounded-md border text-lg focus:outline-none focus:ring-2 focus:ring-[#12796F]"
-                       placeholder="Enter Durian Description" required />
+                <div class="w-1/2">
+                    <label for="durianDescription" class="text-black block text-lg font-bold">Durian Description</label>
+                    <input type="text" id="durianDescription" name="durianDescription"
+                            class="mt-2 px-4 py-3 border-gray-300 w-full rounded-md border text-lg focus:outline-none focus:ring-2 focus:ring-[#12796F]"
+                            placeholder="Enter Durian Description" required />
+                </div>
+                <div class="w-1/2">
+                    <label for="durianCode" class="text-black block text-lg font-bold">Durian Code</label>
+                    <input type="text" id="durianCode" name="durianCode"
+                           class="mt-2 px-4 py-3 border-gray-300 w-full rounded-md border text-lg focus:outline-none focus:ring-2 focus:ring-[#12796F]"
+                           placeholder="Enter Durian Code" required />
+                </div>
+
             </div>
 
             <!-- Level 4 -->
@@ -86,35 +95,12 @@
 </div>
 
 <script>
-    // document.getElementById('addDurianForm').addEventListener('submit', async function (event) {
-    //     event.preventDefault();
-
-    //     const formData = new FormData(this);
-
-    //     try {
-    //         const response = await fetch('/api/durianprofile/AddDurianProfile', {
-    //             method: 'POST',
-    //             body: formData
-    //         });
-
-    //         if (!response.ok) {
-    //             const error = await response.text();
-    //             alert(`Failed to add durian profile: ${error}`);
-    //             return;
-    //         }
-
-    //         alert("Durian profile uploaded successfully!");
-    //         window.location.href = '/durianprofile/DurianProfilePage'; // Redirect to the Durian Profile page
-    //     } catch (error) {
-    //         console.error(error);
-    //         alert("An error occurred while uploading the durian profile. Please try again.");
-    //     }
-    // });
 
     document.getElementById('addDurianForm').addEventListener('submit', async function (event) {
         event.preventDefault();
 
         const durianName = document.getElementById('durianName').value.trim();
+        const durianCode = document.getElementById('durianCode').value.trim();
         const characteristics = document.getElementById('characteristics').value.trim();
         const tasteProfile = document.getElementById('tasteProfile').value.trim();
         const durianDescription = document.getElementById('durianDescription').value.trim();
@@ -137,6 +123,7 @@
 
         const payload = {
             durianName,
+            durianCode,
             characteristics,
             tasteProfile,
             durianDescription,

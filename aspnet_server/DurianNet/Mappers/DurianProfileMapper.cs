@@ -12,6 +12,7 @@ namespace DurianNet.Mappers
             {
                 DurianId = profile.DurianId,
                 DurianName = profile.DurianName,
+                DurianCode = profile.DurianCode,
                 DurianDescription = profile.DurianDescription,
                 Characteristics = profile.Characteristics,
                 TasteProfile = profile.TasteProfile,
@@ -35,14 +36,8 @@ namespace DurianNet.Mappers
         {
             return new DurianProfile
             {
-                //DurianName = dto.DurianName,
-                //DurianDescription = dto.DurianDescription,
-                //Characteristics = dto.Characteristics,
-                //TasteProfile = dto.TasteProfile,
-                //DurianImage = dto.DurianImage,
-                //DurianVideoId = videoId
-
                 DurianName = dto.DurianName,
+                DurianCode = dto.DurianCode,
                 DurianDescription = dto.DurianDescription,
                 Characteristics = dto.Characteristics, // Match property names
                 TasteProfile = dto.TasteProfile,

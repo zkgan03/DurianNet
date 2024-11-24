@@ -3,6 +3,7 @@
     public class UpdateDurianProfileRequestDto
     {
         public string DurianName { get; set; }
+        public string DurianCode { get; set; }
         public string Characteristics { get; set; }
         public string TasteProfile { get; set; }
         public string DurianDescription { get; set; }

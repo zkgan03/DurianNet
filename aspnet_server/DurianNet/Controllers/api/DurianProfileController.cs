@@ -60,111 +60,6 @@ namespace DurianNet.Controllers.api
             return Ok(durianProfile.ToDurianProfileDto());
         }
 
-        //[HttpPost("AddDurianProfile")]
-        //public async Task<IActionResult> AddDurianProfile([FromForm] AddDurianProfileRequestDto dto)
-        //{
-        //    // Check for duplicate Durian Name
-        //    if (await _context.DurianProfiles.AnyAsync(dp => dp.DurianName == dto.DurianName))
-        //    {
-        //        return BadRequest("Durian name already exists.");
-        //    }
-
-        //    // Handle Durian Image upload
-        //    string imageDirectory = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/images");
-        //    if (!Directory.Exists(imageDirectory))
-        //    {
-        //        Directory.CreateDirectory(imageDirectory);
-        //    }
-        //    string imagePath = Path.Combine(imageDirectory, dto.DurianImage.FileName);
-        //    using (var stream = new FileStream(imagePath, FileMode.Create))
-        //    {
-        //        await dto.DurianImage.CopyToAsync(stream);
-        //    }
-        //    string imageUrl = $"/images/{dto.DurianImage.FileName}"; // Relative URL for database storage
-
-        //    // Handle Durian Video upload
-        //    string videoDirectory = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/videos");
-        //    if (!Directory.Exists(videoDirectory))
-        //    {
-        //        Directory.CreateDirectory(videoDirectory);
-        //    }
-        //    string videoPath = Path.Combine(videoDirectory, dto.DurianVideo.FileName);
-        //    using (var stream = new FileStream(videoPath, FileMode.Create))
-        //    {
-        //        await dto.DurianVideo.CopyToAsync(stream);
-        //    }
-        //    string videoUrl = $"/videos/{dto.DurianVideo.FileName}";
-
-        //    // Save Durian Video record
-        //    var video = dto.ToDurianVideoFromAddRequest(videoUrl); // Pass video URL explicitly
-        //    _context.DurianVideos.Add(video);
-        //    await _context.SaveChangesAsync();
-
-        //    // Save Durian Profile record
-        //    var profile = dto.ToDurianProfileFromAddRequest(imageUrl, video.VideoId); // Pass image URL explicitly
-        //    _context.DurianProfiles.Add(profile);
-        //    await _context.SaveChangesAsync();
-
-        //    return Ok(profile.ToDurianProfileDto());
-        //}
-
-        //[HttpPost("AddDurianProfile")]
-        //public async Task<IActionResult> AddDurianProfile([FromBody] AddDurianProfileRequestDto dto)
-        //{
-        //    // Check for duplicate Durian Name
-        //    if (await _context.DurianProfiles.AnyAsync(dp => dp.DurianName == dto.DurianName))
-        //    {
-        //        return BadRequest("Durian name already exists.");
-        //    }
-
-        //    string imageUrl = null;
-        //    string videoUrl = null;
-
-        //    // Handle Durian Image upload
-        //    if (!string.IsNullOrEmpty(dto.DurianImage))
-        //    {
-        //        string imageDirectory = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/images");
-        //        if (!Directory.Exists(imageDirectory))
-        //        {
-        //            Directory.CreateDirectory(imageDirectory);
-        //        }
-
-        //        string imageName = $"durian_{Guid.NewGuid()}_{DateTime.Now.Ticks}.png"; // Unique file name
-        //        string imagePath = Path.Combine(imageDirectory, imageName);
-        //        var imageBytes = Convert.FromBase64String(dto.DurianImage.Split(',')[1]); // Remove metadata prefix
-        //        await System.IO.File.WriteAllBytesAsync(imagePath, imageBytes);
-        //        imageUrl = $"/images/{imageName}";
-        //    }
-
-        //    // Handle Durian Video upload
-        //    if (!string.IsNullOrEmpty(dto.DurianVideo))
-        //    {
-        //        string videoDirectory = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/videos");
-        //        if (!Directory.Exists(videoDirectory))
-        //        {
-        //            Directory.CreateDirectory(videoDirectory);
-        //        }
-
-        //        string videoName = $"durian_{Guid.NewGuid()}_{DateTime.Now.Ticks}.mp4"; // Unique file name
-        //        string videoPath = Path.Combine(videoDirectory, videoName);
-        //        var videoBytes = Convert.FromBase64String(dto.DurianVideo.Split(',')[1]); // Remove metadata prefix
-        //        await System.IO.File.WriteAllBytesAsync(videoPath, videoBytes);
-        //        videoUrl = $"/videos/{videoName}";
-        //    }
-
-        //    // Save Durian Video record
-        //    var video = dto.ToDurianVideoFromAddRequest(videoUrl); // Pass video URL explicitly
-        //    _context.DurianVideos.Add(video);
-        //    await _context.SaveChangesAsync();
-
-        //    // Save Durian Profile record
-        //    var profile = dto.ToDurianProfileFromAddRequest(imageUrl, video.VideoId); // Pass image URL explicitly
-        //    _context.DurianProfiles.Add(profile);
-        //    await _context.SaveChangesAsync();
-
-        //    return Ok(profile.ToDurianProfileDto());
-        //}
-
         [HttpPost("AddDurianProfile")]
         public async Task<IActionResult> AddDurianProfile([FromBody] AddDurianProfileRequestDto dto)
         {
@@ -274,6 +169,7 @@ namespace DurianNet.Controllers.api
             }
 
             // Update other fields
+            profile.DurianCode = dto.DurianCode;
             profile.DurianName = dto.DurianName;
             profile.Characteristics = dto.Characteristics;
             profile.TasteProfile = dto.TasteProfile;
