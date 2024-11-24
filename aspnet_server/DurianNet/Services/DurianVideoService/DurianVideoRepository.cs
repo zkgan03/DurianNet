@@ -1,11 +1,10 @@
 ﻿using DurianNet.Data;
 using DurianNet.Models.DataModels;
-using DurianNet.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace DurianNet.Repository
+namespace DurianNet.Services.DurianVideoService
 {
     public class DurianVideoRepository : IDurianVideoRepository
     {

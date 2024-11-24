@@ -1,7 +1,6 @@
 ﻿using DurianNet.Data;
 using DurianNet.Dtos.Request.User;
 using DurianNet.Helpers;
-using DurianNet.Interfaces;
 using DurianNet.Mappers;
 using DurianNet.Models.DataModels;
 using DurianNet.Services.EmailService;

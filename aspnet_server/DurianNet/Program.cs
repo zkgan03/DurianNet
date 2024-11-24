@@ -1,13 +1,15 @@
 using DurianNet.Data;
 using DurianNet.Exceptions;
 using DurianNet.Hubs;
-using DurianNet.Interfaces;
 using DurianNet.Models.DataModels;
-using DurianNet.Repository;
 using DurianNet.Services.CommentService;
 using DurianNet.Services.DetectionService;
 using DurianNet.Services.DetectionService.YOLO.v10;
+using DurianNet.Services.DurianVideoService;
+using DurianNet.Services.FavoriteDurianService;
 using DurianNet.Services.SellerService;
+using DurianNet.Services.TokenService;
+using DurianNet.Services.UserService;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
@@ -60,7 +62,7 @@ builder.Services.AddSwaggerGen(option =>
 builder.Services.AddSingleton<IDetector, YoloV10Detector>();
 builder.Services.AddScoped<ISellerService, SellerService>();
 builder.Services.AddScoped<ICommentService, CommentService>();
-builder.Services.AddScoped<IDurianProfileRepository, DurianProfileRepository>();
+builder.Services.AddScoped<DurianNet.Services.DurianProfileService.IDurianProfileRepository, DurianNet.Services.DurianProfileService.DurianProfileRepository>();
 builder.Services.AddScoped<IDurianVideoRepository, DurianVideoRepository>();
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<ITokenService, TokenService>();

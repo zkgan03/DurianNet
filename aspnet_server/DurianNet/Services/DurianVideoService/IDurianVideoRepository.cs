@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace DurianNet.Interfaces
+namespace DurianNet.Services.DurianVideoService
 {
     public interface IDurianVideoRepository
     {

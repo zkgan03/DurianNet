@@ -1,6 +1,6 @@
 ﻿using DurianNet.Models.DataModels;
 
-namespace DurianNet.Interfaces
+namespace DurianNet.Services.TokenService
 {
     public interface ITokenService
     {

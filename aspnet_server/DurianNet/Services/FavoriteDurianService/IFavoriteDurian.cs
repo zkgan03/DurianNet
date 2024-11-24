@@ -1,7 +1,6 @@
 ﻿using DurianNet.Models.DataModels;
-using DurianNet.Repository;
 
-namespace DurianNet.Interfaces
+namespace DurianNet.Services.FavoriteDurianService
 {
     public interface IFavoriteDurian
     {

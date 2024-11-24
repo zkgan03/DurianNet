@@ -116,47 +116,6 @@
         }
     }
 
-    // async function submitUpdateDurianProfileForm(event) {
-    //     event.preventDefault();
-
-    //     // Extract form fields
-    //     const formData = new FormData();
-    //     formData.append('durianName', document.getElementById('durianName').value.trim());
-    //     formData.append('characteristics', document.getElementById('characteristic').value.trim());
-    //     formData.append('tasteProfile', document.getElementById('tasteProfile').value.trim());
-    //     formData.append('durianDescription', document.getElementById('durianDescription').value.trim());
-    //     formData.append('videoDescription', document.getElementById('videoDescription').value.trim());
-
-    //     const durianImage = document.getElementById('durianImage').files[0];
-    //     if (durianImage) {
-    //         formData.append('durianImage', durianImage);
-    //     }
-
-    //     const durianVideo = document.getElementById('durianVideo').files[0];
-    //     if (durianVideo) {
-    //         formData.append('durianVideo', durianVideo);
-    //     }
-
-    //     try {
-    //         const response = await fetch(`/api/durianprofile/UpdateDurianProfile`, {
-    //             method: 'PUT',
-    //             body: formData,
-    //         });
-
-    //         if (!response.ok) {
-    //             const error = await response.json();
-    //             alert(error.message || "Failed to update durian profile.");
-    //             return;
-    //         }
-
-    //         alert("Durian profile updated successfully!");
-    //         window.location.href = '/durianprofile/DurianProfilePage';
-    //     } catch (error) {
-    //         console.error(error);
-    //         alert("An error occurred. Please try again.");
-    //     }
-    // }
-
     async function submitUpdateDurianProfileForm(event) {
         event.preventDefault();
 

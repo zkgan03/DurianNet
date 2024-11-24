@@ -1,5 +1,4 @@
 ﻿using DurianNet.Dtos.Account;
-using DurianNet.Interfaces;
 using DurianNet.Models.DataModels;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication;

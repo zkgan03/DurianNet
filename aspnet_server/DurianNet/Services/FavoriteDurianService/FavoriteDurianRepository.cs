@@ -1,14 +1,13 @@
 ﻿using DurianNet.Data;
-using DurianNet.Interfaces;
 using DurianNet.Models.DataModels;
 using Microsoft.EntityFrameworkCore;
 
-namespace DurianNet.Repository
+namespace DurianNet.Services.FavoriteDurianService
 {
     public class FavoriteDurianRepository : IFavoriteDurian
     {
         private readonly ApplicationDBContext _context;
-        
+
         public FavoriteDurianRepository(ApplicationDBContext context)
         {
             _context = context;

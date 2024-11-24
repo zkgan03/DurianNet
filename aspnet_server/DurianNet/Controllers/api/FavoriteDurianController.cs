@@ -1,7 +1,6 @@
 ﻿using DurianNet.Extensions;
-using DurianNet.Interfaces;
 using DurianNet.Models.DataModels;
-using DurianNet.Repository;
+using DurianNet.Services.FavoriteDurianService;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -13,11 +12,11 @@ namespace DurianNet.Controllers.api
     public class FavoriteDurianController : ControllerBase
     {
         private readonly UserManager<User> _userManager;
-        private readonly IDurianProfileRepository _durianProfileRepo;
+        private readonly Services.DurianProfileService.IDurianProfileRepository _durianProfileRepo;
         private readonly IFavoriteDurian _favoriteDurianRepo;
 
         public FavoriteDurianController(UserManager<User> userManager,
-        IDurianProfileRepository durianProfileRepo, IFavoriteDurian favoriteDurianRepo)
+        Services.DurianProfileService.IDurianProfileRepository durianProfileRepo, IFavoriteDurian favoriteDurianRepo)
         {
             _userManager = userManager;
             _durianProfileRepo = durianProfileRepo;

@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using DurianNet.Helpers;
 
-namespace DurianNet.Interfaces
+namespace DurianNet.Services.UserService
 {
     public interface IUserRepository
     {

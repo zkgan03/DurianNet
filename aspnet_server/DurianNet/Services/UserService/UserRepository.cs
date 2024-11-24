@@ -1,13 +1,12 @@
 ﻿using DurianNet.Data;
 using DurianNet.Models.DataModels;
 using DurianNet.Dtos.Request.User;
-using DurianNet.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using DurianNet.Helpers;
 
-namespace DurianNet.Repository
+namespace DurianNet.Services.UserService
 {
     public class UserRepository : IUserRepository
     {

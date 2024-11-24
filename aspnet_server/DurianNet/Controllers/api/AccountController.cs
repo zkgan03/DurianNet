@@ -1,8 +1,8 @@
 ﻿using DurianNet.Dtos.Account;
 using DurianNet.Dtos.Request.User;
-using DurianNet.Interfaces;
 using DurianNet.Models.DataModels;
-using DurianNet.Repository;
+using DurianNet.Services.TokenService;
+using DurianNet.Services.UserService;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
