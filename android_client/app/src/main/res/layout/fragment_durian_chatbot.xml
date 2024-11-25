@@ -23,7 +23,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
-            android:text="Edit Profile"
+            android:text="Durian Chatbot"
             android:textColor="@color/black"
             android:textSize="24sp"
             tools:layout_editor_absoluteX="148dp"

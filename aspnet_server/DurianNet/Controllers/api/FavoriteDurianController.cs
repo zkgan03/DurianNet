@@ -41,7 +41,7 @@ namespace DurianNet.Controllers.api
             var appUser = await _userManager.FindByNameAsync(username);
             var durianProfile = await _durianProfileRepo.GetBySymbolAsync(symbol);
 
-            if (durianProfile == null) return BadRequest("Stock not found");
+            if (durianProfile == null) return BadRequest("Favorite Durian not found");
 
             var userFavoriteDurian = await _favoriteDurianRepo.GetUserFavoriteDurian(appUser);
 

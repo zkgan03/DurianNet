@@ -53,33 +53,33 @@ namespace DurianNet.Controllers.api
             var token = _tokenService.CreateToken(user);
 
             // Create cookie for session-based authentication
-    //        var claims = new List<Claim>
-    //{
-    //    new Claim(ClaimTypes.Name, user.UserName),
-    //    new Claim(ClaimTypes.NameIdentifier, user.Id),
-    //    new Claim(ClaimTypes.Role, user.UserType.ToString())
-    //};
+            var claims = new List<Claim>
+    {
+        new Claim(ClaimTypes.Name, user.UserName),
+        new Claim(ClaimTypes.NameIdentifier, user.Id),
+        new Claim(ClaimTypes.Role, user.UserType.ToString())
+    };
 
-    //        var identity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
-    //        var principal = new ClaimsPrincipal(identity);
+            var identity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
+            var principal = new ClaimsPrincipal(identity);
 
-            //await HttpContext.SignInAsync(
-            //    CookieAuthenticationDefaults.AuthenticationScheme,
-            //    principal,
-            //    new AuthenticationProperties
-            //    {
-            //        IsPersistent = true,  // Keep the cookie across sessions
-            //        ExpiresUtc = DateTime.UtcNow.AddMinutes(30)  // Cookie expiration
-            //    });
+            await HttpContext.SignInAsync(
+                CookieAuthenticationDefaults.AuthenticationScheme,
+                principal,
+                new AuthenticationProperties
+                {
+                    IsPersistent = true,  // Keep the cookie across sessions
+                    ExpiresUtc = DateTime.UtcNow.AddMinutes(30)  // Cookie expiration
+                });
 
-            //// Save JWT in a secure HTTP-only cookie
-            //HttpContext.Response.Cookies.Append("AuthToken", token, new CookieOptions
-            //{
-            //    HttpOnly = true, // Prevent access via JavaScript
-            //    Secure = true,   // Use HTTPS
-            //    SameSite = SameSiteMode.Strict, // Strict SameSite policy
-            //    Expires = DateTime.UtcNow.AddMinutes(30) // Matches the session expiration
-            //});
+            // Save JWT in a secure HTTP-only cookie
+            HttpContext.Response.Cookies.Append("AuthToken", token, new CookieOptions
+            {
+                HttpOnly = true, // Prevent access via JavaScript
+                Secure = true,   // Use HTTPS
+                SameSite = SameSiteMode.Strict, // Strict SameSite policy
+                Expires = DateTime.UtcNow.AddMinutes(30) // Matches the session expiration
+            });
 
             return Ok(
                 new NewUserDto
