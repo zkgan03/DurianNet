@@ -59,4 +59,11 @@ class UserRepository @Inject constructor(private val userApi: UserApi) {
     suspend fun resetPassword(newPassword: String, email: String) = runCatching {
         userApi.resetPassword(ResetPasswordRequestDto(email, newPassword))
     }
+
+    suspend fun validateOTP(email: String, otp: String): Result<Unit> {
+        return runCatching {
+            userApi.validateOTP(ValidateOTPRequestDto(email, otp))
+        }
+    }
+
 }

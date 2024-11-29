@@ -30,6 +30,9 @@ namespace DurianNet.Models.DataModels
         //no use
         public DateTime? ResetTokenExpires { get; set; }
 
+        public string? OTP { get; set; }
+        public DateTime? OTPExpiry { get; set; }
+
     }
 
     public enum UserType

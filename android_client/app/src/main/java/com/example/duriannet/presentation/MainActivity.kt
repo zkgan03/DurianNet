@@ -74,9 +74,7 @@ class MainActivity : AppCompatActivity() {
             R.id.resetPasswordFragment,
             R.id.signUpFragment,
             R.id.forgetPasswordFragment,
-            R.id.changePasswordFragment,
-            R.id.editProfileFragment,
-            R.id.favoriteDurianFragment
+            R.id.otpFragment
         )
 
         navController.addOnDestinationChangedListener { _, destination, _ ->

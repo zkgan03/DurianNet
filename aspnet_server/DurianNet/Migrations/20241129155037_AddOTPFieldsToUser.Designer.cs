@@ -4,6 +4,7 @@ using DurianNet.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace DurianNet.Migrations
 {
     [DbContext(typeof(ApplicationDBContext))]
-    partial class ApplicationDBContextModelSnapshot : ModelSnapshot
+    [Migration("20241129155037_AddOTPFieldsToUser")]
+    partial class AddOTPFieldsToUser
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -237,12 +240,6 @@ namespace DurianNet.Migrations
                         .HasMaxLength(256)
                         .HasColumnType("nvarchar(256)");
 
-                    b.Property<string>("OTP")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime?>("OTPExpiry")
-                        .HasColumnType("datetime2");
-
                     b.Property<string>("PasswordHash")
                         .HasColumnType("nvarchar(max)");
 
@@ -350,13 +347,13 @@ namespace DurianNet.Migrations
                     b.HasData(
                         new
                         {
-                            Id = "5fe3d208-0c8d-476e-a8f5-b2ebf220b138",
+                            Id = "e3b0e49a-93d0-4d5d-84e8-b089d1c67b77",
                             Name = "Admin",
                             NormalizedName = "ADMIN"
                         },
                         new
                         {
-                            Id = "8341d3c1-c0d2-452c-8ff3-ab2007b5d026",
+                            Id = "8b04291f-ced4-4238-acad-d607228d34cd",
                             Name = "User",
                             NormalizedName = "USER"
                         });

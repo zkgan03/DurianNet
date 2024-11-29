@@ -33,4 +33,8 @@ interface UserApi {
 
     @POST("appApi/user/appResetPassword")
     suspend fun resetPassword(@Body request: ResetPasswordRequestDto): Response<Unit>
+
+    @POST("appApi/user/validateOTP")
+    suspend fun validateOTP(@Body request: ValidateOTPRequestDto): Response<Unit>
+
 }

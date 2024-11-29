@@ -86,34 +86,87 @@ namespace DurianNet.Controllers.appApi
             return Ok("Password changed successfully");
         }
 
-        //forgot password
+        ////forgot password
+        //[HttpPost("appForgotPassword")]
+        //public async Task<IActionResult> appForgotPassword([FromBody] ForgotPasswordRequestDto dto)
+        //{
+        //    if (string.IsNullOrWhiteSpace(dto.Email))
+        //        return BadRequest("Email cannot be empty.");
+
+        //    //var user = await _userManager.FindByEmailAsync(dto.Email);
+        //    var user = await _context.Users.FirstOrDefaultAsync(u => u.Email == dto.Email);
+        //    if (user == null) return NotFound("No user found with the provided email");
+
+        //    // Determine whether the user is an admin or regular user
+        //    bool isAdmin = user.UserType == UserType.Admin || user.UserType == UserType.SuperAdmin;
+
+        //    try
+        //    {
+        //        // Use the EmailService to send the password recovery email
+        //        EmailService.SendPasswordRecoveryEmail(user.Email, isAdmin);
+
+        //        // Return success response
+        //        return Ok("Password recovery email sent successfully.");
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        // Handle errors during email sending
+        //        return StatusCode(500, $"An error occurred while sending the email: {ex.Message}");
+        //    }
+        //}
+
         [HttpPost("appForgotPassword")]
         public async Task<IActionResult> appForgotPassword([FromBody] ForgotPasswordRequestDto dto)
         {
             if (string.IsNullOrWhiteSpace(dto.Email))
                 return BadRequest("Email cannot be empty.");
 
-            //var user = await _userManager.FindByEmailAsync(dto.Email);
             var user = await _context.Users.FirstOrDefaultAsync(u => u.Email == dto.Email);
-            if (user == null) return NotFound("No user found with the provided email");
+            if (user == null) return NotFound("No user found with the provided email.");
 
-            // Determine whether the user is an admin or regular user
-            bool isAdmin = user.UserType == UserType.Admin || user.UserType == UserType.SuperAdmin;
+            // Generate a new OTP
+            var otp = new Random().Next(1000, 9999).ToString();
+            var expiry = DateTime.UtcNow.AddMinutes(10); // OTP expires in 10 minutes
 
+            // Update user with OTP and expiry
+            user.OTP = otp;
+            user.OTPExpiry = expiry;
+
+            _context.Users.Update(user);
+            await _context.SaveChangesAsync();
+
+            // Send the OTP via email
             try
             {
-                // Use the EmailService to send the password recovery email
-                EmailService.SendPasswordRecoveryEmail(user.Email, isAdmin);
-
-                // Return success response
-                return Ok("Password recovery email sent successfully.");
+                EmailService.SendOtpEmail(user.Email, otp);
+                return Ok("OTP sent successfully.");
             }
             catch (Exception ex)
             {
-                // Handle errors during email sending
                 return StatusCode(500, $"An error occurred while sending the email: {ex.Message}");
             }
         }
+
+
+        [HttpPost("validateOTP")]
+        public async Task<IActionResult> ValidateOTP([FromBody] ValidateOTPRequestDto dto)
+        {
+            var user = await _context.Users.FirstOrDefaultAsync(u => u.Email == dto.Email);
+
+            if (user == null) return NotFound("User not found.");
+            if (user.OTP != dto.OTP) return BadRequest("Invalid OTP.");
+            if (user.OTPExpiry == null || user.OTPExpiry < DateTime.UtcNow) return BadRequest("OTP has expired.");
+
+            // Clear OTP after validation
+            user.OTP = null;
+            user.OTPExpiry = null;
+            _context.Users.Update(user);
+            await _context.SaveChangesAsync();
+
+            return Ok("OTP validated successfully.");
+        }
+
+
 
         //reset password (get email and new password)
         [HttpPost("appResetPassword")]
