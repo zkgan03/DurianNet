@@ -1,31 +1,52 @@
-package com.example.duriannet.presentation.account_management.adapter
+package com.example.duriannet.presentation.durian_dictionary.adapter
 
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
-import androidx.recyclerview.widget.DiffUtil
-import androidx.recyclerview.widget.ListAdapter
+import android.widget.Button
+import android.widget.ImageView
+import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
-import com.example.duriannet.databinding.ItemDurianProfileBinding
+import com.bumptech.glide.Glide
+import com.example.duriannet.R
+import com.example.duriannet.data.remote.dtos.response.DurianProfileForUserResponseDto
 
-class DurianProfileAdapter : ListAdapter<String, DurianProfileAdapter.DurianProfileViewHolder>(DiffCallback()) {
+class DurianProfileAdapter(
+    private val onViewDetailsClick: (DurianProfileForUserResponseDto) -> Unit
+) : RecyclerView.Adapter<DurianProfileAdapter.ViewHolder>() {
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): DurianProfileViewHolder {
-        val binding = ItemDurianProfileBinding.inflate(LayoutInflater.from(parent.context), parent, false)
-        return DurianProfileViewHolder(binding)
+    private val durians = mutableListOf<DurianProfileForUserResponseDto>()
+
+    fun submitList(newList: List<DurianProfileForUserResponseDto>) {
+        durians.clear()
+        durians.addAll(newList)
+        notifyDataSetChanged()
     }
 
-    override fun onBindViewHolder(holder: DurianProfileViewHolder, position: Int) {
-        holder.bind(getItem(position))
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
+        val view = LayoutInflater.from(parent.context)
+            .inflate(R.layout.item_durian_profile, parent, false)
+        return ViewHolder(view)
     }
 
-    class DurianProfileViewHolder(private val binding: ItemDurianProfileBinding) : RecyclerView.ViewHolder(binding.root) {
-        fun bind(durianName: String) {
-            binding.durianName.text = durianName
+    override fun onBindViewHolder(holder: ViewHolder, position: Int) {
+        holder.bind(durians[position])
+    }
+
+    override fun getItemCount(): Int = durians.size
+
+    inner class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+        private val durianName: TextView = itemView.findViewById(R.id.durian_name)
+        private val durianImage: ImageView = itemView.findViewById(R.id.iv_profile)
+        private val viewDetailsButton: Button = itemView.findViewById(R.id.button2)
+
+        fun bind(durian: DurianProfileForUserResponseDto) {
+            durianName.text = durian.durianName
+            Glide.with(itemView.context).load(durian.durianImage).into(durianImage)
+
+            viewDetailsButton.setOnClickListener {
+                onViewDetailsClick(durian)
+            }
         }
-    }
-
-    class DiffCallback : DiffUtil.ItemCallback<String>() {
-        override fun areItemsTheSame(oldItem: String, newItem: String): Boolean = oldItem == newItem
-        override fun areContentsTheSame(oldItem: String, newItem: String): Boolean = oldItem == newItem
     }
 }

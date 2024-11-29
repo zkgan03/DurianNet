@@ -1,0 +1,28 @@
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/nav_durian_profile"
+    app:startDestination="@id/durianProfileFragment">
+
+    <fragment
+        android:id="@+id/durianProfileFragment"
+        android:name="com.example.duriannet.presentation.durian_dictionary.fragments.DurianProfileFragment"
+        tools:layout="@layout/fragment_durian_profile">
+        <action
+            android:id="@+id/action_durianProfile_to_details"
+            app:destination="@id/durianProfileDetailsFragment">
+            <argument
+                android:name="durianId"
+                app:argType="integer" />
+        </action>
+    </fragment>
+
+    <fragment
+        android:id="@+id/durianProfileDetailsFragment"
+        android:name="com.example.duriannet.presentation.durian_dictionary.fragments.DurianProfileDetailsFragment"
+        tools:layout="@layout/fragment_durian_profile_details">
+        <argument
+            android:name="durianId"
+            app:argType="integer" />
+    </fragment>
+</navigation>

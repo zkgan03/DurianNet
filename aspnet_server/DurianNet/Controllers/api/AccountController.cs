@@ -446,25 +446,54 @@ namespace DurianNet.Controllers.api
 
 
 
-        //This is admin logout
-        [Authorize(policy: "AdminPolicy")]
+        ////This is admin logout
+        //[Authorize(policy: "AdminPolicy")]
+        //[HttpPost("logout")]
+        //public async Task<IActionResult> Logout()
+        //{
+        //    // Retrieve the username from session
+        //    //var username = HttpContext.Session.GetString("Username");
+        //    //if (string.IsNullOrEmpty(username))
+        //    //    return Unauthorized("User not logged in.");
+
+        //    var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+        //    // get the user
+        //    var user = await _userManager.FindByIdAsync(userId);
+
+        //    if (user == null)
+        //    {
+        //        return Unauthorized("User not logged in.");
+        //    }
+
+        //    // Clear session data
+        //    HttpContext.Session.Remove("Username");
+        //    HttpContext.Session.Remove("ResetPasswordEmail");
+
+        //    // Sign out and remove cookies
+        //    //await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+        //    HttpContext.Response.Cookies.Delete("AuthToken");
+
+        //    await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+
+        //    return Ok("Logged out successfully.");
+        //}
+
+        //[Authorize(Policy = "AdminPolicy")]
+        //[HttpGet("admin-action")]
+        //public IActionResult AdminAction()
+        //{
+        //    return Ok("This is an admin-only action.");
+        //}
+
         [HttpPost("logout")]
         public async Task<IActionResult> Logout()
         {
-            // Retrieve the username from session
-            //var username = HttpContext.Session.GetString("Username");
-            //if (string.IsNullOrEmpty(username))
-            //    return Unauthorized("User not logged in.");
-
-            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-
-            // get the user
-            var user = await _userManager.FindByIdAsync(userId);
-
-            if (user == null)
-            {
+            //Retrieve the username from session
+            var username = HttpContext.Session.GetString("Username");
+            if (string.IsNullOrEmpty(username))
                 return Unauthorized("User not logged in.");
-            }
+
 
             // Clear session data
             HttpContext.Session.Remove("Username");
@@ -479,12 +508,7 @@ namespace DurianNet.Controllers.api
             return Ok("Logged out successfully.");
         }
 
-        [Authorize(Policy = "AdminPolicy")]
-        [HttpGet("admin-action")]
-        public IActionResult AdminAction()
-        {
-            return Ok("This is an admin-only action.");
-        }
+
 
 
 

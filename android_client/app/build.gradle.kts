@@ -53,6 +53,9 @@ android {
 
 dependencies {
 
+    // Logging Interceptor for OkHttp
+    implementation ("com.squareup.okhttp3:logging-interceptor:4.11.0")
+
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
     implementation(libs.material)

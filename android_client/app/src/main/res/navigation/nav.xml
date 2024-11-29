@@ -3,97 +3,111 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/nav"
-    app:startDestination="@id/fragment_login">
+    app:startDestination="@id/loginFragment">
 
     <fragment
-        android:id="@+id/fragment_login"
+        android:id="@+id/loginFragment"
         android:name="com.example.duriannet.presentation.account_management.fragments.LoginFragment"
         tools:layout="@layout/fragment_login">
         <action
-            android:id="@+id/action_login_to_profile"
-            app:destination="@id/fragment_profile" />
+            android:id="@+id/action_login_to_durian_profile"
+            app:destination="@id/durianProfileFragment" />
         <action
             android:id="@+id/action_login_to_forget_password"
-            app:destination="@id/fragment_forget_password" />
+            app:destination="@id/forgetPasswordFragment" />
         <action
             android:id="@+id/action_login_to_sign_up"
-            app:destination="@id/fragment_sign_up" />
+            app:destination="@id/signUpFragment" />
     </fragment>
 
-<!--    <fragment-->
-<!--        android:id="@+id/fragment_profile"-->
-<!--        android:name="com.example.duriannet.presentation.account_management.fragments.ProfileFragment"-->
-<!--        tools:layout="@layout/fragment_profile" />-->
-
     <fragment
-        android:id="@+id/fragment_sign_up"
+        android:id="@+id/signUpFragment"
         android:name="com.example.duriannet.presentation.account_management.fragments.SignUpFragment"
         tools:layout="@layout/fragment_sign_up">
         <action
             android:id="@+id/action_sign_up_to_login"
-            app:destination="@id/fragment_login" />
+            app:destination="@id/loginFragment" />
     </fragment>
 
     <fragment
-        android:id="@+id/fragment_forget_password"
+        android:id="@+id/forgetPasswordFragment"
         android:name="com.example.duriannet.presentation.account_management.fragments.ForgetPasswordFragment"
         tools:layout="@layout/fragment_forget_password">
         <action
             android:id="@+id/action_forget_password_to_reset_password"
-            app:destination="@id/fragment_reset_password" />
+            app:destination="@id/resetPasswordFragment" />
         <action
             android:id="@+id/action_forget_password_to_login"
-            app:destination="@id/fragment_login" />
+            app:destination="@id/loginFragment" />
     </fragment>
 
     <fragment
-        android:id="@+id/fragment_reset_password"
+        android:id="@+id/resetPasswordFragment"
         android:name="com.example.duriannet.presentation.account_management.fragments.ResetPasswordFragment"
         tools:layout="@layout/fragment_reset_password">
         <action
             android:id="@+id/action_reset_password_to_login"
-            app:destination="@id/fragment_login" />
+            app:destination="@id/loginFragment" />
+        <deepLink
+            app:uri="https://duriannet.com/reset-password" />
     </fragment>
 
     <fragment
-        android:id="@+id/fragment_profile"
+        android:id="@+id/profileFragment"
         android:name="com.example.duriannet.presentation.account_management.fragments.ProfileFragment"
         android:label="Profile">
         <action
             android:id="@+id/action_profile_to_edit_profile"
-            app:destination="@id/fragment_edit_profile" />
+            app:destination="@id/editProfileFragment" />
         <action
             android:id="@+id/action_profile_to_change_password"
-            app:destination="@id/fragment_change_password" />
+            app:destination="@id/changePasswordFragment" />
         <action
             android:id="@+id/action_profile_to_favorite_durian"
-            app:destination="@id/fragment_favorite_durian" />
+            app:destination="@id/favoriteDurianFragment" />
     </fragment>
 
+
     <fragment
-        android:id="@+id/fragment_edit_profile"
+        android:id="@+id/editProfileFragment"
         android:name="com.example.duriannet.presentation.account_management.fragments.EditProfileFragment"
         android:label="Edit Profile">
         <action
             android:id="@+id/action_edit_profile_to_profile"
-            app:destination="@id/fragment_profile" />
+            app:destination="@id/profileFragment" />
     </fragment>
 
     <fragment
-        android:id="@+id/fragment_change_password"
+        android:id="@+id/changePasswordFragment"
         android:name="com.example.duriannet.presentation.account_management.fragments.ChangePasswordFragment"
         android:label="Change Password">
         <action
             android:id="@+id/action_change_password_to_profile"
-            app:destination="@id/fragment_profile" />
+            app:destination="@id/profileFragment" />
     </fragment>
 
     <fragment
-        android:id="@+id/fragment_favorite_durian"
+        android:id="@+id/favoriteDurianFragment"
         android:name="com.example.duriannet.presentation.account_management.fragments.FavoriteDurianFragment"
         android:label="Favorite Durian">
         <action
             android:id="@+id/action_favorite_durian_to_profile"
-            app:destination="@id/fragment_profile" />
+            app:destination="@id/profileFragment" />
     </fragment>
+
+    <fragment
+        android:id="@+id/durianProfileFragment"
+        android:name="com.example.duriannet.presentation.durian_dictionary.fragments.DurianProfileFragment"
+        tools:layout="@layout/fragment_durian_profile" />
+
+    <fragment
+        android:id="@+id/durianChatbotFragment"
+        android:name="com.example.duriannet.presentation.durian_dictionary.fragments.DurianChatbotFragment"
+        tools:layout="@layout/fragment_durian_chatbot" />
+
+    <fragment
+        android:id="@+id/userProfileFragment"
+        android:name="com.example.duriannet.presentation.account_management.fragments.ProfileFragment"
+        tools:layout="@layout/fragment_profile" />
+
 </navigation>

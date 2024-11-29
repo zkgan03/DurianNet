@@ -14,15 +14,13 @@ import com.example.duriannet.databinding.FragmentChangePasswordBinding
 import com.example.duriannet.presentation.account_management.view_models.ChangePasswordViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collect
-import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
 class ChangePasswordFragment : Fragment() {
 
     private var _binding: FragmentChangePasswordBinding? = null
     private val binding get() = _binding!!
-
-    private val changePasswordViewModel: ChangePasswordViewModel by viewModels()
+    private val viewModel: ChangePasswordViewModel by viewModels()
     private val navController by lazy { findNavController() }
 
     override fun onCreateView(
@@ -40,19 +38,50 @@ class ChangePasswordFragment : Fragment() {
             val currentPassword = binding.edtCurrentPassword.text.toString()
             val newPassword = binding.edtNewPassword.text.toString()
             val confirmPassword = binding.edtConfPassword.text.toString()
-            changePasswordViewModel.changePassword(currentPassword, newPassword, confirmPassword)
+
+            if (currentPassword.isEmpty()) {
+                binding.edtCurrentPassword.error = "Current password cannot be empty"
+                return@setOnClickListener
+            }
+
+            if (newPassword.isEmpty()) {
+                binding.edtNewPassword.error = "New password cannot be empty"
+                return@setOnClickListener
+            }
+
+            if (confirmPassword.isEmpty()) {
+                binding.edtConfPassword.error = "Confirm password cannot be empty"
+                return@setOnClickListener
+            }
+
+            if (!isValidPassword(newPassword)) {
+                binding.edtNewPassword.error = "Password must be at least 8 characters long and include at least one uppercase letter, one lowercase letter, one number, and one special character."
+                return@setOnClickListener
+            }
+
+            if (newPassword != confirmPassword) {
+                Toast.makeText(context, "Passwords do not match", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
+
+            viewModel.changePassword(currentPassword, newPassword, confirmPassword)
         }
 
-        viewLifecycleOwner.lifecycleScope.launch {
-            changePasswordViewModel.changePasswordState.collect { state ->
-                if (state.isPasswordChanged) {
-                    Toast.makeText(requireContext(), "Password Changed Successfully", Toast.LENGTH_SHORT).show()
-                    navController.navigate(R.id.action_change_password_to_profile)
-                } else if (state.error.isNotEmpty()) {
-                    Toast.makeText(requireContext(), state.error, Toast.LENGTH_SHORT).show()
+        lifecycleScope.launchWhenStarted {
+            viewModel.changePasswordState.collect {
+                if (it.isPasswordChanged) {
+                    Toast.makeText(context, "Password Changed Successfully", Toast.LENGTH_SHORT).show()
+                    navController.navigate(R.id.action_change_password_to_profile) // Example action
+                } else if (it.error.isNotEmpty()) {
+                    Toast.makeText(context, it.error, Toast.LENGTH_SHORT).show()
                 }
             }
         }
+    }
+
+    private fun isValidPassword(password: String): Boolean {
+        val passwordPattern = "^(?=.*[A-Z])(?=.*[a-z])(?=.*\\d)(?=.*[@\$!%*?&#])[A-Za-z\\d@\$!%*?&#]{8,}$"
+        return password.matches(passwordPattern.toRegex())
     }
 
     override fun onDestroyView() {

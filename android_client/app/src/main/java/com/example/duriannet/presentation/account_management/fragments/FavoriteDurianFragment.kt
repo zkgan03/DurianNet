@@ -1,5 +1,6 @@
 package com.example.duriannet.presentation.account_management.fragments
 
+import android.content.Context
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -9,21 +10,23 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.example.duriannet.R
 import com.example.duriannet.databinding.FragmentFavoriteDurianBinding
+import com.example.duriannet.presentation.account_management.adapter.FavoriteDurianSelectionAdapter
 import com.example.duriannet.presentation.account_management.view_models.FavoriteDurianViewModel
-import com.example.duriannet.presentation.account_management.adapter.AllDurianAdapter
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
+import android.widget.Toast
 
 @AndroidEntryPoint
 class FavoriteDurianFragment : Fragment() {
+
     private var _binding: FragmentFavoriteDurianBinding? = null
     private val binding get() = _binding!!
-
-    private val favoriteDurianViewModel: FavoriteDurianViewModel by viewModels()
+    private val viewModel: FavoriteDurianViewModel by viewModels()
     private val navController by lazy { findNavController() }
+    private lateinit var adapter: FavoriteDurianSelectionAdapter
+    private lateinit var username: String
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -36,24 +39,49 @@ class FavoriteDurianFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        val adapter = AllDurianAdapter()
-        binding.rvFavoriteDurianProfile.layoutManager = LinearLayoutManager(requireContext())
+        val sharedPreferences = requireActivity().getSharedPreferences("DurianNetPrefs", Context.MODE_PRIVATE)
+        username = sharedPreferences.getString("username", "") ?: ""
+
+        adapter = FavoriteDurianSelectionAdapter { durian, isFavorite ->
+            viewModel.onFavoriteChange(durian.durianId, isFavorite)
+        }
+
+        binding.rvFavoriteDurianProfile.layoutManager = LinearLayoutManager(context)
         binding.rvFavoriteDurianProfile.adapter = adapter
 
-        favoriteDurianViewModel.loadAllDurians()
+        if (username.isNotEmpty()) {
+            viewModel.loadDurians(username)
+        }
 
         viewLifecycleOwner.lifecycleScope.launch {
-            favoriteDurianViewModel.favoriteDurianState.collect { state ->
+            viewModel.favoriteDurianState.collect { state ->
                 if (state.error.isNotEmpty()) {
-                    // Handle error
+                    Toast.makeText(requireContext(), state.error, Toast.LENGTH_SHORT).show()
                 } else {
-                    adapter.submitList(state.favoriteDurians)
+                    adapter.submitList(state.filteredDurians, state.favoriteDurianIds)
+                    if (state.filteredDurians.isEmpty()) {
+                        Toast.makeText(requireContext(), "No results found", Toast.LENGTH_SHORT).show()
+                    }
                 }
             }
         }
 
+        // Handle SearchView
+        binding.svFavoriteDurian.setOnQueryTextListener(object : android.widget.SearchView.OnQueryTextListener {
+            override fun onQueryTextSubmit(query: String?): Boolean {
+                viewModel.filterDurians(query.orEmpty())
+                return true
+            }
+
+            override fun onQueryTextChange(newText: String?): Boolean {
+                viewModel.filterDurians(newText.orEmpty())
+                return true
+            }
+        })
+
         binding.btnFdSave.setOnClickListener {
-            navController.navigate(R.id.action_favorite_durian_to_profile)
+            viewModel.saveFavoriteChanges(username)
+            Toast.makeText(requireContext(), "Favorites saved successfully", Toast.LENGTH_SHORT).show()
         }
     }
 
@@ -62,3 +90,5 @@ class FavoriteDurianFragment : Fragment() {
         _binding = null
     }
 }
+
+

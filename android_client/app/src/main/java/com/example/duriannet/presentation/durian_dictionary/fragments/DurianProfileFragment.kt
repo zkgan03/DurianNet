@@ -7,20 +7,23 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.duriannet.databinding.FragmentDurianProfileBinding
+import com.example.duriannet.presentation.durian_dictionary.adapter.DurianProfileAdapter
 import com.example.duriannet.presentation.durian_dictionary.view_models.DurianProfileViewModel
-import com.example.duriannet.presentation.account_management.adapter.DurianProfileAdapter
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
 class DurianProfileFragment : Fragment() {
+
     private var _binding: FragmentDurianProfileBinding? = null
     private val binding get() = _binding!!
+    private val viewModel: DurianProfileViewModel by viewModels()
 
-    private val durianProfileViewModel: DurianProfileViewModel by viewModels()
+    private lateinit var adapter: DurianProfileAdapter
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -33,17 +36,37 @@ class DurianProfileFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        val adapter = DurianProfileAdapter()
+        adapter = DurianProfileAdapter { durian ->
+            val action = DurianProfileFragmentDirections.actionDurianProfileToDetails(durian.durianId)
+            findNavController().navigate(action)
+        }
+
         binding.rvDurianProfile.layoutManager = LinearLayoutManager(requireContext())
         binding.rvDurianProfile.adapter = adapter
 
-        durianProfileViewModel.loadAllDurians()
+        viewModel.loadAllDurians()
 
         viewLifecycleOwner.lifecycleScope.launch {
-            durianProfileViewModel.durianProfileState.collect { durians ->
-                adapter.submitList(durians.map { it.name }) // Assuming Durian has a 'name' property
+            viewModel.durianProfileState.collect { state ->
+                if (state.error.isNotEmpty()) {
+                    // Handle error (e.g., show a Toast)
+                } else {
+                    adapter.submitList(state.filteredDurians)
+                }
             }
         }
+
+        binding.svDurianProfile.setOnQueryTextListener(object : android.widget.SearchView.OnQueryTextListener {
+            override fun onQueryTextSubmit(query: String?): Boolean {
+                viewModel.filterDurians(query.orEmpty())
+                return true
+            }
+
+            override fun onQueryTextChange(newText: String?): Boolean {
+                viewModel.filterDurians(newText.orEmpty())
+                return true
+            }
+        })
     }
 
     override fun onDestroyView() {

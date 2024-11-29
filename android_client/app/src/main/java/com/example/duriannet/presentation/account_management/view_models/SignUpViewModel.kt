@@ -3,7 +3,7 @@ package com.example.duriannet.presentation.account_management.view_models
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.duriannet.data.repository.account_management.UserRepository
-import com.example.duriannet.presentation.account_management.states.SignUpState
+import com.example.duriannet.presentation.account_management.state.SignUpState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -24,12 +24,11 @@ class SignUpViewModel @Inject constructor(
                 _signUpState.value = SignUpState(error = "Passwords do not match")
                 return@launch
             }
-
             val result = userRepository.register(username, email, password)
             if (result.isSuccess) {
                 _signUpState.value = SignUpState(isRegistered = true)
             } else {
-                _signUpState.value = SignUpState(error = result.exceptionOrNull()?.message ?: "Unknown error")
+                _signUpState.value = SignUpState(error = result.exceptionOrNull()?.message ?: "Failed to register")
             }
         }
     }

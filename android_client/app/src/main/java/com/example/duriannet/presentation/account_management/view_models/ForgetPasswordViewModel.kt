@@ -20,11 +20,11 @@ class ForgetPasswordViewModel @Inject constructor(
 
     fun sendResetEmail(email: String) {
         viewModelScope.launch {
-            val result = userRepository.sendResetEmail(email)
+            val result = userRepository.forgotPassword(email)
             if (result.isSuccess) {
                 _forgetPasswordState.value = ForgetPasswordState(isEmailSent = true)
             } else {
-                _forgetPasswordState.value = ForgetPasswordState(error = result.exceptionOrNull()?.message ?: "Unknown error")
+                _forgetPasswordState.value = ForgetPasswordState(error = result.exceptionOrNull()?.message ?: "Failed to send reset email")
             }
         }
     }

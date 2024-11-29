@@ -1,10 +1,10 @@
-package com.example.duriannet.presentation.account_management.state
+package com.example.duriannet.presentation.durian_dictionary.state
 
 import com.example.duriannet.data.remote.dtos.response.DurianProfileForUserResponseDto
 
-data class FavoriteDurianState(
+data class DurianProfileState(
     val allDurians: List<DurianProfileForUserResponseDto> = emptyList(),
     val filteredDurians: List<DurianProfileForUserResponseDto> = emptyList(),
-    val favoriteDurianIds: List<Int> = emptyList(),
     val error: String = ""
 )
+

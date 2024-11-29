@@ -142,14 +142,14 @@ namespace DurianNet.Controllers.api
 
 
 
-        [HttpPost("Register")]
-        public async Task<IActionResult> Register([FromBody] RegisterRequestDto dto)
-        {
-            var user = dto.ToUserFromRegisterRequest();
-            _context.Users.Add(user);
-            await _context.SaveChangesAsync();
-            return Ok(user.ToUserDetailsDto());
-        }
+        //[HttpPost("Register")]
+        //public async Task<IActionResult> Register([FromBody] RegisterRequestDto dto)
+        //{
+        //    var user = dto.ToUserFromRegisterRequest();
+        //    _context.Users.Add(user);
+        //    await _context.SaveChangesAsync();
+        //    return Ok(user.ToUserDetailsDto());
+        //}
 
         //UpdateUserByUsername
         [HttpPut("UpdateUser/{id}")]
@@ -242,53 +242,53 @@ namespace DurianNet.Controllers.api
 
 
 
-        [HttpPut("SaveFavoriteDurians/{userId}")]
-        public async Task<IActionResult> SaveFavoriteDurians(string userId, [FromBody] FavoriteDurianRequestDto dto)
-        {
-            var user = await _context.Users.Include(u => u.FavoriteDurian).FirstOrDefaultAsync(u => u.Id == userId);
-            if (user == null)
-            {
-                return NotFound("User not found");
-            }
+        //[HttpPut("SaveFavoriteDurians/{userId}")]
+        //public async Task<IActionResult> SaveFavoriteDurians(string userId, [FromBody] FavoriteDurianRequestDto dto)
+        //{
+        //    var user = await _context.Users.Include(u => u.FavoriteDurian).FirstOrDefaultAsync(u => u.Id == userId);
+        //    if (user == null)
+        //    {
+        //        return NotFound("User not found");
+        //    }
 
-            // Validate the durian IDs
-            var durians = await _context.DurianProfiles.Where(dp => dto.DurianIds.Contains(dp.DurianId)).ToListAsync();
-            if (durians.Count != dto.DurianIds.Count)
-            {
-                return BadRequest("Some durian IDs are invalid.");
-            }
+        //    // Validate the durian IDs
+        //    var durians = await _context.DurianProfiles.Where(dp => dto.DurianIds.Contains(dp.DurianId)).ToListAsync();
+        //    if (durians.Count != dto.DurianIds.Count)
+        //    {
+        //        return BadRequest("Some durian IDs are invalid.");
+        //    }
 
-            // Initialize or clear the FavoriteDurian collection
-            user.FavoriteDurian ??= new List<DurianProfile>();
-            user.FavoriteDurian.Clear();
+        //    // Initialize or clear the FavoriteDurian collection
+        //    user.FavoriteDurian ??= new List<DurianProfile>();
+        //    user.FavoriteDurian.Clear();
 
-            // Add the new favorites
-            foreach (var durian in durians)
-            {
-                user.FavoriteDurian.Add(durian);
-            }
+        //    // Add the new favorites
+        //    foreach (var durian in durians)
+        //    {
+        //        user.FavoriteDurian.Add(durian);
+        //    }
 
-            await _context.SaveChangesAsync();
-            return Ok("Favorite durians updated successfully");
-        }
+        //    await _context.SaveChangesAsync();
+        //    return Ok("Favorite durians updated successfully");
+        //}
 
 
 
-        [HttpPost("RegisterAdmin")]
-        public async Task<IActionResult> RegisterAdmin([FromBody] RegisterRequestDto dto)
-        {
-            var admin = dto.ToUserFromRegisterRequest();
-            admin.UserType = UserType.Admin;
+        //[HttpPost("RegisterAdmin")]
+        //public async Task<IActionResult> RegisterAdmin([FromBody] RegisterRequestDto dto)
+        //{
+        //    var admin = dto.ToUserFromRegisterRequest();
+        //    admin.UserType = UserType.Admin;
 
-            // Hash the password
-            var passwordHasher = new PasswordHasher<User>();
-            admin.PasswordHash = passwordHasher.HashPassword(admin, dto.Password);
+        //    // Hash the password
+        //    var passwordHasher = new PasswordHasher<User>();
+        //    admin.PasswordHash = passwordHasher.HashPassword(admin, dto.Password);
 
-            _context.Users.Add(admin);
-            await _context.SaveChangesAsync();
+        //    _context.Users.Add(admin);
+        //    await _context.SaveChangesAsync();
 
-            return Ok(admin.ToUserDetailsDto());
-        }
+        //    return Ok(admin.ToUserDetailsDto());
+        //}
 
         //user account
         [HttpPut("DeleteUser/{id}")]

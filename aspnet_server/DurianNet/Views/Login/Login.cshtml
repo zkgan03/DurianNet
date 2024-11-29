@@ -22,7 +22,8 @@
         <div class="mx-auto w-[50%]">
             <h3 class="mb-8 text-gray-800 text-center text-4xl font-bold">Admin Login</h3>
             <!-- Login Form -->
-            <form id="loginForm" method="post" asp-action="LoginAdmin">
+            @* <form id="loginForm" method="post" asp-action="LoginAdmin"> *@
+            <form id="loginForm">
                 <div class="mb-6">
                     <label for="username" class="text-gray-700 block text-lg font-medium">Username</label>
                     <input type="text" id="username" name="username" required
@@ -51,6 +52,43 @@
             </form>
         </div>
     </div>
+
+    <script>
+        document.getElementById("loginForm").addEventListener("submit", async function (event) {
+            event.preventDefault(); // Prevent default form submission
+
+            const username = document.getElementById("username").value;
+            const password = document.getElementById("password").value;
+            const errorMessageDiv = document.getElementById("errorMessage");
+
+            errorMessageDiv.textContent = ""; // Clear previous messages
+
+            try {
+                const response = await fetch('/api/account/loginAdmin', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ username, password })
+                });
+
+                if (!response.ok) {
+                    // Handle error response
+                    const errorData = await response.json();
+                    errorMessageDiv.textContent = errorData.message || "An error occurred. Please try again.";
+                    return;
+                }
+
+                const data = await response.json();
+                alert(data.message); // Show success message
+
+                // Redirect to the profile page
+                window.location.href = "/durianprofile/DurianProfilePage";
+            } catch (error) {
+                // Handle network or other unexpected errors
+                errorMessageDiv.textContent = "An unexpected error occurred. Please try again.";
+                console.error("Login error:", error);
+            }
+        });
+    </script>
 
    @*  <script>
         async function login() {
@@ -119,7 +157,13 @@
         });
     </script> *@
 
-    <script>
+    
+
+
+
+    @* webcontroller *@
+
+    @* <script>
         document.getElementById("loginForm").addEventListener("submit", function (event) {
             event.preventDefault(); // Prevent the form from submitting the default way
 
@@ -149,7 +193,7 @@
                     console.error("Login error:", error);
                 });
         });
-    </script>
+    </script> *@
 
 
 </body>

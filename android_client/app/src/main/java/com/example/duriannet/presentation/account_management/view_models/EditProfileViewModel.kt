@@ -2,6 +2,7 @@ package com.example.duriannet.presentation.account_management.view_models
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.duriannet.data.remote.dtos.request.user.UpdateUserProfileRequestDto
 import com.example.duriannet.data.repository.account_management.UserRepository
 import com.example.duriannet.presentation.account_management.state.EditProfileState
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -18,16 +19,18 @@ class EditProfileViewModel @Inject constructor(
     private val _editProfileState = MutableStateFlow(EditProfileState())
     val editProfileState: StateFlow<EditProfileState> = _editProfileState
 
-    fun loadProfile() {
+    fun loadProfile(username: String) {
         viewModelScope.launch {
-            val result = userRepository.getProfile()
+            val result = userRepository.getProfile(username)
             if (result.isSuccess) {
                 val profile = result.getOrNull()
                 _editProfileState.value = profile?.let {
-                    EditProfileState(
-                        fullname = it.fullname,
+                    _editProfileState.value.copy(
+                        username = it.userName,
+                        fullName = it.fullName,
                         email = it.email,
-                        phoneNumber = it.phoneNumber
+                        phoneNumber = it.phoneNumber,
+                        profilePicture = it.profilePicture
                     )
                 } ?: EditProfileState(error = "Profile not found")
             } else {
@@ -36,13 +39,21 @@ class EditProfileViewModel @Inject constructor(
         }
     }
 
-    fun updateProfile(fullname: String, email: String, phoneNumber: String) {
+    fun updateProfile(username: String, fullName: String, email: String, phoneNumber: String, profilePicture: String?) {
         viewModelScope.launch {
-            val result = userRepository.updateProfile(fullname, email, phoneNumber)
+            val request = UpdateUserProfileRequestDto(
+                fullName = fullName,
+                email = email,
+                phoneNumber = phoneNumber,
+                profilePicture = profilePicture
+            )
+            val result = userRepository.updateProfile(username, request)
             if (result.isSuccess) {
-                _editProfileState.value = EditProfileState(isProfileUpdated = true)
+                _editProfileState.value = _editProfileState.value.copy(isProfileUpdated = true)
             } else {
-                _editProfileState.value = EditProfileState(error = result.exceptionOrNull()?.message ?: "Unknown error")
+                _editProfileState.value = _editProfileState.value.copy(
+                    error = result.exceptionOrNull()?.message ?: "Unknown error"
+                )
             }
         }
     }

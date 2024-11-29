@@ -18,18 +18,25 @@ class ResetPasswordViewModel @Inject constructor(
     private val _resetPasswordState = MutableStateFlow(ResetPasswordState())
     val resetPasswordState: StateFlow<ResetPasswordState> = _resetPasswordState
 
-    fun resetPassword(newPassword: String, confirmPassword: String) {
+    fun resetPassword(newPassword: String, confirmPassword: String, email: String) {
         viewModelScope.launch {
+            if (newPassword.isEmpty() || confirmPassword.isEmpty()) {
+                _resetPasswordState.value = ResetPasswordState(error = "Fields cannot be empty")
+                return@launch
+            }
+
             if (newPassword != confirmPassword) {
                 _resetPasswordState.value = ResetPasswordState(error = "Passwords do not match")
                 return@launch
             }
 
-            val result = userRepository.resetPassword(newPassword)
+            val result = userRepository.resetPassword(newPassword, email)
             if (result.isSuccess) {
                 _resetPasswordState.value = ResetPasswordState(isPasswordReset = true)
             } else {
-                _resetPasswordState.value = ResetPasswordState(error = result.exceptionOrNull()?.message ?: "Unknown error")
+                _resetPasswordState.value = ResetPasswordState(
+                    error = result.exceptionOrNull()?.message ?: "Failed to reset password"
+                )
             }
         }
     }
