@@ -1,6 +1,7 @@
 package com.example.duriannet.presentation.durian_dictionary.fragments
 
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -37,7 +38,7 @@ class DurianProfileFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         adapter = DurianProfileAdapter { durian ->
-            val action = DurianProfileFragmentDirections.actionDurianProfileToDetails(durian.durianId)
+            val action = DurianProfileFragmentDirections.actionDurianProfileToDetails(durian.durianId) // Ensure durianId is Int
             findNavController().navigate(action)
         }
 
@@ -49,12 +50,21 @@ class DurianProfileFragment : Fragment() {
         viewLifecycleOwner.lifecycleScope.launch {
             viewModel.durianProfileState.collect { state ->
                 if (state.error.isNotEmpty()) {
-                    // Handle error (e.g., show a Toast)
+                    Log.e("DurianProfileFragment", "Error: ${state.error}")
                 } else {
-                    adapter.submitList(state.filteredDurians)
+                    Log.d("DurianProfileFragment", "Durians loaded: ${state.filteredDurians.size}")
+                    if (state.filteredDurians.isEmpty()) {
+                        //binding.emptyStateView.visibility = View.VISIBLE
+                        binding.rvDurianProfile.visibility = View.GONE
+                    } else {
+                        //binding.emptyStateView.visibility = View.GONE
+                        binding.rvDurianProfile.visibility = View.VISIBLE
+                        adapter.submitList(state.filteredDurians)
+                    }
                 }
             }
         }
+
 
         binding.svDurianProfile.setOnQueryTextListener(object : android.widget.SearchView.OnQueryTextListener {
             override fun onQueryTextSubmit(query: String?): Boolean {
@@ -67,6 +77,7 @@ class DurianProfileFragment : Fragment() {
                 return true
             }
         })
+
     }
 
     override fun onDestroyView() {

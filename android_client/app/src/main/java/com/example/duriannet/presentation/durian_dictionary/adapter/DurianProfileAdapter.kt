@@ -30,7 +30,8 @@ class DurianProfileAdapter(
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        holder.bind(durians[position])
+        val durian = durians[position]
+        holder.bind(durian)
     }
 
     override fun getItemCount(): Int = durians.size
@@ -42,7 +43,11 @@ class DurianProfileAdapter(
 
         fun bind(durian: DurianProfileForUserResponseDto) {
             durianName.text = durian.durianName
-            Glide.with(itemView.context).load(durian.durianImage).into(durianImage)
+            Glide.with(itemView.context)
+                .load(durian.durianImage) // Ensure this is a valid URL
+                .placeholder(R.drawable.unknownuser) // Placeholder image
+                .error(R.drawable.unknownuser) // Fallback image on error
+                .into(durianImage)
 
             viewDetailsButton.setOnClickListener {
                 onViewDetailsClick(durian)

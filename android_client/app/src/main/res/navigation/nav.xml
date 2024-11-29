@@ -101,7 +101,22 @@
     <fragment
         android:id="@+id/durianProfileFragment"
         android:name="com.example.duriannet.presentation.durian_dictionary.fragments.DurianProfileFragment"
-        tools:layout="@layout/fragment_durian_profile" />
+        tools:layout="@layout/fragment_durian_profile">
+
+        <action
+            android:id="@+id/action_durianProfile_to_details"
+            app:destination="@id/durianProfileDetailsFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/durianProfileDetailsFragment"
+        android:name="com.example.duriannet.presentation.durian_dictionary.fragments.DurianProfileDetailsFragment"
+        tools:layout="@layout/fragment_durian_profile_details">
+        <argument
+            android:name="durianId"
+            app:argType="integer" /> <!-- Ensure this matches the type being passed -->
+    </fragment>
+
 
     <fragment
         android:id="@+id/durianChatbotFragment"
