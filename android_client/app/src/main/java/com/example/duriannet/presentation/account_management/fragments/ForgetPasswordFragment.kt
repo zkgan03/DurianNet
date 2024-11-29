@@ -62,7 +62,7 @@ class ForgetPasswordFragment : Fragment() {
             viewModel.forgetPasswordState.collect { state ->
                 if (state.isEmailSent) {
                     Toast.makeText(requireContext(), "Reset email sent", Toast.LENGTH_SHORT).show()
-                    //navController.navigate(R.id.action_forget_password_to_reset_password)
+                    navController.navigate(R.id.action_forget_password_to_otpFragment)
                 } else if (state.error.isNotEmpty()) {
                     Toast.makeText(requireContext(), state.error, Toast.LENGTH_SHORT).show()
                 }

@@ -7,14 +7,14 @@ namespace DurianNet.Services.EmailService
     {
         private const string SenderEmail = "magnetic636@gmail.com"; // Update to your email
         private const string SenderPassword = "tqbp zars jlzu wpof"; // Update to your email password or app password
-        private const string UserResetLink = "https://duriannet.com/reset-password"; // Update to your app's reset link
-        private const string AdminResetLink = "https://localhost:7091/account/ResetPassword"; // Update to your admin web reset link 
+        private const string UserResetLink = "http://duriannet.com/reset-password"; // Update to your app's reset link
+        private const string AdminResetLink = "http://localhost:5176/account/ResetPassword"; // Update to your admin web reset link 
 
         public static void SendPasswordRecoveryEmail(string receiverEmail, bool isAdmin)
         {
             try
             {
-                string resetLink = $"https://localhost:7091/account/ResetPassword";
+                string resetLink = isAdmin ? AdminResetLink : UserResetLink;
 
                 MailMessage mailMessage = new MailMessage(SenderEmail, receiverEmail)
                 {
@@ -42,6 +42,40 @@ namespace DurianNet.Services.EmailService
                 throw new InvalidOperationException($"Failed to send email: {ex.Message}");
             }
         }
+
+        public static void SendOtpEmail(string receiverEmail, string otp)
+        {
+            try
+            {
+                string subject = "Your OTP Code for DurianNet";
+                string body = $@"
+            <h3>One-Time Password (OTP)</h3>
+            <p>Use the code below to reset your password:</p>
+            <h1 style='color:blue;'>{otp}</h1>
+            <p>This code will expire in 10 minutes.</p>";
+
+                MailMessage mailMessage = new MailMessage(SenderEmail, receiverEmail)
+                {
+                    Subject = subject,
+                    Body = body,
+                    IsBodyHtml = true
+                };
+
+                SmtpClient smtpClient = new SmtpClient("smtp.gmail.com", 587)
+                {
+                    EnableSsl = true,
+                    UseDefaultCredentials = false,
+                    Credentials = new NetworkCredential(SenderEmail, SenderPassword)
+                };
+
+                smtpClient.Send(mailMessage);
+            }
+            catch (Exception ex)
+            {
+                throw new InvalidOperationException($"Failed to send email: {ex.Message}");
+            }
+        }
+
 
 
     }
