@@ -64,4 +64,5 @@ class DurianRepository @Inject constructor(private val durianApi: DurianApi) {
     suspend fun removeFavoriteDurian(username: String, durianName: String) = runCatching {
         durianApi.removeFavoriteDurian(RemoveFavoriteDurianRequestDto(username, durianName))
     }
+
 }

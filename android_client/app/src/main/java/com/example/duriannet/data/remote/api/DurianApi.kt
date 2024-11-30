@@ -20,8 +20,12 @@ interface DurianApi {
     suspend fun addFavoriteDurian(@Body request: AddFavoriteDurianRequestDto): Response<Unit>
 
     // Remove a durian from favorites
-    @DELETE("appApi/durian/appRemoveFavoriteDurian")
+    /*@DELETE("appApi/durian/appRemoveFavoriteDurian")
+    suspend fun removeFavoriteDurian(@Body request: RemoveFavoriteDurianRequestDto): Response<Unit>*/
+
+    @POST("appApi/durian/appRemoveFavoriteDurian")
     suspend fun removeFavoriteDurian(@Body request: RemoveFavoriteDurianRequestDto): Response<Unit>
+
 
     // Get a specific durian profile by ID
     @GET("appApi/durian/appGetDurianProfile/{id}")

@@ -53,7 +53,7 @@ class FavoriteDurianFragment : Fragment() {
             viewModel.loadDurians(username)
         }
 
-        viewLifecycleOwner.lifecycleScope.launch {
+        /*viewLifecycleOwner.lifecycleScope.launch {
             viewModel.favoriteDurianState.collect { state ->
                 if (state.error.isNotEmpty()) {
                     Toast.makeText(requireContext(), state.error, Toast.LENGTH_SHORT).show()
@@ -64,7 +64,24 @@ class FavoriteDurianFragment : Fragment() {
                     }
                 }
             }
+        }*/
+
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewModel.favoriteDurianState.collect { state ->
+                if (state.error.isNotEmpty()) {
+                    Toast.makeText(requireContext(), state.error, Toast.LENGTH_SHORT).show()
+                } else {
+                    println("Filtered Durians Count: ${state.filteredDurians.size}")
+                    state.filteredDurians.forEach { println("Durian: ${it.durianName}") }
+
+                    adapter.submitList(state.filteredDurians, state.favoriteDurianIds)
+                    if (state.filteredDurians.isEmpty()) {
+                        Toast.makeText(requireContext(), "No results found", Toast.LENGTH_SHORT).show()
+                    }
+                }
+            }
         }
+
 
         // Handle SearchView
         binding.svFavoriteDurian.setOnQueryTextListener(object : android.widget.SearchView.OnQueryTextListener {
@@ -82,6 +99,7 @@ class FavoriteDurianFragment : Fragment() {
         binding.btnFdSave.setOnClickListener {
             viewModel.saveFavoriteChanges(username)
             Toast.makeText(requireContext(), "Favorites saved successfully", Toast.LENGTH_SHORT).show()
+            navController.navigateUp()
         }
     }
 

@@ -15,6 +15,7 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
+import com.bumptech.glide.Glide
 import com.example.duriannet.R
 import com.example.duriannet.databinding.FragmentEditProfileBinding
 import com.example.duriannet.presentation.account_management.view_models.EditProfileViewModel
@@ -116,9 +117,17 @@ class EditProfileFragment : Fragment() {
                     binding.edtProfileFullname.setText(state.fullName)
                     binding.edtProfileEmail.setText(state.email)
                     binding.edtProfilePhoneNumber.setText(state.phoneNumber)
+                    /*state.profilePicture?.let { profilePicturePath ->
+                        binding.ivProfile.setImageURI(Uri.parse(profilePicturePath))*/
                     state.profilePicture?.let { profilePicturePath ->
-                        binding.ivProfile.setImageURI(Uri.parse(profilePicturePath))
+                        Glide.with(requireContext())
+                            .load(profilePicturePath)
+                            .placeholder(R.drawable.unknownuser) // Fallback if the image is loading
+                            .error(R.drawable.unknownuser) // Fallback if there's an error
+                            .into(binding.ivProfile)
                     }
+
+
                 }
             }
         }

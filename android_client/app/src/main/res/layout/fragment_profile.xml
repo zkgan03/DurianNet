@@ -213,6 +213,7 @@
             android:layout_marginStart="24dp"
             android:layout_marginTop="16dp"
             android:text="Favorite Durian"
+            android:textColor="@color/button_green"
             android:textSize="18sp"
             android:textStyle="bold"
             app:layout_constraintStart_toStartOf="parent"

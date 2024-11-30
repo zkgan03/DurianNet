@@ -11,6 +11,7 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.bumptech.glide.Glide
 import com.example.duriannet.R
 import com.example.duriannet.databinding.FragmentProfileBinding
 import com.example.duriannet.presentation.account_management.adapter.FavoriteDurianAdapter
@@ -60,6 +61,14 @@ class ProfileFragment : Fragment() {
                     binding.txtProfileFullname.text = state.fullName
                     binding.txtProfileEmail.text = state.email
                     binding.txtProfilePhoneNumber.text = state.phoneNumber
+
+                    Glide.with(requireContext())
+                        .load(state.profileImageUrl) // Load the resolved image URL
+                        .placeholder(R.drawable.unknownuser) // Placeholder image
+                        .error(R.drawable.unknownuser) // Fallback image
+                        .centerCrop() // Optional for circular images
+                        .into(binding.ivProfile)
+
                     adapter.submitList(state.favoriteDurians)
                 }
             }

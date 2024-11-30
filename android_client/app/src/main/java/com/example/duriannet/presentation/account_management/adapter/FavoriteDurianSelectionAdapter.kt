@@ -44,14 +44,53 @@ class FavoriteDurianSelectionAdapter(
         private val durianImage: ImageView = itemView.findViewById(R.id.iv_favorite__profile)
         private val favoriteCheckbox: CheckBox = itemView.findViewById(R.id.checkBox)
 
+        /*fun bind(durian: DurianProfileForUserResponseDto, isFavorite: Boolean) {
+            durianName.text = durian.durianName
+
+            // Log the image URL for debugging
+            println("Loading image from URL: ${durian.durianImage}")
+
+            Glide.with(itemView.context)
+                .load(durian.durianImage) // Load the image URL
+                .placeholder(R.drawable.unknownuser) // Fallback image during loading
+                .error(R.drawable.unknownuser) // Fallback image if the load fails
+                .into(durianImage) // Target the ImageView
+            favoriteCheckbox.isChecked = isFavorite
+
+            favoriteCheckbox.setOnCheckedChangeListener { _, isChecked ->
+                onFavoriteChange(durian, isChecked)
+            }
+        }*/
+
         fun bind(durian: DurianProfileForUserResponseDto, isFavorite: Boolean) {
             durianName.text = durian.durianName
-            Glide.with(itemView.context).load(durian.durianImage).into(durianImage)
+
+            // Base URL of your server
+            val baseUrl = "http://10.0.2.2:5176" // Update this to your actual base URL if needed
+
+            // Resolve the full image URL
+            val fullImageUrl = if (durian.durianImage.startsWith("http")) {
+                durian.durianImage
+            } else {
+                "$baseUrl${if (durian.durianImage.startsWith("/")) durian.durianImage else "/${durian.durianImage}"}"
+            }
+
+            // Log the resolved URL for debugging
+            println("Loading image from URL: $fullImageUrl")
+
+            Glide.with(itemView.context)
+                .load(fullImageUrl) // Load the resolved URL
+                .placeholder(R.drawable.unknownuser) // Replace with your placeholder drawable
+                .error(R.drawable.unknownuser) // Replace with your error drawable
+                .centerCrop()
+                .into(durianImage)
+
             favoriteCheckbox.isChecked = isFavorite
 
             favoriteCheckbox.setOnCheckedChangeListener { _, isChecked ->
                 onFavoriteChange(durian, isChecked)
             }
         }
+
     }
 }

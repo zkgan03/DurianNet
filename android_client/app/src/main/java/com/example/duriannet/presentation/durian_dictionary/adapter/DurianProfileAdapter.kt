@@ -43,10 +43,25 @@ class DurianProfileAdapter(
 
         fun bind(durian: DurianProfileForUserResponseDto) {
             durianName.text = durian.durianName
+
+            // Base URL of your server
+            val baseUrl = "http://10.0.2.2:5176" // Replace with the actual base URL if needed
+
+            // Resolve the full image URL
+            val fullImageUrl = if (durian.durianImage.startsWith("http")) {
+                durian.durianImage
+            } else {
+                "$baseUrl${if (durian.durianImage.startsWith("/")) durian.durianImage else "/${durian.durianImage}"}"
+            }
+
+            // Log the resolved URL for debugging
+            println("Loading image from URL: $fullImageUrl")
+
             Glide.with(itemView.context)
-                .load(durian.durianImage) // Ensure this is a valid URL
+                .load(fullImageUrl) // Load the resolved URL
                 .placeholder(R.drawable.unknownuser) // Placeholder image
                 .error(R.drawable.unknownuser) // Fallback image on error
+                .centerCrop()
                 .into(durianImage)
 
             viewDetailsButton.setOnClickListener {

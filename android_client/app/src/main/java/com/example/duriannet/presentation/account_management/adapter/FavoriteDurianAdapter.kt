@@ -20,7 +20,7 @@ class FavoriteDurianAdapter :
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): FavoriteDurianViewHolder {
         val view = LayoutInflater.from(parent.context)
-            .inflate(R.layout.item_favorite_durian, parent, false)
+            .inflate(R.layout.item_favorite_durian_selected, parent, false)
         return FavoriteDurianViewHolder(view)
     }
 

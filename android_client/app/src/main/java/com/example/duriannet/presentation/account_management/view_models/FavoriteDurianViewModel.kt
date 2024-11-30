@@ -2,9 +2,13 @@ package com.example.duriannet.presentation.account_management.view_models
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.bumptech.glide.Glide
+import com.example.duriannet.R
+import com.example.duriannet.data.remote.dtos.response.DurianProfileForUserResponseDto
 import com.example.duriannet.data.repository.durian_dictionary.DurianRepository
 import com.example.duriannet.presentation.account_management.state.FavoriteDurianState
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
@@ -63,20 +67,55 @@ class FavoriteDurianViewModel @Inject constructor(
         if (favoriteChanges.isEmpty()) return // No changes to save
 
         viewModelScope.launch {
-            favoriteChanges.forEach { (durianId, isFavorite) ->
-                val durianName = _favoriteDurianState.value.allDurians
-                    .find { it.durianId == durianId }?.durianName ?: return@forEach
+            val additions = favoriteChanges.filter { it.value } // Durian IDs to add as favorites
+            val deletions = favoriteChanges.filter { !it.value } // Durian IDs to remove from favorites
 
-                if (isFavorite) {
-                    durianRepository.addFavoriteDurian(username, durianName)
-                } else {
-                    durianRepository.removeFavoriteDurian(username, durianName)
-                }
+            try {
+                // Execute additions and deletions in parallel using async
+                val addJobs = additions.map { (durianId, _) ->
+                    val durianName = _favoriteDurianState.value.allDurians
+                        .find { it.durianId == durianId }?.durianName
+                    if (durianName != null) {
+                        async {
+                            try {
+                                durianRepository.addFavoriteDurian(username, durianName)
+                            } catch (e: Exception) {
+                                println("Failed to add durian: $durianName -> ${e.message}")
+                            }
+                        }
+                    } else null
+                }.filterNotNull()
+
+                val deleteJobs = deletions.map { (durianId, _) ->
+                    val durianName = _favoriteDurianState.value.allDurians
+                        .find { it.durianId == durianId }?.durianName
+                    if (durianName != null) {
+                        async {
+                            try {
+                                durianRepository.removeFavoriteDurian(username, durianName)
+                            } catch (e: Exception) {
+                                println("Failed to remove durian: $durianName -> ${e.message}")
+                            }
+                        }
+                    } else null
+                }.filterNotNull()
+
+                // Wait for all operations to complete
+                val allJobs = addJobs + deleteJobs
+                allJobs.forEach { it.await() }
+
+                // Clear changes after successful save
+                favoriteChanges.clear()
+            } catch (e: Exception) {
+                // Handle any errors that occur during the network requests
+                println("Failed to save changes: ${e.message}")
+                _favoriteDurianState.value = _favoriteDurianState.value.copy(
+                    error = "Failed to save changes: ${e.message}"
+                )
             }
-            // Clear changes after saving
-            favoriteChanges.clear()
         }
     }
+
 }
 
 

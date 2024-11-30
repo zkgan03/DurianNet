@@ -19,7 +19,7 @@ class EditProfileViewModel @Inject constructor(
     private val _editProfileState = MutableStateFlow(EditProfileState())
     val editProfileState: StateFlow<EditProfileState> = _editProfileState
 
-    fun loadProfile(username: String) {
+    /*fun loadProfile(username: String) {
         viewModelScope.launch {
             val result = userRepository.getProfile(username)
             if (result.isSuccess) {
@@ -37,7 +37,31 @@ class EditProfileViewModel @Inject constructor(
                 _editProfileState.value = EditProfileState(error = result.exceptionOrNull()?.message ?: "Unknown error")
             }
         }
+    }*/
+
+    fun loadProfile(username: String) {
+        viewModelScope.launch {
+            val baseUrl = "http://10.0.2.2:5176"
+            val result = userRepository.getProfile(username)
+            if (result.isSuccess) {
+                val profile = result.getOrNull()
+                _editProfileState.value = profile?.let {
+                    _editProfileState.value.copy(
+                        username = it.userName,
+                        fullName = it.fullName,
+                        email = it.email,
+                        phoneNumber = it.phoneNumber,
+                        profilePicture = it.profilePicture?.let { picture ->
+                            if (picture.startsWith("http")) picture else "$baseUrl/$picture"
+                        }
+                    )
+                } ?: EditProfileState(error = "Profile not found")
+            } else {
+                _editProfileState.value = EditProfileState(error = result.exceptionOrNull()?.message ?: "Unknown error")
+            }
+        }
     }
+
 
     fun updateProfile(username: String, fullName: String, email: String, phoneNumber: String, profilePicture: String?) {
         viewModelScope.launch {
