@@ -11,6 +11,7 @@ import com.bumptech.glide.Glide
 import com.example.duriannet.R
 import com.example.duriannet.data.remote.dtos.response.DurianProfileForUserResponseDto
 
+//favorite durian fragment
 class FavoriteDurianSelectionAdapter(
     private val onFavoriteChange: (DurianProfileForUserResponseDto, Boolean) -> Unit
 ) : RecyclerView.Adapter<FavoriteDurianSelectionAdapter.FavoriteDurianViewHolder>() {
@@ -44,23 +45,6 @@ class FavoriteDurianSelectionAdapter(
         private val durianImage: ImageView = itemView.findViewById(R.id.iv_favorite__profile)
         private val favoriteCheckbox: CheckBox = itemView.findViewById(R.id.checkBox)
 
-        /*fun bind(durian: DurianProfileForUserResponseDto, isFavorite: Boolean) {
-            durianName.text = durian.durianName
-
-            // Log the image URL for debugging
-            println("Loading image from URL: ${durian.durianImage}")
-
-            Glide.with(itemView.context)
-                .load(durian.durianImage) // Load the image URL
-                .placeholder(R.drawable.unknownuser) // Fallback image during loading
-                .error(R.drawable.unknownuser) // Fallback image if the load fails
-                .into(durianImage) // Target the ImageView
-            favoriteCheckbox.isChecked = isFavorite
-
-            favoriteCheckbox.setOnCheckedChangeListener { _, isChecked ->
-                onFavoriteChange(durian, isChecked)
-            }
-        }*/
 
         fun bind(durian: DurianProfileForUserResponseDto, isFavorite: Boolean) {
             durianName.text = durian.durianName

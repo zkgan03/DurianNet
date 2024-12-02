@@ -67,6 +67,7 @@ class DurianProfileAdapter(
             viewDetailsButton.setOnClickListener {
                 onViewDetailsClick(durian)
             }
+
         }
     }
 }

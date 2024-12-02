@@ -6,6 +6,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
@@ -38,13 +39,39 @@ class ProfileFragment : Fragment() {
         return binding.root
     }
 
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+
+        parentFragmentManager.setFragmentResultListener("favorite_updated", this) { _, _ ->
+            val sharedPreferences =
+                requireActivity().getSharedPreferences("DurianNetPrefs", Context.MODE_PRIVATE)
+            val username = sharedPreferences.getString("username", "") ?: ""
+
+            if (username.isNotEmpty()) {
+                profileViewModel.loadProfile(username) // Reload the latest profile data
+            }
+        }
+    }
+
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        val sharedPreferences = requireActivity().getSharedPreferences("DurianNetPrefs", Context.MODE_PRIVATE)
+        val sharedPreferences =
+            requireActivity().getSharedPreferences("DurianNetPrefs", Context.MODE_PRIVATE)
         val username = sharedPreferences.getString("username", "") ?: ""
 
-        adapter = FavoriteDurianAdapter()
+        if (username.isNotEmpty()) {
+            profileViewModel.loadProfile(username) // Ensure the latest data is fetched
+        }
+
+        // Initialize adapter with click listener
+        adapter = FavoriteDurianAdapter { durianId ->
+            // Navigate to DurianProfileDetailsFragment using the durianId
+            val action = ProfileFragmentDirections.actionProfileToDurianProfileDetails(durianId)
+            navController.navigate(action)
+        }
+
         binding.rvProfileFavoriteDurian.layoutManager = LinearLayoutManager(requireContext())
         binding.rvProfileFavoriteDurian.adapter = adapter
 
@@ -52,7 +79,7 @@ class ProfileFragment : Fragment() {
             profileViewModel.loadProfile(username)
         }
 
-        viewLifecycleOwner.lifecycleScope.launch {
+        /*viewLifecycleOwner.lifecycleScope.launch {
             profileViewModel.profileState.collect { state ->
                 if (state.error.isNotEmpty()) {
                     Toast.makeText(requireContext(), state.error, Toast.LENGTH_SHORT).show()
@@ -72,7 +99,32 @@ class ProfileFragment : Fragment() {
                     adapter.submitList(state.favoriteDurians)
                 }
             }
+        }*/
+
+        viewLifecycleOwner.lifecycleScope.launch {
+            profileViewModel.profileState.collect { state ->
+                binding.progressBar.visibility = if (state.loading) View.VISIBLE else View.GONE
+
+                if (state.error.isNotEmpty()) {
+                    Toast.makeText(requireContext(), state.error, Toast.LENGTH_SHORT).show()
+                } else {
+                    binding.txtProfileUsername.text = state.username
+                    binding.txtProfileFullname.text = state.fullName
+                    binding.txtProfileEmail.text = state.email
+                    binding.txtProfilePhoneNumber.text = state.phoneNumber
+
+                    Glide.with(requireContext())
+                        .load(state.profileImageUrl)
+                        .placeholder(R.drawable.unknownuser)
+                        .error(R.drawable.unknownuser)
+                        .centerCrop()
+                        .into(binding.ivProfile)
+
+                    adapter.submitList(state.favoriteDurians)
+                }
+            }
         }
+
 
         binding.toolbarChangePassword.setOnMenuItemClickListener { item ->
             when (item.itemId) {
@@ -85,28 +137,84 @@ class ProfileFragment : Fragment() {
                     true
                 }
                 R.id.delete_account -> {
-                    // Handle delete account logic
-                    Toast.makeText(requireContext(), "Delete Account clicked", Toast.LENGTH_SHORT).show()
+                    showConfirmationDialog(
+                        "Delete Account",
+                        "Are you sure you want to delete your account? This action cannot be undone."
+                    ) {
+                        lifecycleScope.launch {
+                            val result = profileViewModel.deleteAccount(username)
+                            if (result.isSuccess) {
+                                Toast.makeText(
+                                    requireContext(),
+                                    "Account deleted successfully",
+                                    Toast.LENGTH_SHORT
+                                ).show()
+                                sharedPreferences.edit().clear().apply() // Clear all shared preferences
+                                navController.navigate(R.id.loginFragment) // Navigate to login
+                            } else {
+                                Toast.makeText(
+                                    requireContext(),
+                                    result.exceptionOrNull()?.message,
+                                    Toast.LENGTH_SHORT
+                                ).show()
+                            }
+                        }
+                    }
                     true
                 }
                 R.id.logout -> {
-                    // Handle logout logic
-                    Toast.makeText(requireContext(), "Logout clicked", Toast.LENGTH_SHORT).show()
+                    showConfirmationDialog(
+                        "Logout",
+                        "Are you sure you want to log out?"
+                    ) {
+                        lifecycleScope.launch {
+                            val result = profileViewModel.logout()
+                            if (result.isSuccess) {
+                                Toast.makeText(
+                                    requireContext(),
+                                    "Logged out successfully",
+                                    Toast.LENGTH_SHORT
+                                ).show()
+                                sharedPreferences.edit().clear().apply() // Clear all shared preferences
+                                navController.navigate(R.id.loginFragment) // Navigate to login
+                            } else {
+                                Toast.makeText(
+                                    requireContext(),
+                                    result.exceptionOrNull()?.message,
+                                    Toast.LENGTH_SHORT
+                                ).show()
+                            }
+                        }
+                    }
                     true
                 }
                 else -> false
             }
         }
 
-
         binding.edtFdIcon.setOnClickListener {
             try {
                 navController.navigate(R.id.favoriteDurianFragment)
             } catch (e: IllegalArgumentException) {
-                Toast.makeText(requireContext(), "Navigation error: ${e.message}", Toast.LENGTH_SHORT).show()
+                Toast.makeText(
+                    requireContext(),
+                    "Navigation error: ${e.message}",
+                    Toast.LENGTH_SHORT
+                ).show()
             }
         }
 
+    }
+
+    private fun showConfirmationDialog(title: String, message: String, onConfirm: () -> Unit) {
+        AlertDialog.Builder(requireContext())
+            .setTitle(title)
+            .setMessage(message)
+            .setPositiveButton("Yes") { _, _ ->
+                onConfirm()
+            }
+            .setNegativeButton("No", null)
+            .show()
     }
 
     override fun onDestroyView() {

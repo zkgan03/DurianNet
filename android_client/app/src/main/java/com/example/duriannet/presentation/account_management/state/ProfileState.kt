@@ -6,6 +6,7 @@ data class ProfileState(
     val email: String = "",
     val phoneNumber: String = "",
     val profileImageUrl: String = "",
-    val favoriteDurians: List<String> = emptyList(),
+    val favoriteDurians: List<Pair<Int, String>> = emptyList(),
+    val loading: Boolean = false,
     val error: String = ""
 )

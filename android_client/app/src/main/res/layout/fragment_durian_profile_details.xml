@@ -59,7 +59,7 @@
 
         <TextView
             android:id="@+id/txt_durian_description"
-            android:layout_width="wrap_content"
+            android:layout_width="360dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="24dp"
             android:layout_marginTop="8dp"
@@ -94,7 +94,7 @@
 
         <TextView
             android:id="@+id/txt_durian_characteristic"
-            android:layout_width="wrap_content"
+            android:layout_width="360dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="24dp"
             android:layout_marginTop="8dp"
@@ -129,7 +129,7 @@
 
         <TextView
             android:id="@+id/txt_durian_taste"
-            android:layout_width="wrap_content"
+            android:layout_width="360dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="24dp"
             android:layout_marginTop="8dp"
@@ -175,12 +175,15 @@
 
         <TextView
             android:id="@+id/txt_video_description"
-            android:layout_width="wrap_content"
+            android:layout_width="360dp"
             android:layout_height="wrap_content"
+            android:layout_marginStart="24dp"
             android:layout_marginTop="24dp"
+            android:layout_marginBottom="32dp"
             android:text="Video Description"
             android:textSize="20sp"
-            app:layout_constraintStart_toStartOf="@+id/vv_durian_video"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/vv_durian_video" />
 
         <TextView

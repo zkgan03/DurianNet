@@ -27,7 +27,7 @@ namespace DurianNet.Controllers.appApi
         }
 
         //login
-        [HttpPost("appLogin")]
+        /*[HttpPost("appLogin")]
         public async Task<IActionResult> appLogin([FromBody] LoginDto loginDto)
         {
             if (!ModelState.IsValid) return BadRequest(ModelState);
@@ -47,7 +47,54 @@ namespace DurianNet.Controllers.appApi
                 Email = user.Email,
                 Token = token // Include the token in the response
             });
+        }*/
+
+        [HttpPost("appLogin")]
+        public async Task<IActionResult> appLogin([FromBody] LoginDto loginDto)
+        {
+            if (!ModelState.IsValid) return BadRequest(ModelState);
+
+            var user = await _userManager.Users.FirstOrDefaultAsync(u => u.UserName.ToLower() == loginDto.Username.ToLower());
+            if (user == null) return Unauthorized("Invalid username or password");
+
+            // Check if the user is deleted
+            if (user.UserStatus == UserStatus.Deleted)
+                return Unauthorized("User account is deleted. Contact support.");
+
+            var result = await _userManager.CheckPasswordAsync(user, loginDto.Password);
+            if (!result) return Unauthorized("Invalid username or password");
+
+            // Generate Token
+            var token = _tokenService.CreateToken(user);
+
+            return Ok(new
+            {
+                UserName = user.UserName,
+                Email = user.Email,
+                Token = token
+            });
         }
+
+        [HttpPut("appDeleteAccount/{username}")]
+        public async Task<IActionResult> appDeleteAccount(string username)
+        {
+            var user = await _userManager.FindByNameAsync(username);
+            if (user == null) return NotFound("User not found");
+
+            // Update user status to deleted
+            user.UserStatus = UserStatus.Deleted;
+            await _userManager.UpdateAsync(user);
+
+            return Ok("User account deleted successfully");
+        }
+
+        [HttpPost("appLogout")]
+        public IActionResult appLogout()
+        {
+            // Clear client-side data like token and shared preferences
+            return Ok("Logged out successfully.");
+        }
+
 
         //signup
         [HttpPost("appRegister")]
@@ -85,35 +132,6 @@ namespace DurianNet.Controllers.appApi
 
             return Ok("Password changed successfully");
         }
-
-        ////forgot password
-        //[HttpPost("appForgotPassword")]
-        //public async Task<IActionResult> appForgotPassword([FromBody] ForgotPasswordRequestDto dto)
-        //{
-        //    if (string.IsNullOrWhiteSpace(dto.Email))
-        //        return BadRequest("Email cannot be empty.");
-
-        //    //var user = await _userManager.FindByEmailAsync(dto.Email);
-        //    var user = await _context.Users.FirstOrDefaultAsync(u => u.Email == dto.Email);
-        //    if (user == null) return NotFound("No user found with the provided email");
-
-        //    // Determine whether the user is an admin or regular user
-        //    bool isAdmin = user.UserType == UserType.Admin || user.UserType == UserType.SuperAdmin;
-
-        //    try
-        //    {
-        //        // Use the EmailService to send the password recovery email
-        //        EmailService.SendPasswordRecoveryEmail(user.Email, isAdmin);
-
-        //        // Return success response
-        //        return Ok("Password recovery email sent successfully.");
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        // Handle errors during email sending
-        //        return StatusCode(500, $"An error occurred while sending the email: {ex.Message}");
-        //    }
-        //}
 
         [HttpPost("appForgotPassword")]
         public async Task<IActionResult> appForgotPassword([FromBody] ForgotPasswordRequestDto dto)

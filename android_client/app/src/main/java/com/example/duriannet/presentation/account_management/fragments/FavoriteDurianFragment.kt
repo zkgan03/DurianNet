@@ -27,6 +27,7 @@ class FavoriteDurianFragment : Fragment() {
     private val navController by lazy { findNavController() }
     private lateinit var adapter: FavoriteDurianSelectionAdapter
     private lateinit var username: String
+    private var isInitialLoad = true // Track if it's the initial load
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -53,19 +54,6 @@ class FavoriteDurianFragment : Fragment() {
             viewModel.loadDurians(username)
         }
 
-        /*viewLifecycleOwner.lifecycleScope.launch {
-            viewModel.favoriteDurianState.collect { state ->
-                if (state.error.isNotEmpty()) {
-                    Toast.makeText(requireContext(), state.error, Toast.LENGTH_SHORT).show()
-                } else {
-                    adapter.submitList(state.filteredDurians, state.favoriteDurianIds)
-                    if (state.filteredDurians.isEmpty()) {
-                        Toast.makeText(requireContext(), "No results found", Toast.LENGTH_SHORT).show()
-                    }
-                }
-            }
-        }*/
-
         viewLifecycleOwner.lifecycleScope.launch {
             viewModel.favoriteDurianState.collect { state ->
                 if (state.error.isNotEmpty()) {
@@ -75,9 +63,17 @@ class FavoriteDurianFragment : Fragment() {
                     state.filteredDurians.forEach { println("Durian: ${it.durianName}") }
 
                     adapter.submitList(state.filteredDurians, state.favoriteDurianIds)
-                    if (state.filteredDurians.isEmpty()) {
+                    /*if (state.filteredDurians.isEmpty()) {
+                        Toast.makeText(requireContext(), "No results found", Toast.LENGTH_SHORT).show()*/
+
+                    // Show "No results found" only after the initial load
+                    if (!isInitialLoad && state.filteredDurians.isEmpty()) {
                         Toast.makeText(requireContext(), "No results found", Toast.LENGTH_SHORT).show()
                     }
+
+                    // Mark initial load as completed
+                    isInitialLoad = false
+
                 }
             }
         }
@@ -96,11 +92,21 @@ class FavoriteDurianFragment : Fragment() {
             }
         })
 
-        binding.btnFdSave.setOnClickListener {
+        /*binding.btnFdSave.setOnClickListener {
             viewModel.saveFavoriteChanges(username)
             Toast.makeText(requireContext(), "Favorites saved successfully", Toast.LENGTH_SHORT).show()
             navController.navigateUp()
+        }*/
+
+        binding.btnFdSave.setOnClickListener {
+            viewModel.saveFavoriteChanges(username)
+            Toast.makeText(requireContext(), "Favorites saved successfully", Toast.LENGTH_SHORT).show()
+
+            // Set a result to notify ProfileFragment
+            parentFragmentManager.setFragmentResult("favorite_updated", Bundle())
+            navController.navigateUp()
         }
+
     }
 
     override fun onDestroyView() {

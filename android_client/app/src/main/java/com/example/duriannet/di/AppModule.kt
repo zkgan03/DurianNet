@@ -46,14 +46,23 @@ object AppModule {
     @Provides
     @Singleton
     fun provideSellerApi(retrofit: Retrofit): SellerApi {
-        return retrofit.create(SellerApi::class.java)
+
+        return retrofit
+            .newBuilder()
+            .baseUrl(SERVER_BASE_URL + "api/Seller/")
+            .build()
+            .create(SellerApi::class.java)
     }
 
     // Provide CommentApi instance
     @Provides
     @Singleton
     fun provideCommentApi(retrofit: Retrofit): CommentApi {
-        return retrofit.create(CommentApi::class.java)
+        return retrofit
+            .newBuilder()
+            .baseUrl(SERVER_BASE_URL + "api/Comment/")
+            .build()
+            .create(CommentApi::class.java)
     }
 
     // Provide UserApi instance

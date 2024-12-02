@@ -1,6 +1,7 @@
 package com.example.duriannet.presentation
 
 import android.content.Intent
+import android.os.Build
 import android.os.Bundle
 import android.view.View
 import android.widget.Toast
@@ -41,7 +42,7 @@ class MainActivity : AppCompatActivity() {
         handleDeepLinkIntent(intent)
     }
 
-    private fun setupNavController() {
+    /*private fun setupNavController() {
         val navHostFragment =
             supportFragmentManager.findFragmentById(R.id.navHost) as NavHostFragment
         navController = navHostFragment.navController
@@ -52,6 +53,14 @@ class MainActivity : AppCompatActivity() {
         // Define mapping between menu item IDs and navigation destinations
         binding.bottomNavigationView.setOnItemSelectedListener { menuItem ->
             when (menuItem.itemId) {
+                R.id.detector -> {
+                    navController.navigate(R.id.detector_nav_graph)
+                    true
+                }
+                R.id.seller_locator -> {
+                    navController.navigate(R.id.seller_locator_nav_graph)
+                    true
+                }
                 R.id.durianProfileHome -> {
                     navController.navigate(R.id.durianProfileFragment)
                     true
@@ -81,6 +90,75 @@ class MainActivity : AppCompatActivity() {
             binding.bottomNavigationView.visibility =
                 if (destination.id in noBottomNavFragments) View.GONE else View.VISIBLE
         }
+    }*/
+
+    private fun setupNavController() {
+        val navHostFragment =
+            supportFragmentManager.findFragmentById(R.id.navHost) as NavHostFragment
+        navController = navHostFragment.navController
+
+        // Link BottomNavigationView with NavController for automatic synchronization
+        binding.bottomNavigationView.setupWithNavController(navController)
+
+        // Ensure BottomNavigationView highlights the correct item on back navigation
+        navController.addOnDestinationChangedListener { _, destination, _ ->
+            val menu = binding.bottomNavigationView.menu
+            when (destination.id) {
+                R.id.detector_nav_graph -> menu.findItem(R.id.detector)?.isChecked = true
+                R.id.seller_locator_nav_graph -> menu.findItem(R.id.seller_locator)?.isChecked = true
+                R.id.durianProfileFragment -> menu.findItem(R.id.durianProfileHome)?.isChecked = true
+                R.id.durianChatbotFragment -> menu.findItem(R.id.chatbotHome)?.isChecked = true
+                R.id.userProfileFragment -> menu.findItem(R.id.userProfileHome)?.isChecked = true
+            }
+
+            // Hide BottomNavigationView for specific fragments
+            val noBottomNavFragments = setOf(
+                R.id.loginFragment,
+                R.id.resetPasswordFragment,
+                R.id.signUpFragment,
+                R.id.forgetPasswordFragment,
+                R.id.otpFragment
+            )
+            binding.bottomNavigationView.visibility =
+                if (destination.id in noBottomNavFragments) View.GONE else View.VISIBLE
+        }
+
+        // Custom navigation handling if needed for specific fragments
+        binding.bottomNavigationView.setOnItemSelectedListener { menuItem ->
+            when (menuItem.itemId) {
+                R.id.detector -> {
+                    if (navController.currentDestination?.id != R.id.detector_nav_graph) {
+                        navController.navigate(R.id.detector_nav_graph)
+                    }
+                    true
+                }
+                R.id.seller_locator -> {
+                    if (navController.currentDestination?.id != R.id.seller_locator_nav_graph) {
+                        navController.navigate(R.id.seller_locator_nav_graph)
+                    }
+                    true
+                }
+                R.id.durianProfileHome -> {
+                    if (navController.currentDestination?.id != R.id.durianProfileFragment) {
+                        navController.navigate(R.id.durianProfileFragment)
+                    }
+                    true
+                }
+                R.id.chatbotHome -> {
+                    if (navController.currentDestination?.id != R.id.durianChatbotFragment) {
+                        navController.navigate(R.id.durianChatbotFragment)
+                    }
+                    true
+                }
+                R.id.userProfileHome -> {
+                    if (navController.currentDestination?.id != R.id.userProfileFragment) {
+                        navController.navigate(R.id.userProfileFragment)
+                    }
+                    true
+                }
+                else -> false
+            }
+        }
     }
 
 
@@ -100,9 +178,15 @@ class MainActivity : AppCompatActivity() {
     private fun setupBackPress() {
         onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {
             override fun handleOnBackPressed() {
-                // Navigate back if possible; otherwise, finish the app
-                if (!navController.popBackStack()) {
-                    finish()
+//                if (!navController.popBackStack()) {
+                if(navController.currentDestination?.id == R.id.durianProfileFragment){
+                    if (Build.VERSION.SDK_INT == Build.VERSION_CODES.Q) {
+                        finishAfterTransition()
+                    } else {
+                        finish()
+                    }
+                } else {
+                    navController.navigateUp()
                 }
             }
         })
@@ -123,6 +207,7 @@ class MainActivity : AppCompatActivity() {
             }
         }
     }
+
 }
 
 
@@ -286,6 +371,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     */
+
 /*private fun setupBackPress() {
         onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {
             override fun handleOnBackPressed() {

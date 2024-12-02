@@ -38,7 +38,7 @@ class DurianProfileFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         adapter = DurianProfileAdapter { durian ->
-            val action = DurianProfileFragmentDirections.actionDurianProfileToDetails(durian.durianId) // Ensure durianId is Int
+            val action = DurianProfileFragmentDirections.actionDurianProfileToDetails(durian.durianId)
             findNavController().navigate(action)
         }
 

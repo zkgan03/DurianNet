@@ -7,12 +7,14 @@ import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.example.duriannet.R
 
-class FavoriteDurianAdapter :
-    RecyclerView.Adapter<FavoriteDurianAdapter.FavoriteDurianViewHolder>() {
+//Profile Fragment
+class FavoriteDurianAdapter(
+    private val clickListener: (Int) -> Unit
+) : RecyclerView.Adapter<FavoriteDurianAdapter.FavoriteDurianViewHolder>() {
 
-    private val durians = mutableListOf<String>()
+    private val durians = mutableListOf<Pair<Int, String>>() // Pair of (durianId, durianName)
 
-    fun submitList(newDurians: List<String>) {
+    fun submitList(newDurians: List<Pair<Int, String>>) {
         durians.clear()
         durians.addAll(newDurians)
         notifyDataSetChanged()
@@ -25,7 +27,11 @@ class FavoriteDurianAdapter :
     }
 
     override fun onBindViewHolder(holder: FavoriteDurianViewHolder, position: Int) {
-        holder.bind(durians[position])
+        val (durianId, durianName) = durians[position]
+        holder.bind(durianName)
+        holder.itemView.setOnClickListener {
+            clickListener(durianId) // Pass the durianId to the clickListener
+        }
     }
 
     override fun getItemCount(): Int = durians.size
@@ -38,3 +44,4 @@ class FavoriteDurianAdapter :
         }
     }
 }
+

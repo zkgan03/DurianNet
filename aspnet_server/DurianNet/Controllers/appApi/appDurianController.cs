@@ -115,24 +115,6 @@ namespace DurianNet.Controllers.appApi
             return Ok("Favorite durian added successfully");
         }
 
-        ////favorite durian for profile
-        //[HttpDelete("appRemoveFavoriteDurian")]
-        //public async Task<IActionResult> appRemoveFavoriteDurian([FromBody] RemoveFavoriteDurianRequest request)
-        //{
-        //    var user = await _context.Users.Include(u => u.FavoriteDurians).ThenInclude(fd => fd.DurianProfile)
-        //        .FirstOrDefaultAsync(u => u.UserName.ToLower() == request.Username.ToLower());
-
-        //    if (user == null) return NotFound("User not found");
-
-        //    var favorite = user.FavoriteDurians.FirstOrDefault(fd => fd.DurianProfile.DurianName.ToLower() == request.DurianName.ToLower());
-        //    if (favorite == null) return NotFound("Favorite durian not found");
-
-        //    user.FavoriteDurians.Remove(favorite);
-        //    await _context.SaveChangesAsync();
-
-        //    return Ok("Favorite durian removed successfully");
-        //}
-
         [HttpPost("appRemoveFavoriteDurian")]
         public async Task<IActionResult> appRemoveFavoriteDurian([FromBody] RemoveFavoriteDurianRequest request)
         {

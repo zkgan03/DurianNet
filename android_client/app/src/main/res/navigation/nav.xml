@@ -114,9 +114,12 @@
         tools:layout="@layout/fragment_durian_profile_details">
         <argument
             android:name="durianId"
-            app:argType="integer" /> <!-- Ensure this matches the type being passed -->
+            app:argType="integer" /> <!-- Ensure this is an integer -->
     </fragment>
 
+    <action
+        android:id="@+id/action_profile_to_durian_profile_details"
+        app:destination="@id/durianProfileDetailsFragment" />
 
     <fragment
         android:id="@+id/durianChatbotFragment"
@@ -136,6 +139,8 @@
             android:id="@+id/action_otp_to_resetPasswordFragment"
             app:destination="@id/resetPasswordFragment" />
     </fragment>
+    <include app:graph="@navigation/detector_nav_graph" />
+    <include app:graph="@navigation/seller_locator_nav_graph" />
 
 
 </navigation>

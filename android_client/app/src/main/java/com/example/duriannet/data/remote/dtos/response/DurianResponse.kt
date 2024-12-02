@@ -1,5 +1,7 @@
 package com.example.duriannet.data.remote.dtos.response
 
+import com.google.gson.annotations.SerializedName
+
 data class DurianListResponseDto(
     val durianId: Int,
     val durianName: String,
@@ -15,8 +17,10 @@ data class DurianProfileResponseDto(
     val tasteProfile: String,
     val durianImage: String,
     val durianVideoUrl: String,
-    val durianVideoDescription: String
+    //val durianVideoDescription: String
+    @SerializedName("description") val durianVideoDescription: String // Map "description" from JSON to this field
 )
+
 
 data class DurianProfileForUserResponseDto(
     val durianId: Int,

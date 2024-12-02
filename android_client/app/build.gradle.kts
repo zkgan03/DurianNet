@@ -21,6 +21,7 @@ android {
         versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+        multiDexEnabled = true //kj added
     }
 
     buildTypes {
@@ -42,11 +43,16 @@ android {
     buildFeatures {
         viewBinding = true
     }
-    sourceSets {
+    /*sourceSets {
         getByName("main") {
             assets {
                 srcDirs("src\\main\\assets", "src\\main\\assets")
             }
+        }
+    }*/
+    sourceSets {
+        getByName("main") {
+            assets.srcDirs("src/main/assets")
         }
     }
 }

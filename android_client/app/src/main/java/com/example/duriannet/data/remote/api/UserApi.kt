@@ -37,4 +37,11 @@ interface UserApi {
     @POST("appApi/user/validateOTP")
     suspend fun validateOTP(@Body request: ValidateOTPRequestDto): Response<Unit>
 
+    @PUT("appApi/user/appDeleteAccount/{username}")
+    suspend fun deleteAccount(@Path("username") username: String): Response<Unit>
+
+    @POST("appApi/user/appLogout")
+    suspend fun logout(): Response<Unit>
+
+
 }
