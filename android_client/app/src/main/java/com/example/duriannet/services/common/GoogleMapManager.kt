@@ -22,6 +22,7 @@ import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.LatLngBounds
 import com.google.android.gms.maps.model.Marker
 import com.google.android.gms.maps.model.MarkerOptions
+import com.google.android.gms.tasks.Tasks.await
 import com.google.maps.android.SphericalUtil
 import com.google.maps.android.clustering.ClusterItem
 import com.google.maps.android.clustering.ClusterManager
@@ -275,7 +276,6 @@ class GoogleMapManager<T : ClusterItem>(
                 != PackageManager.PERMISSION_GRANTED
             ) {
                 throw Exception("Location permission not granted")
-                return
             }
 
             fusedLocationClient.lastLocation.addOnSuccessListener { location ->
@@ -284,6 +284,25 @@ class GoogleMapManager<T : ClusterItem>(
                 }
             }
         }
+
+        fun getUserLocationAwait(context: Context): Location? {
+            val fusedLocationClient: FusedLocationProviderClient =
+                LocationServices.getFusedLocationProviderClient(context)
+
+            if (
+                ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION)
+                != PackageManager.PERMISSION_GRANTED
+            ) {
+                throw Exception("Location permission not granted")
+            }
+
+            return fusedLocationClient.lastLocation.addOnSuccessListener { location ->
+                location
+            }.let {
+                await(it)
+            }
+        }
+
 
         fun getAddress(context: Context, lat: Double, lon: Double): String {
 

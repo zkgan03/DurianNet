@@ -162,12 +162,15 @@ class MapFragment : Fragment() {
 
         isGpsSettingOpened = false // when activity is resumed, the setting must be closed
 
-        viewModel.onEvent(MapEvent.RefreshSellers) // refresh sellers
+//        viewModel.onEvent(MapEvent.RefreshSellers) // refresh sellers
 
         // Request permissions
         if (!Common.hasPermissions(requireContext(), PERMISSIONS_REQUIRED)) {
             requestAllPermissionLauncher.launch(PERMISSIONS_REQUIRED)
         } else {
+
+
+            viewModel.initViewModel()
 
             initMap()
 
@@ -183,8 +186,6 @@ class MapFragment : Fragment() {
                     }
                 }
                 .launchIn(viewLifecycleOwner.lifecycleScope)
-
-            viewModel.initViewModel()
         }
     }
 
@@ -343,7 +344,7 @@ class MapFragment : Fragment() {
 
     // Initialize the map
     private fun initMap() {
-        if (googleMapManager != null) return
+//        if (googleMapManager != null) return
 
         val mapFragment = binding.mapFragment.getFragment() as SupportMapFragment
 

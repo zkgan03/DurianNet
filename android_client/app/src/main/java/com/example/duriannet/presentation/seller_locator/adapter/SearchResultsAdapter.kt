@@ -13,7 +13,6 @@ import com.example.duriannet.models.SellerSearchResult
 import com.example.duriannet.services.common.GoogleMapManager
 
 class SearchResultsAdapter(
-    private var userLocation: Pair<Double, Double> = Pair(0.0, 0.0),
     private var onItemClicked: (SellerSearchResult) -> Unit = {},
 ) : ListAdapter<SellerSearchResult, SearchResultsAdapter.ViewHolder>(object : DiffUtil.ItemCallback<SellerSearchResult>() {
     override fun areItemsTheSame(oldItem: SellerSearchResult, newItem: SellerSearchResult): Boolean {
@@ -38,11 +37,6 @@ class SearchResultsAdapter(
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val searchResult = getItem(position)
         holder.bind(searchResult)
-    }
-
-    fun updateUserLocation(userLocation: Pair<Double, Double>) {
-        this.userLocation = userLocation
-        notifyDataSetChanged()
     }
 
     fun setOnItemClickedListener(onItemClicked: (SellerSearchResult) -> Unit) {
