@@ -9,6 +9,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
+import okhttp3.MultipartBody
 import javax.inject.Inject
 
 @HiltViewModel
@@ -52,7 +53,8 @@ class EditProfileViewModel @Inject constructor(
                         email = it.email,
                         phoneNumber = it.phoneNumber,
                         profilePicture = it.profilePicture?.let { picture ->
-                            if (picture.startsWith("http")) picture else "$baseUrl/$picture"
+                            //if (picture.startsWith("http")) picture else "$baseUrl/$picture"
+                            if (picture.startsWith("http")) picture else "$baseUrl${if (picture.startsWith("/")) picture else "/$picture"}"
                         }
                     )
                 } ?: EditProfileState(error = "Profile not found")
@@ -81,4 +83,38 @@ class EditProfileViewModel @Inject constructor(
             }
         }
     }
+
+    /*fun updateProfileWithImage(username: String, fullName: String, email: String, phoneNumber: String, profilePicture: MultipartBody.Part) {
+        viewModelScope.launch {
+            val result = userRepository.updateProfileWithImage(username, fullName, email, phoneNumber, profilePicture)
+            if (result.isSuccess) {
+                _editProfileState.value = _editProfileState.value.copy(isProfileUpdated = true)
+            } else {
+                _editProfileState.value = _editProfileState.value.copy(
+                    error = result.exceptionOrNull()?.message ?: "Unknown error"
+                )
+            }
+        }
+    }*/
+
+    fun updateProfileWithImage(
+        username: String,
+        fullName: String,
+        email: String,
+        phoneNumber: String,
+        profilePicture: MultipartBody.Part
+    ) {
+        viewModelScope.launch {
+            val result = userRepository.updateProfileWithImage(username, fullName, email, phoneNumber, profilePicture)
+            if (result.isSuccess) {
+                _editProfileState.value = _editProfileState.value.copy(isProfileUpdated = true)
+            } else {
+                _editProfileState.value = _editProfileState.value.copy(
+                    error = result.exceptionOrNull()?.message ?: "Unknown error"
+                )
+            }
+        }
+    }
+
+
 }

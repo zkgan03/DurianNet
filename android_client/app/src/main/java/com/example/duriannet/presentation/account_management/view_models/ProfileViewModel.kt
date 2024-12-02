@@ -20,50 +20,6 @@ class ProfileViewModel @Inject constructor(
     private val _profileState = MutableStateFlow(ProfileState())
     val profileState: StateFlow<ProfileState> = _profileState
 
-    /*fun loadProfile(username: String) {
-        viewModelScope.launch {
-            try {
-                val profileResult = userRepository.getProfile(username)
-                if (profileResult.isSuccess) {
-                    val profile = profileResult.getOrNull()
-                    if (profile != null) {
-                        val baseUrl = "http://10.0.2.2:5176" // Update to match your server's base URL
-                        val profileImageUrl = profile.profilePicture?.let {
-                            if (it.startsWith("http")) {
-                                it
-                            } else {
-                                "$baseUrl${if (it.startsWith("/")) it else "/$it"}"
-                            }
-                        } ?: "$baseUrl/defaultProfileImage.png" // Provide a default image URL if null
-
-                        _profileState.value = _profileState.value.copy(
-                            username = profile.userName,
-                            fullName = profile.fullName,
-                            email = profile.email,
-                            phoneNumber = profile.phoneNumber,
-                            profileImageUrl = profileImageUrl // Add this if you want to show a profile image
-                        )
-                    } else {
-                        _profileState.value = _profileState.value.copy(error = "Profile not found")
-                    }
-                } else {
-                    _profileState.value = _profileState.value.copy(error = "Failed to load profile")
-                }
-
-                val favoriteResult = durianRepository.getFavoriteDurians(username)
-                if (favoriteResult.isSuccess) {
-                    val favorites = favoriteResult.getOrNull()?.map { it.durianId to it.durianName } ?: emptyList()
-                    _profileState.value = _profileState.value.copy(favoriteDurians = favorites)
-                } else {
-                    _profileState.value = _profileState.value.copy(error = "Failed to load favorite durians")
-                }
-
-            } catch (e: Exception) {
-                _profileState.value = _profileState.value.copy(error = e.message ?: "Unknown error")
-            }
-        }
-    }*/
-
     fun loadProfile(username: String) {
         _profileState.value = _profileState.value.copy(loading = true) // Set loading to true
         viewModelScope.launch {

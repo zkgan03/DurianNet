@@ -56,15 +56,24 @@
 
             // Populate user details
             document.getElementById("username").textContent = user.username || 'N/A';
-            document.getElementById("fullname").textContent = user.fullname || 'N/A';
+            document.getElementById("fullname").textContent = user.fullName || 'N/A';
             document.getElementById("email").textContent = user.email || 'N/A';
             document.getElementById("phoneNumber").textContent = user.phoneNumber || 'N/A';
             document.getElementById("userStatus").textContent = user.userStatus || 'N/A';
 
+            // // Update profile picture if available
+            // if (user.profilePicture) {
+            //     document.getElementById("profilePicture").src = user.profilePicture;
+            // }
+
             // Update profile picture if available
+            const profilePictureElement = document.getElementById("profilePicture");
             if (user.profilePicture) {
-                document.getElementById("profilePicture").src = user.profilePicture;
+                profilePictureElement.src = user.profilePicture;
+            } else {
+                profilePictureElement.src = "/images/default-profile.jpg"; // Fallback image
             }
+
         } catch (error) {
             console.error(error);
             alert("An error occurred while loading user details.");

@@ -3,6 +3,8 @@ package com.example.duriannet.data.remote.api
 import com.example.duriannet.data.remote.dtos.request.user.*
 import com.example.duriannet.data.remote.dtos.response.NewUserDto
 import com.example.duriannet.data.remote.dtos.response.UserProfileDto
+import okhttp3.MultipartBody
+import okhttp3.RequestBody
 import retrofit2.Response
 import retrofit2.http.*
 
@@ -27,6 +29,16 @@ interface UserApi {
         @Path("username") username: String,
         @Body request: UpdateUserProfileRequestDto
     ): Response<Unit>
+
+    @Multipart
+    @PUT("appApi/user/appUpdateUserByUsername/{username}")
+    suspend fun updateProfileWithImage(
+        @Path("username") username: String,
+        @PartMap requestBodyMap: Map<String, @JvmSuppressWildcards RequestBody>,
+        @Part profilePicture: MultipartBody.Part
+    ): Response<Unit>
+
+
 
     @POST("appApi/user/appForgotPassword")
     suspend fun forgotPassword(@Body request: ForgotPasswordRequestDto): Response<Unit>

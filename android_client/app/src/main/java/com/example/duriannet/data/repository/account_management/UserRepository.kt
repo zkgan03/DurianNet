@@ -7,6 +7,9 @@ import com.example.duriannet.data.remote.dtos.response.UserProfileDto
 import com.google.gson.Gson
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import okhttp3.MediaType.Companion.toMediaTypeOrNull
+import okhttp3.MultipartBody
+import okhttp3.RequestBody.Companion.toRequestBody
 import javax.inject.Inject
 
 class UserRepository @Inject constructor(private val userApi: UserApi) {
@@ -110,6 +113,40 @@ class UserRepository @Inject constructor(private val userApi: UserApi) {
         return runCatching {
             val response = userApi.logout()
             if (!response.isSuccessful) throw Exception("Failed to log out: ${response.message()}")
+        }
+    }
+
+    /*suspend fun updateProfileWithImage(
+        username: String,
+        fullName: String,
+        email: String,
+        phoneNumber: String,
+        profilePicture: MultipartBody.Part
+    ): Result<Unit> {
+        return runCatching {
+            val fullNameBody = fullName.toRequestBody("text/plain".toMediaTypeOrNull())
+            val emailBody = email.toRequestBody("text/plain".toMediaTypeOrNull())
+            val phoneNumberBody = phoneNumber.toRequestBody("text/plain".toMediaTypeOrNull())
+
+            val response = userApi.updateProfileWithImage(username, fullNameBody, emailBody, phoneNumberBody, profilePicture)
+            if (!response.isSuccessful) throw Exception("Failed to update profile: ${response.message()}")
+        }
+    }*/
+
+    suspend fun updateProfileWithImage(
+        username: String,
+        fullName: String,
+        email: String,
+        phoneNumber: String,
+        profilePicture: MultipartBody.Part
+    ): Result<Unit> {
+        return runCatching {
+            val requestBodyMap = mapOf(
+                "fullName" to fullName.toRequestBody("text/plain".toMediaTypeOrNull()),
+                "email" to email.toRequestBody("text/plain".toMediaTypeOrNull()),
+                "phoneNumber" to phoneNumber.toRequestBody("text/plain".toMediaTypeOrNull())
+            )
+            userApi.updateProfileWithImage(username, requestBodyMap, profilePicture)
         }
     }
 

@@ -219,7 +219,7 @@ namespace DurianNet.Controllers.appApi
         }
 
         //edit profile
-        [HttpPut("appUpdateUserByUsername/{username}")]
+        /*[HttpPut("appUpdateUserByUsername/{username}")]
         public async Task<IActionResult> appUpdateUserByUsername(string username, [FromBody] UpdateUserProfileRequestDto dto)
         {
             var user = await _userManager.Users.SingleOrDefaultAsync(u => u.UserName == username);
@@ -231,6 +231,72 @@ namespace DurianNet.Controllers.appApi
 
             await _userManager.UpdateAsync(user);
             return Ok("User profile updated successfully");
+        }*/
+
+        [HttpPut("appUpdateUserByUsername/{username}")]
+        public async Task<IActionResult> appUpdateUserByUsername(string username, [FromForm] UpdateUserProfileRequestDto dto)
+        {
+            var user = await _context.Users.SingleOrDefaultAsync(u => u.UserName == username);
+            if (user == null) return NotFound("User not found");
+
+            user.FullName = dto.FullName ?? user.FullName;
+            user.Email = dto.Email ?? user.Email;
+            user.PhoneNumber = dto.PhoneNumber ?? user.PhoneNumber;
+
+            // Handle profile picture upload
+            if (dto.ProfilePicture != null)
+            {
+                var uploadsFolder = Path.Combine("wwwroot", "images");
+                Directory.CreateDirectory(uploadsFolder);
+
+                var fileName = $"{Guid.NewGuid()}_{dto.ProfilePicture.FileName}";
+                var filePath = Path.Combine(uploadsFolder, fileName);
+
+                using (var stream = new FileStream(filePath, FileMode.Create))
+                {
+                    await dto.ProfilePicture.CopyToAsync(stream);
+                }
+
+                user.ProfilePicture = $"/images/{fileName}"; // Save relative path
+            }
+
+            _context.Users.Update(user);
+            await _context.SaveChangesAsync();
+
+            return Ok("User profile updated successfully");
         }
+
+
+        [HttpPut("appUpdateUserWithImage/{username}")]
+        public async Task<IActionResult> UpdateUserWithImage(string username, [FromForm] UpdateUserProfileRequestDto dto)
+        {
+            var user = await _userManager.Users.SingleOrDefaultAsync(u => u.UserName == username);
+            if (user == null)
+                return NotFound("User not found");
+
+            user.FullName = dto.FullName ?? user.FullName;
+            user.Email = dto.Email ?? user.Email;
+            user.PhoneNumber = dto.PhoneNumber ?? user.PhoneNumber;
+
+            if (dto.ProfilePicture != null)
+            {
+                var uploadsFolder = Path.Combine("wwwroot", "images");
+                Directory.CreateDirectory(uploadsFolder);
+
+                var fileName = $"{Guid.NewGuid()}_{dto.ProfilePicture.FileName}";
+                var filePath = Path.Combine(uploadsFolder, fileName);
+
+                using (var stream = new FileStream(filePath, FileMode.Create))
+                {
+                    await dto.ProfilePicture.CopyToAsync(stream);
+                }
+
+                user.ProfilePicture = $"/images/{fileName}";
+            }
+
+            await _userManager.UpdateAsync(user);
+            return Ok("Profile updated successfully");
+        }
+
     }
 }

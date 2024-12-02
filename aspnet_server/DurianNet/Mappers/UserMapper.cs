@@ -46,13 +46,14 @@ namespace DurianNet.Mappers
             };
         }
 
-        public static void UpdateUserFromDto(this User user, UpdateUserProfileRequestDto dto)
+        //admin no use
+        /*public static void UpdateUserFromDto(this User user, UpdateUserProfileRequestDto dto)
         {
             user.FullName = dto.FullName;
             user.Email = dto.Email;
             user.PhoneNumber = dto.PhoneNumber;
             user.ProfilePicture = dto.ProfilePicture;
-        }
+        }*/
 
         public static UserDetailsDto UserDetailsDto(this User user)
         {

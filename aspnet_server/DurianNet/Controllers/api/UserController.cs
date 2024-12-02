@@ -151,8 +151,9 @@ namespace DurianNet.Controllers.api
         //    return Ok(user.ToUserDetailsDto());
         //}
 
+        //admin no use
         //UpdateUserByUsername
-        [HttpPut("UpdateUser/{id}")]
+        /*[HttpPut("UpdateUser/{id}")]
         public async Task<IActionResult> UpdateUser(string id, [FromBody] UpdateUserProfileRequestDto dto)
         {
             var user = await _context.Users.FindAsync(id);
@@ -164,10 +165,10 @@ namespace DurianNet.Controllers.api
             user.UpdateUserFromDto(dto);
             await _context.SaveChangesAsync();
             return Ok(user.ToUserDetailsDto());
-        }
+        }*/
 
-        
-        [HttpPut("UpdateUserByUsername/{username?}")]
+        //admin no use
+        /*[HttpPut("UpdateUserByUsername/{username?}")]
         public async Task<IActionResult> UpdateUserByUsername(string? username, [FromBody] UpdateUserProfileRequestDto dto)
         {
             if (string.IsNullOrEmpty(username))
@@ -192,7 +193,7 @@ namespace DurianNet.Controllers.api
 
             await _context.SaveChangesAsync();
             return Ok(user.ToUserDetailsDto());
-        }
+        }*/
 
         [HttpPost("ForgotPassword")]
         public async Task<IActionResult> ForgotPassword([FromBody] ForgotPasswordRequestDto dto)
@@ -237,58 +238,6 @@ namespace DurianNet.Controllers.api
 
             return Ok($"Email in session: {email}");
         }
-
-
-
-
-
-        //[HttpPut("SaveFavoriteDurians/{userId}")]
-        //public async Task<IActionResult> SaveFavoriteDurians(string userId, [FromBody] FavoriteDurianRequestDto dto)
-        //{
-        //    var user = await _context.Users.Include(u => u.FavoriteDurian).FirstOrDefaultAsync(u => u.Id == userId);
-        //    if (user == null)
-        //    {
-        //        return NotFound("User not found");
-        //    }
-
-        //    // Validate the durian IDs
-        //    var durians = await _context.DurianProfiles.Where(dp => dto.DurianIds.Contains(dp.DurianId)).ToListAsync();
-        //    if (durians.Count != dto.DurianIds.Count)
-        //    {
-        //        return BadRequest("Some durian IDs are invalid.");
-        //    }
-
-        //    // Initialize or clear the FavoriteDurian collection
-        //    user.FavoriteDurian ??= new List<DurianProfile>();
-        //    user.FavoriteDurian.Clear();
-
-        //    // Add the new favorites
-        //    foreach (var durian in durians)
-        //    {
-        //        user.FavoriteDurian.Add(durian);
-        //    }
-
-        //    await _context.SaveChangesAsync();
-        //    return Ok("Favorite durians updated successfully");
-        //}
-
-
-
-        //[HttpPost("RegisterAdmin")]
-        //public async Task<IActionResult> RegisterAdmin([FromBody] RegisterRequestDto dto)
-        //{
-        //    var admin = dto.ToUserFromRegisterRequest();
-        //    admin.UserType = UserType.Admin;
-
-        //    // Hash the password
-        //    var passwordHasher = new PasswordHasher<User>();
-        //    admin.PasswordHash = passwordHasher.HashPassword(admin, dto.Password);
-
-        //    _context.Users.Add(admin);
-        //    await _context.SaveChangesAsync();
-
-        //    return Ok(admin.ToUserDetailsDto());
-        //}
 
         //user account
         [HttpPut("DeleteUser/{id}")]

@@ -21,6 +21,9 @@ import com.example.duriannet.databinding.FragmentEditProfileBinding
 import com.example.duriannet.presentation.account_management.view_models.EditProfileViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collect
+import okhttp3.MediaType.Companion.toMediaTypeOrNull
+import okhttp3.MultipartBody
+import okhttp3.RequestBody.Companion.asRequestBody
 import java.io.File
 
 @AndroidEntryPoint
@@ -66,7 +69,7 @@ class EditProfileFragment : Fragment() {
             selectImageLauncher.launch(intent)
         }
 
-        binding.btnEdtProfileSave.setOnClickListener {
+        /*binding.btnEdtProfileSave.setOnClickListener {
             val fullName = binding.edtProfileFullname.text.toString()
             val email = binding.edtProfileEmail.text.toString()
             val phoneNumber = binding.edtProfilePhoneNumber.text.toString()
@@ -104,7 +107,105 @@ class EditProfileFragment : Fragment() {
             }
 
             viewModel.updateProfile(username, fullName, email, phoneNumber, profileImagePath)
+        }*/
+
+        /*binding.btnEdtProfileSave.setOnClickListener {
+            val fullName = binding.edtProfileFullname.text.toString()
+            val email = binding.edtProfileEmail.text.toString()
+            val phoneNumber = binding.edtProfilePhoneNumber.text.toString()
+
+            // Validate all fields including profile picture
+            when {
+                fullName.isEmpty() -> {
+                    binding.edtProfileFullname.error = "Full name is required"
+                    return@setOnClickListener
+                }
+                email.isEmpty() -> {
+                    binding.edtProfileEmail.error = "Email is required"
+                    return@setOnClickListener
+                }
+                !android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches() -> {
+                    binding.edtProfileEmail.error = "Enter a valid email address"
+                    return@setOnClickListener
+                }
+                phoneNumber.isEmpty() -> {
+                    binding.edtProfilePhoneNumber.error = "Phone number is required"
+                    return@setOnClickListener
+                }
+                !phoneNumber.matches("^[0-9]{10}$".toRegex()) -> {
+                    binding.edtProfilePhoneNumber.error = "Enter a valid 10-digit phone number"
+                    return@setOnClickListener
+                }
+                profileImagePath.isNullOrEmpty() -> {
+                    Toast.makeText(context, "Profile picture is required", Toast.LENGTH_SHORT).show()
+                    return@setOnClickListener
+                }
+            }
+
+            // Prepare the file to send
+            val file = File(profileImagePath!!)
+            val requestFile = file.asRequestBody("image/jpeg".toMediaTypeOrNull())
+            val profilePicturePart = MultipartBody.Part.createFormData("profilePicture", file.name, requestFile)
+
+            viewModel.updateProfileWithImage(username, fullName, email, phoneNumber, profilePicturePart)
+        }*/
+
+        binding.btnEdtProfileSave.setOnClickListener {
+            val fullName = binding.edtProfileFullname.text.toString()
+            val email = binding.edtProfileEmail.text.toString()
+            val phoneNumber = binding.edtProfilePhoneNumber.text.toString()
+
+            // Validate all fields (excluding profile picture)
+            when {
+                fullName.isEmpty() -> {
+                    binding.edtProfileFullname.error = "Full name is required"
+                    return@setOnClickListener
+                }
+                email.isEmpty() -> {
+                    binding.edtProfileEmail.error = "Email is required"
+                    return@setOnClickListener
+                }
+                !android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches() -> {
+                    binding.edtProfileEmail.error = "Enter a valid email address"
+                    return@setOnClickListener
+                }
+                phoneNumber.isEmpty() -> {
+                    binding.edtProfilePhoneNumber.error = "Phone number is required"
+                    return@setOnClickListener
+                }
+                !phoneNumber.matches("^[0-9]{10}$".toRegex()) -> {
+                    binding.edtProfilePhoneNumber.error = "Enter a valid 10-digit phone number"
+                    return@setOnClickListener
+                }
+            }
+
+            // Determine if a new profile image is uploaded
+            if (profileImagePath.isNullOrEmpty()) {
+                // No new image, use the current profile picture from state
+                viewModel.updateProfile(
+                    username = username,
+                    fullName = fullName,
+                    email = email,
+                    phoneNumber = phoneNumber,
+                    profilePicture = viewModel.editProfileState.value.profilePicture // Use the current profile picture URL
+                )
+            } else {
+                // A new image is selected, upload it
+                val file = File(profileImagePath!!)
+                val requestFile = file.asRequestBody("image/jpeg".toMediaTypeOrNull())
+                val profilePicturePart = MultipartBody.Part.createFormData("profilePicture", file.name, requestFile)
+
+                viewModel.updateProfileWithImage(
+                    username = username,
+                    fullName = fullName,
+                    email = email,
+                    phoneNumber = phoneNumber,
+                    profilePicture = profilePicturePart
+                )
+            }
         }
+
+
 
         lifecycleScope.launchWhenStarted {
             viewModel.editProfileState.collect { state ->
@@ -124,6 +225,7 @@ class EditProfileFragment : Fragment() {
                             .load(profilePicturePath)
                             .placeholder(R.drawable.unknownuser) // Fallback if the image is loading
                             .error(R.drawable.unknownuser) // Fallback if there's an error
+                            .centerCrop()
                             .into(binding.ivProfile)
                     }
 
@@ -144,6 +246,19 @@ class EditProfileFragment : Fragment() {
         }
         return null
     }
+
+    private fun uploadProfileImage(username: String, imagePath: String) {
+        val file = File(imagePath)
+        val requestFile = file.asRequestBody("image/jpeg".toMediaTypeOrNull())
+        val multipartBody = MultipartBody.Part.createFormData("profilePicture", file.name, requestFile)
+
+        val fullName = binding.edtProfileFullname.text.toString()
+        val email = binding.edtProfileEmail.text.toString()
+        val phoneNumber = binding.edtProfilePhoneNumber.text.toString()
+
+        viewModel.updateProfileWithImage(username, fullName, email, phoneNumber, multipartBody)
+    }
+
 
     override fun onDestroyView() {
         super.onDestroyView()
