@@ -33,7 +33,7 @@ class DurianRepository @Inject constructor(private val durianApi: DurianApi) {
         }
     }
 
-    suspend fun getDurianDetails(id: Int): Result<DurianProfileResponseDto> {
+    /*suspend fun getDurianDetails(id: Int): Result<DurianProfileResponseDto> {
         return runCatching {
             val response = durianApi.getDurianProfileDetails(id)
             if (response.isSuccessful) {
@@ -41,6 +41,19 @@ class DurianRepository @Inject constructor(private val durianApi: DurianApi) {
             } else {
                 throw Exception("Failed to fetch durian details: ${response.message()}")
             }
+        }
+    }*/
+
+    suspend fun getDurianDetails(id: Int): Result<DurianProfileResponseDto> {
+        return try {
+            val response = durianApi.getDurianProfileDetails(id) // API call using Retrofit
+            if (response.isSuccessful && response.body() != null) {
+                Result.success(response.body()!!)
+            } else {
+                Result.failure(Exception("Failed to load durian details"))
+            }
+        } catch (e: Exception) {
+            Result.failure(e)
         }
     }
 
