@@ -1,8 +1,10 @@
 package com.example.duriannet.data.remote.api
 
 import com.example.duriannet.data.remote.dtos.request.durian.AddFavoriteDurianRequestDto
+import com.example.duriannet.data.remote.dtos.request.durian.ChatRequestDto
 import com.example.duriannet.data.remote.dtos.request.durian.RemoveFavoriteDurianRequestDto
 import com.example.duriannet.data.remote.dtos.response.*
+import okhttp3.ResponseBody
 import retrofit2.Response
 import retrofit2.http.*
 
@@ -34,4 +36,8 @@ interface DurianApi {
     // Get all durian profiles for the user (basic details)
     @GET("appApi/durian/appGetAllDurianProfilesForUser")
     suspend fun getAllDurianProfilesForUser(): Response<List<DurianProfileForUserResponseDto>>
+
+    @POST("appApi/chatbot/WithHistory")
+    @Streaming
+    suspend fun chatWithHistory(@Body chatRequest: ChatRequestDto): Response<ResponseBody>
 }

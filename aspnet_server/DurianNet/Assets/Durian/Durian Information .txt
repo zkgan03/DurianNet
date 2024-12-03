@@ -1,0 +1,81 @@
+Durian Information (name, description, characteristic, taste profile)
+
+Durian name: Musang King
+Durian description: Also known as "Mao Shan Wang," Musang King is one of the most popular durian varieties in Malaysia due to its strong, unique flavor.
+Characteristics: Bright yellow flesh, creamy and smooth texture, and small seeds. It has a strong aroma and thorny exterior.
+Taste profile: Rich, sweet, and slightly bitter with a creamy consistency.
+
+Durian name: D24 (Sultan)
+Durian description: Widely known as the "Sultan" durian, D24 is favored for its balanced flavor profile and affordability.
+Characteristics: Pale yellow flesh, smooth texture, and medium-sized seeds. Its spikes are moderately sharp.
+Taste profile: Mildly sweet with a slight bitterness, creamy but less intense than Musang King.
+
+Durian name: Red Prawn
+Durian description: Originating from Penang, Red Prawn durians are popular for their sweet taste and soft texture.
+Characteristics: Reddish-orange flesh, soft texture, and large seeds. The exterior has a rounder shape with softer thorns.
+Taste profile: Very sweet and creamy, often with a hint of floral notes.
+
+Durian name: XO
+Durian description: Named after its alcoholic aftertaste, the XO durian is loved for its deep flavor.
+Characteristics: Pale, almost greyish-yellow flesh, slightly watery texture, and pungent aroma. It has elongated seeds.
+Taste profile: Bitter with a subtle alcoholic aftertaste, creamy with a slight fermented flavor.
+
+Durian name: Black Thorn
+Durian description: A premium variety mainly found in Penang, known for its deep, complex flavors.
+Characteristics: Dark yellow-orange flesh, soft and sticky texture, and has a small thorn at the bottom of the fruit.
+Taste profile: Sweet, rich, and slightly bitter, with a smooth and custard-like texture.
+
+Durian name: Golden Phoenix
+Durian description: Known for its distinctive, light-colored flesh and strong aroma, Golden Phoenix is popular in Singapore and Malaysia.
+Characteristics: Pale yellow or whitish flesh, soft and smooth texture, with medium-sized seeds. The exterior is smaller with sharper thorns.
+Taste profile: Mildly sweet with a hint of bitterness, soft and creamy, often with a slight alcoholic taste.
+
+Durian name: Green Bamboo
+Durian description: This variety is famous in Thailand and Malaysia for its balanced flavor and less pungent aroma, appealing to newcomers.
+Characteristics: Light green, smooth skin, golden yellow flesh with a creamy and smooth texture. The seeds are relatively small.
+Taste profile: Sweet, mild bitterness with a subtle creaminess, suitable for people who prefer less intense flavors.
+
+Durian name: Kampung Durian
+Durian description: Known as "Village Durian," this variety is a mix of various local breeds in Malaysia. It is popular due to its natural, less commercialized flavor.
+Characteristics: Varies widely in color and texture, with medium to large seeds and a thorny exterior.
+Taste profile: Typically sweet with slight bitterness, though flavors can vary significantly depending on the specific breed.
+
+Durian name: Chanee
+Durian description: One of Thailand’s most popular varieties, Chanee is prized for its creamy texture and balanced taste.
+Characteristics: Yellow flesh, dense and soft texture, with relatively large seeds. Its shell is less thorny compared to other varieties.
+Taste profile: Sweet and slightly bitter, creamy with a smooth texture.
+
+Durian name: Ganja
+Durian description: A Thai variety, Ganja durians are well-loved for their complex and rich flavor profile.
+Characteristics: Light yellow flesh, creamy texture, with large seeds. The rind is moderately thorny and greenish.
+Taste profile: Sweet with a slight bitterness, intense and creamy, often compared to Musang King but with a unique taste.
+
+Durian name: Black Pearl
+Durian description: Named for its unusual, almost greyish-colored flesh, Black Pearl is a rare variety favored by enthusiasts.
+Characteristics: Greyish, pale flesh, soft and sticky texture, with small seeds. It has a round shape with a thick husk and less prominent thorns.
+Taste profile: Mildly sweet with a hint of bitterness, soft and custard-like, with a subtle aftertaste.
+
+Durian name: Hor Lor
+Durian description: Originating from Penang, Hor Lor is known for its smooth, sticky flesh and unique flavor profile.
+Characteristics: Golden-yellow flesh, sticky and creamy texture with medium-sized seeds. The shell is oval-shaped with sharp thorns.
+Taste profile: Sweet with a mild bitterness, creamy with a caramel-like flavor.
+
+Durian name: D101
+Durian description: A popular Malaysian variety, D101 is widely enjoyed for its sweet and creamy taste, appealing to a broad audience.
+Characteristics: Bright orange flesh, thick and smooth texture with large seeds. It has a rounder shell with moderate thorns.
+Taste profile: Very sweet, mild bitterness with a rich, creamy texture.
+
+Durian name: Tekka
+Durian description: Also known as “Bamboo Leg,” Tekka is a Malaysian durian known for its robust and unique flavor, preferred by durian aficionados.
+Characteristics: Light orange flesh, thick and dense texture with large seeds. The exterior is moderately thorny and greenish.
+Taste profile: Strong, bittersweet flavor with a nutty undertone, slightly less creamy than other varieties.
+
+Durian name: Kan Yao
+Durian description: Known as one of Thailand’s most expensive and sought-after durians, Kan Yao offers a unique flavor and texture experience.
+Characteristics: Golden-yellow flesh, thick and creamy texture with medium-sized seeds. Its rind is oblong, and the spikes are spaced further apart.
+Taste profile: Sweet, buttery with a subtle bitterness, exceptionally creamy and smooth.
+
+Durian name: Monthong
+Durian description: Also known as "Golden Pillow," Monthong is Thailand’s most famous durian, popular for its sweet, mild flavor.
+Characteristics: Pale yellow flesh, thick and slightly dry texture with large seeds. The rind is thick with blunt thorns.
+Taste profile: Very sweet with little bitterness, smooth and firm texture, less pungent than other varieties.

@@ -2,20 +2,17 @@ package com.example.duriannet.presentation.durian_dictionary.adapters
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import androidx.recyclerview.widget.DiffUtil
+import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.example.duriannet.databinding.ItemMessageReceivedBinding
 import com.example.duriannet.databinding.ItemMessageSentBinding
 import com.example.duriannet.models.Message
 
-class ChatbotAdapter(private val messages: List<Message>) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
-
-    companion object {
-        private const val VIEW_TYPE_SENT = 1
-        private const val VIEW_TYPE_RECEIVED = 2
-    }
+class ChatbotAdapter : ListAdapter<Message, RecyclerView.ViewHolder>(DiffCallback()) {
 
     override fun getItemViewType(position: Int): Int {
-        return if (messages[position].isSent) VIEW_TYPE_SENT else VIEW_TYPE_RECEIVED
+        return if (getItem(position).isSent) VIEW_TYPE_SENT else VIEW_TYPE_RECEIVED
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
@@ -29,15 +26,15 @@ class ChatbotAdapter(private val messages: List<Message>) : RecyclerView.Adapter
     }
 
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
-        val message = messages[position]
-        if (holder is SentMessageViewHolder) {
-            holder.bind(message)
-        } else if (holder is ReceivedMessageViewHolder) {
-            holder.bind(message)
-        }
+        val message = getItem(position)
+        if (holder is SentMessageViewHolder) holder.bind(message)
+        else if (holder is ReceivedMessageViewHolder) holder.bind(message)
     }
 
-    override fun getItemCount(): Int = messages.size
+    companion object {
+        private const val VIEW_TYPE_SENT = 1
+        private const val VIEW_TYPE_RECEIVED = 2
+    }
 
     class SentMessageViewHolder(private val binding: ItemMessageSentBinding) : RecyclerView.ViewHolder(binding.root) {
         fun bind(message: Message) {
@@ -48,6 +45,16 @@ class ChatbotAdapter(private val messages: List<Message>) : RecyclerView.Adapter
     class ReceivedMessageViewHolder(private val binding: ItemMessageReceivedBinding) : RecyclerView.ViewHolder(binding.root) {
         fun bind(message: Message) {
             binding.txtReceiveMessage.text = message.text
+        }
+    }
+
+    private class DiffCallback : DiffUtil.ItemCallback<Message>() {
+        override fun areItemsTheSame(oldItem: Message, newItem: Message): Boolean {
+            return oldItem.text == newItem.text && oldItem.isSent == newItem.isSent
+        }
+
+        override fun areContentsTheSame(oldItem: Message, newItem: Message): Boolean {
+            return oldItem == newItem
         }
     }
 }

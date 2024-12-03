@@ -5,6 +5,7 @@ import com.example.duriannet.data.remote.api.UserApi
 import com.example.duriannet.data.repository.account_management.UserRepository
 import com.example.duriannet.data.repository.comment.CommentRepository
 import com.example.duriannet.data.repository.comment.ICommentRepository
+import com.example.duriannet.data.repository.durian_dictionary.ChatbotRepository
 import com.example.duriannet.data.repository.durian_dictionary.DurianRepository
 import com.example.duriannet.data.repository.seller.ISellerRepository
 import com.example.duriannet.data.repository.seller.SellerRepository
@@ -46,4 +47,5 @@ abstract class RepositoryModule {
         @Provides
         fun provideDurianRepository(durianApi: DurianApi): DurianRepository = DurianRepository(durianApi)
     }
+
 }

@@ -2,6 +2,7 @@ using DurianNet.Data;
 using DurianNet.Exceptions;
 using DurianNet.Hubs;
 using DurianNet.Models.DataModels;
+using DurianNet.Services.Chatbot;
 using DurianNet.Services.CommentService;
 using DurianNet.Services.DetectionService;
 using DurianNet.Services.DetectionService.YOLO.v10;
@@ -67,6 +68,7 @@ builder.Services.AddScoped<IDurianVideoRepository, DurianVideoRepository>();
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<ITokenService, TokenService>();
 builder.Services.AddScoped<IFavoriteDurian, FavoriteDurianRepository>();
+builder.Services.AddScoped<IChatbotService, ChatbotService>();
 
 // Setup signalR
 builder.Services.AddSignalR(option =>
