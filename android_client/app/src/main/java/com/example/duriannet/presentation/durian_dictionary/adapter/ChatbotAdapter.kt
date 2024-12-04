@@ -1,7 +1,9 @@
 package com.example.duriannet.presentation.durian_dictionary.adapters
 
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
+import android.widget.TextView
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
@@ -43,8 +45,38 @@ class ChatbotAdapter : ListAdapter<Message, RecyclerView.ViewHolder>(DiffCallbac
     }
 
     class ReceivedMessageViewHolder(private val binding: ItemMessageReceivedBinding) : RecyclerView.ViewHolder(binding.root) {
+
         fun bind(message: Message) {
-            binding.txtReceiveMessage.text = message.text
+            if (message.isLoading) {
+                binding.txtReceiveMessage.visibility = View.GONE
+                binding.loadingContainer.visibility = View.VISIBLE
+
+                // Start dots animation
+                animateDots(binding.loadingDots)
+            } else {
+                binding.txtReceiveMessage.visibility = View.VISIBLE
+                binding.loadingContainer.visibility = View.GONE
+
+                val cleanText = message.text.replace("**", "") // Remove bold markers
+                val cleanText2 = cleanText.replace("*", "") // Remove italic markers
+                binding.txtReceiveMessage.text = cleanText2
+
+                //binding.txtReceiveMessage.text = message.text
+            }
+        }
+
+        private fun animateDots(textView: TextView) {
+            val dotsArray = arrayOf("", ".", "..", "...")
+            var index = 0
+
+            // Animate dots every 500ms
+            textView.postDelayed(object : Runnable {
+                override fun run() {
+                    textView.text = dotsArray[index]
+                    index = (index + 1) % dotsArray.size
+                    textView.postDelayed(this, 500)
+                }
+            }, 500)
         }
     }
 

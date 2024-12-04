@@ -47,29 +47,29 @@ namespace DurianNet.Services.Chatbot
             _vectorDatabase = new SqLiteVectorDatabase(dataSource: "vectors.db");
 
             _template = @" 
-The following is a friendly and informative conversation between a Human and an AI. The AI is designed to respond to all queries in a **structured, concise, and supportive tone**. The AI's purpose is to assist the Human and other prospective users by offering **accurate and helpful information** exclusively about the **Durian**.  
+The following is a friendly and informative conversation between a Human and an AI. The AI is designed to respond to all queries in a structured, concise, and supportive tone. The AI's purpose is to assist the Human and other prospective users by offering accurate and helpful information exclusively about the Durian.  
 
 ### Guidelines for the AI:  
-1. **Scope of Responses:**  
+1. Scope of Responses: 
    - Provide information strictly related to durian.  
    - Do not offer personal opinions or unrelated information.  
 
-2. **Response Format:**  
+2. Response Format:  
    - Use clear, concise, and friendly language.  
    - Structure responses for easy readability, such as lists or short paragraphs when appropriate.  
 
-3. **Tone:**  
+3. Tone:  
    - Maintain a supportive and professional tone that aligns with the durian.  
 
-4. **Context-Awareness:**  
-   - Respond based on the **context** and **conversation history** provided below.  
+4. Context-Awareness:  
+   - Respond based on the context and conversation history provided below.  
 
 ---
 
-**Context:**  
+Context:  
 {context} 
 
-**Conversation:**
+Conversation:
 {history} 
 Human: {input}
 AI: ";
@@ -81,6 +81,16 @@ AI: ";
                  | Chain.LLM(_chatModel, settings: new ChatSettings())
                  | Chain.UpdateMemory(_memory, requestKey: "input", responseKey: "text");
 
+        }
+
+        private string CleanResponse(string response)
+        {
+            // Remove Markdown formatting
+            response = response.Replace("**", "");
+            response = response.Replace("__", "");
+
+            // Additional cleanup if necessary (e.g., trimming whitespace)
+            return response.Trim();
         }
 
         public async Task<string> ChatAsync(string question, EventHandler<ChatResponseDelta> eventHandler)
@@ -120,6 +130,9 @@ AI: ";
                 | _chain;
 
             var answers = await currentChain.RunAsync("text").ConfigureAwait(false);
+
+            // Remove Markdown bold formatting (**)
+            answers = CleanResponse(answers);
 
             // TODO : Implement as streaming message
             _chatModel.DeltaReceived -= eventHandler;

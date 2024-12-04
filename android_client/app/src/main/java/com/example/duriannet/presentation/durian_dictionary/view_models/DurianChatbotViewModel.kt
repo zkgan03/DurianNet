@@ -22,52 +22,36 @@ class DurianChatbotViewModel @Inject constructor(
     private val _messages = MutableStateFlow<List<Message>>(emptyList())
     val messages = _messages.asStateFlow()
 
+    private fun cleanResponse(response: String): String {
+        return response.replace("**", "").trim()
+    }
+
     fun sendMessage(userMessage: String) {
         if (userMessage.isBlank()) return
 
         val currentMessages = _messages.value.toMutableList()
-        currentMessages.add(Message(userMessage, true)) // Add user message
+        currentMessages.add(Message(userMessage, true)) // Add user's message
+        currentMessages.add(Message("", isSent = false, isLoading = true)) // Add loading message
         _messages.value = currentMessages
 
-        val messageDtos = currentMessages.map {
+        // Prepare the message DTOs (excluding loading indicators)
+        val messageDtos = currentMessages.filterNot { it.isLoading }.map {
             ChatRequestDto.MessageDto(
                 role = if (it.isSent) "Human" else "AI",
                 content = it.text
             )
         }
 
+        // Collect the response from the repository
         viewModelScope.launch {
-            chatbotRepository.streamChat(messageDtos).collect { cleanedResponse ->
+            chatbotRepository.streamChat(messageDtos).collect { rawResponse ->
+                val cleanedResponse = cleanResponse(rawResponse) // Sanitize the response
                 val updatedMessages = _messages.value.toMutableList()
-                updatedMessages.add(Message(cleanedResponse, false)) // Add combined response
+                updatedMessages.removeLast() // Remove the loading message
+                updatedMessages.add(Message(cleanedResponse, isSent = false)) // Add the cleaned response
                 _messages.value = updatedMessages
             }
         }
     }
-
-
-
-    /*fun sendMessage(userMessage: String) {
-        if (userMessage.isBlank()) return
-
-        val currentMessages = _messages.value.toMutableList()
-        currentMessages.add(Message(userMessage, true))
-        _messages.value = currentMessages
-
-        val messageDtos = currentMessages.map {
-            ChatRequestDto.MessageDto(
-                role = if (it.isSent) "Human" else "AI",
-                content = it.text
-            )
-        }
-
-        viewModelScope.launch {
-            chatbotRepository.streamChat(messageDtos).collect { response ->
-                val updatedMessages = _messages.value.toMutableList()
-                updatedMessages.add(Message(response, false))
-                _messages.value = updatedMessages
-            }
-        }
-    }*/
 }
 

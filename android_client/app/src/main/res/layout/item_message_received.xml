@@ -23,9 +23,53 @@
             android:layout_marginEnd="10dp"
             android:layout_marginBottom="10dp"
             android:padding="5dp"
-            android:textColor="@android:color/black"
+            android:textColor="@color/background_white"
             android:textSize="18sp"
             tools:text="This is a receive message" />
+
+        <!-- One moment text -->
+        <TextView
+            android:id="@+id/txt_loading_message"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="10dp"
+            android:layout_marginTop="10dp"
+            android:layout_marginBottom="10dp"
+            android:text="One moment"
+            android:textColor="@android:color/white"
+            android:textSize="16sp"
+            android:visibility="gone" />
+
+        <!-- Loading dots -->
+        <RelativeLayout
+            android:id="@+id/loading_container"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:layout_marginStart="10dp"
+            android:layout_marginBottom="10dp"
+            android:visibility="gone">
+
+            <TextView
+                android:id="@+id/txt_loading_message2"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="One moment"
+                android:textColor="@android:color/white"
+                android:textSize="16sp" />
+
+            <!-- Loading dots beside the "One moment" text -->
+            <TextView
+                android:id="@+id/loading_dots"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_toEndOf="@id/txt_loading_message2"
+                android:layout_marginStart="4dp"
+                android:paddingEnd="10dp"
+                android:textSize="18sp"
+                android:textColor="@android:color/darker_gray"
+                tools:text="..." />
+        </RelativeLayout>
 
     </RelativeLayout>
 
