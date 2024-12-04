@@ -2,7 +2,6 @@
 using DurianNet.Dtos.Request.User;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using DurianNet.Helpers;
 
 namespace DurianNet.Services.UserService
 {

@@ -38,7 +38,7 @@ namespace DurianNet.Services.SellerService
 
             //decode the seller image and save into wwwroot/images
             var wwwrootPath = _environment.WebRootPath;
-            var imagePath = Path.Combine(wwwrootPath, "images", $"{Guid.NewGuid()}.jpg");
+            var imagePath = Path.Combine(wwwrootPath, "detected_durian_imgs", $"{Guid.NewGuid()}.jpg");
             ImageUtils.SaveImage(seller.Image, imagePath);
 
             //save relative path to database

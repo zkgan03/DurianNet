@@ -1,4 +1,4 @@
-﻿using DurianNet.Dtos;
+﻿using DurianNet.Dtos.Request.Chat;
 using LangChain.Providers;
 
 namespace DurianNet.Services.Chatbot

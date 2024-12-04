@@ -1,5 +1,4 @@
-﻿using DurianNet.Dtos;
-using System.Text;
+﻿using System.Text;
 using LangChain.Chains;
 using LangChain.Chains.HelperChains;
 using LangChain.Databases;
@@ -10,6 +9,7 @@ using LangChain.Providers;
 using LangChain.Providers.Ollama;
 using Ollama;
 using DurianNet.Utils;
+using DurianNet.Dtos.Request.Chat;
 
 namespace DurianNet.Services.Chatbot
 {

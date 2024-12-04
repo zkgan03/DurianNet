@@ -4,7 +4,6 @@ using DurianNet.Dtos.Request.DurianProfile;
 using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using DurianNet.Helpers;
 
 namespace DurianNet.Services.DurianProfileService
 {
@@ -17,7 +16,7 @@ namespace DurianNet.Services.DurianProfileService
             _context = context;
         }
 
-        public async Task<List<DurianProfile>> GetAllDurianProfilesAsync(DurianQueryObject query)
+        public async Task<List<DurianProfile>> GetAllDurianProfilesAsync(DurianQueryRequestDto query)
         {
             var durianProfilesQuery = _context.DurianProfiles.AsQueryable();
 

@@ -2,13 +2,12 @@
 using DurianNet.Dtos.Request.DurianProfile;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using DurianNet.Helpers;
 
 namespace DurianNet.Services.DurianProfileService
 {
     public interface IDurianProfileRepository
     {
-        Task<List<DurianProfile>> GetAllDurianProfilesAsync(DurianQueryObject query);
+        Task<List<DurianProfile>> GetAllDurianProfilesAsync(DurianQueryRequestDto query);
         Task<DurianProfile?> GetDurianProfileByIdAsync(int id);
         Task<DurianProfile?> GetBySymbolAsync(string symbol);
         Task<DurianProfile> AddDurianProfileAsync(AddDurianProfileRequestDto dto);

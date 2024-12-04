@@ -60,6 +60,7 @@ namespace DurianNet.Data
         new()
         {
             DurianName = DurianType.MusangKing,
+            DurianCode = "D197",
             DurianDescription = "Musang King is known for its rich flavor and creamy texture.",
             Characteristics = "Golden yellow flesh, small seeds, strong aroma",
             TasteProfile = "Sweet, slightly bitter, creamy",
@@ -69,6 +70,7 @@ namespace DurianNet.Data
         new()
         {
             DurianName = DurianType.D24,
+            DurianCode = "D24",
             DurianDescription = "D24 is popular for its balanced taste and smooth texture.",
             Characteristics = "Pale yellow flesh, medium seeds, mild aroma",
             TasteProfile = "Sweet, slightly bitter, smooth",
@@ -78,6 +80,7 @@ namespace DurianNet.Data
         new()
         {
             DurianName = DurianType.RedPrawn,
+            DurianCode = "D101",
             DurianDescription = "Red Prawn is famous for its reddish flesh and unique taste.",
             Characteristics = "Reddish flesh, small seeds, strong aroma",
             TasteProfile = "Sweet, slightly alcoholic, creamy",
@@ -87,6 +90,7 @@ namespace DurianNet.Data
         new()
         {
             DurianName = DurianType.BlackThorn,
+            DurianCode = "D200",
             DurianDescription = "Black Thorn is prized for its rich and complex flavor.",
             Characteristics = "Dark yellow flesh, small seeds, strong aroma",
             TasteProfile = "Sweet, slightly bitter, rich",

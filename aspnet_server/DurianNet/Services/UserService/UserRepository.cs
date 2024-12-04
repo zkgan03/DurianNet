@@ -4,7 +4,6 @@ using DurianNet.Dtos.Request.User;
 using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using DurianNet.Helpers;
 
 namespace DurianNet.Services.UserService
 {

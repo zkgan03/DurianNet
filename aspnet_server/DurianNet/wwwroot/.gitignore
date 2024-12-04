@@ -1,9 +1,6 @@
 # Ignore all images in wwwroot
-images/*.jpg
-images/*.png
-images/*.jpeg
-images/*.gif
-images/*.bmp
-
-# Exception for image_1.jpg
-!images/image_1.jpg
+detected_durian_imgs/*.jpg
+detected_durian_imgs/*.png
+detected_durian_imgs/*.jpeg
+detected_durian_imgs/*.gif
+detected_durian_imgs/*.bmp
