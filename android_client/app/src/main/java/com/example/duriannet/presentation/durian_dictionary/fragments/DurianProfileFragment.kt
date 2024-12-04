@@ -1,60 +1,87 @@
 package com.example.duriannet.presentation.durian_dictionary.fragments
 
 import android.os.Bundle
-import androidx.fragment.app.Fragment
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import com.example.duriannet.R
+import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
+import androidx.lifecycle.lifecycleScope
+import androidx.navigation.fragment.findNavController
+import androidx.recyclerview.widget.LinearLayoutManager
+import com.example.duriannet.databinding.FragmentDurianProfileBinding
+import com.example.duriannet.presentation.durian_dictionary.adapter.DurianProfileAdapter
+import com.example.duriannet.presentation.durian_dictionary.view_models.DurianProfileViewModel
+import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.launch
 
-// TODO: Rename parameter arguments, choose names that match
-// the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-private const val ARG_PARAM1 = "param1"
-private const val ARG_PARAM2 = "param2"
-
-/**
- * A simple [Fragment] subclass.
- * Use the [DurianProfileFragment.newInstance] factory method to
- * create an instance of this fragment.
- */
+@AndroidEntryPoint
 class DurianProfileFragment : Fragment() {
-    // TODO: Rename and change types of parameters
-    private var param1: String? = null
-    private var param2: String? = null
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        arguments?.let {
-            param1 = it.getString(ARG_PARAM1)
-            param2 = it.getString(ARG_PARAM2)
-        }
-    }
+    private var _binding: FragmentDurianProfileBinding? = null
+    private val binding get() = _binding!!
+    private val viewModel: DurianProfileViewModel by viewModels()
+
+    private lateinit var adapter: DurianProfileAdapter
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
-        // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_durian_profile, container, false)
+    ): View {
+        _binding = FragmentDurianProfileBinding.inflate(inflater, container, false)
+        return binding.root
     }
 
-    companion object {
-        /**
-         * Use this factory method to create a new instance of
-         * this fragment using the provided parameters.
-         *
-         * @param param1 Parameter 1.
-         * @param param2 Parameter 2.
-         * @return A new instance of fragment DurianProfileFragment.
-         */
-        // TODO: Rename and change types and number of parameters
-        @JvmStatic
-        fun newInstance(param1: String, param2: String) =
-            DurianProfileFragment().apply {
-                arguments = Bundle().apply {
-                    putString(ARG_PARAM1, param1)
-                    putString(ARG_PARAM2, param2)
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+
+        adapter = DurianProfileAdapter { durian ->
+            val action = DurianProfileFragmentDirections.actionDurianProfileToDetails(durian.durianId)
+            findNavController().navigate(action)
+        }
+
+        binding.rvDurianProfile.layoutManager = LinearLayoutManager(requireContext())
+        binding.rvDurianProfile.adapter = adapter
+
+        viewModel.loadAllDurians()
+
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewModel.durianProfileState.collect { state ->
+                if (state.error.isNotEmpty()) {
+                    Log.e("DurianProfileFragment", "Error: ${state.error}")
+                } else {
+                    Log.d("DurianProfileFragment", "Durians loaded: ${state.filteredDurians.size}")
+                    if (state.filteredDurians.isEmpty()) {
+                        //binding.emptyStateView.visibility = View.VISIBLE
+                        binding.rvDurianProfile.visibility = View.GONE
+                    } else {
+                        //binding.emptyStateView.visibility = View.GONE
+                        binding.rvDurianProfile.visibility = View.VISIBLE
+                        adapter.submitList(state.filteredDurians)
+                    }
                 }
             }
+        }
+
+
+        binding.svDurianProfile.setOnQueryTextListener(object : android.widget.SearchView.OnQueryTextListener {
+            override fun onQueryTextSubmit(query: String?): Boolean {
+                viewModel.filterDurians(query.orEmpty())
+                return true
+            }
+
+            override fun onQueryTextChange(newText: String?): Boolean {
+                viewModel.filterDurians(newText.orEmpty())
+                return true
+            }
+        })
+
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
     }
 }

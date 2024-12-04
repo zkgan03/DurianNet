@@ -1,14 +1,27 @@
 using DurianNet.Data;
 using DurianNet.Exceptions;
 using DurianNet.Hubs;
+using DurianNet.Models.DataModels;
+using DurianNet.Services.Chatbot;
 using DurianNet.Services.CommentService;
 using DurianNet.Services.DetectionService;
 using DurianNet.Services.DetectionService.YOLO.v10;
+using DurianNet.Services.DurianVideoService;
+using DurianNet.Services.FavoriteDurianService;
 using DurianNet.Services.DetectionService.YOLO.v8;
 using DurianNet.Services.SellerService;
+using DurianNet.Services.TokenService;
+using DurianNet.Services.UserService;
+using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Diagnostics;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
+using Microsoft.OpenApi.Models;
 using System.Net;
+using System.Text;
 using System.Text.Json;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -19,11 +32,44 @@ builder.Services.AddControllersWithViews();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
+builder.Services.AddSwaggerGen(option =>
+{
+    option.SwaggerDoc("v1", new OpenApiInfo { Title = "Demo API", Version = "v1" });
+    option.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+    {
+        In = ParameterLocation.Header,
+        Description = "Please enter a valid token",
+        Name = "Authorization",
+        Type = SecuritySchemeType.Http,
+        BearerFormat = "JWT",
+        Scheme = "Bearer"
+    });
+    option.AddSecurityRequirement(new OpenApiSecurityRequirement
+    {
+        {
+            new OpenApiSecurityScheme
+            {
+                Reference = new OpenApiReference
+                {
+                    Type=ReferenceType.SecurityScheme,
+                    Id="Bearer"
+                }
+            },
+            new string[]{}
+        }
+    });
+});
+
 //Setup dependencies
 builder.Services.AddSingleton<IDetector, YoloV8Detector>();
 builder.Services.AddScoped<ISellerService, SellerService>();
 builder.Services.AddScoped<ICommentService, CommentService>();
-
+builder.Services.AddScoped<DurianNet.Services.DurianProfileService.IDurianProfileRepository, DurianNet.Services.DurianProfileService.DurianProfileRepository>();
+builder.Services.AddScoped<IDurianVideoRepository, DurianVideoRepository>();
+builder.Services.AddScoped<IUserRepository, UserRepository>();
+builder.Services.AddScoped<ITokenService, TokenService>();
+builder.Services.AddScoped<IFavoriteDurian, FavoriteDurianRepository>();
+builder.Services.AddScoped<IChatbotService, ChatbotService>();
 
 // Setup signalR
 builder.Services.AddSignalR(option =>
@@ -40,6 +86,125 @@ builder.Services.AddDbContext<ApplicationDBContext>(options =>
 {
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
 });
+
+builder.Services.AddIdentity<User, IdentityRole>(options =>
+{
+    options.Password.RequireDigit = true;
+    options.Password.RequireLowercase = true;
+    options.Password.RequireUppercase = true;
+    options.Password.RequireNonAlphanumeric = true;
+    options.Password.RequiredLength = 12;
+})
+.AddEntityFrameworkStores<ApplicationDBContext>()
+.AddDefaultTokenProviders();
+
+builder.Services.AddAuthorization(options =>
+{
+
+    options.DefaultPolicy = new AuthorizationPolicyBuilder(JwtBearerDefaults.AuthenticationScheme)
+    .RequireAuthenticatedUser()
+    .Build();
+
+    options.AddPolicy("AdminPolicy", policy =>
+    {
+        policy.AddAuthenticationSchemes(CookieAuthenticationDefaults.AuthenticationScheme);
+        policy.RequireAuthenticatedUser();
+        //policy.RequireRole("Admin");
+    });
+});
+
+
+//builder.Services.AddAuthentication(options =>
+//{
+//    options.DefaultAuthenticateScheme =
+//    options.DefaultChallengeScheme =
+//    options.DefaultForbidScheme =
+//    options.DefaultScheme =
+//    options.DefaultSignInScheme =
+//    options.DefaultSignOutScheme = JwtBearerDefaults.AuthenticationScheme;
+//}).AddJwtBearer(options =>
+//{
+//    options.TokenValidationParameters = new TokenValidationParameters
+//    {
+//        ValidateIssuer = true,
+//        ValidIssuer = builder.Configuration["JWT:Issuer"],
+//        ValidateAudience = true,
+//        ValidAudience = builder.Configuration["JWT:Audience"],
+//        ValidateIssuerSigningKey = true,
+//        IssuerSigningKey = new SymmetricSecurityKey(
+//            System.Text.Encoding.UTF8.GetBytes(builder.Configuration["JWT:SigningKey"])
+//        )
+//    };
+//});
+
+//builder.Services.AddAuthentication(options =>
+//{
+//    options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
+//    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+//    options.DefaultSignInScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+//}).AddCookie(CookieAuthenticationDefaults.AuthenticationScheme)
+//  .AddJwtBearer(JwtBearerDefaults.AuthenticationScheme, options =>
+//  {
+//      options.TokenValidationParameters = new TokenValidationParameters
+//      {
+//          ValidateIssuer = true,
+//          ValidIssuer = builder.Configuration["JWT:Issuer"],
+//          ValidateAudience = true,
+//          ValidAudience = builder.Configuration["JWT:Audience"],
+//          ValidateIssuerSigningKey = true,
+//          IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["JWT:SigningKey"]))
+//      };
+//  });
+
+//builder.Services.AddAuthentication(options =>
+//{
+//    options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
+//    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+//})
+//.AddCookie(CookieAuthenticationDefaults.AuthenticationScheme)
+//.AddJwtBearer(JwtBearerDefaults.AuthenticationScheme, options =>
+//{
+//    options.TokenValidationParameters = new TokenValidationParameters
+//    {
+//        ValidateIssuer = true,
+//        ValidIssuer = builder.Configuration["JWT:Issuer"],
+//        ValidateAudience = true,
+//        ValidAudience = builder.Configuration["JWT:Audience"],
+//        ValidateIssuerSigningKey = true,
+//        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["JWT:SigningKey"]))
+//    };
+//});
+
+builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+    .AddCookie(CookieAuthenticationDefaults.AuthenticationScheme, options =>
+    {
+        options.LoginPath = "/Account/LoginPage";
+    }).AddJwtBearer(options =>
+    {
+        options.TokenValidationParameters = new TokenValidationParameters
+        {
+            ValidateIssuer = true,
+            ValidIssuer = builder.Configuration["JWT:Issuer"],
+            ValidateAudience = true,
+            ValidAudience = builder.Configuration["JWT:Audience"],
+            ValidateIssuerSigningKey = true,
+            IssuerSigningKey = new SymmetricSecurityKey(
+                Encoding.UTF8.GetBytes(builder.Configuration["JWT:SigningKey"])
+            )
+        };
+    });
+
+
+// Enable session services
+builder.Services.AddDistributedMemoryCache();
+builder.Services.AddSession(options =>
+{
+    options.Cookie.Name = ".DurianNet.Session";
+    options.IdleTimeout = TimeSpan.FromMinutes(30); // Session timeout
+    options.Cookie.HttpOnly = true; // Ensures session cookie is accessible only via HTTP
+    options.Cookie.IsEssential = true; // Mark the session cookie as essential
+});
+
 
 var app = builder.Build();
 
@@ -81,13 +246,18 @@ app.UseWhen(context => context.Request.Path.StartsWithSegments("/api"), subApp =
 app.UseHttpsRedirection();
 app.UseStaticFiles();
 
+// Enable session middleware
+app.UseSession();
+
 app.UseRouting();
 
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllerRoute(
     name: "default",
-    pattern: "{controller=Home}/{action=Index}/{id?}");
+    pattern: "{controller=Home}/{action=RedirectToLoginPage}/{id?}");
+
 
 app.MapHub<ObjectDetectionHub>("/DetectionHub");
 

@@ -4,43 +4,149 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>@ViewData["Title"] - DurianNet</title>
+    <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/DurianNet.styles.css" asp-append-version="true" />
+    <style>
+        header {
+            background-color: #12796F; /* Header background color */
+            color: white; /* Header text color */
+            position: fixed; /* Fix header at the top */
+            top: 0; /* Align to the top */
+            width: 100%; /* Make header span the full width */
+            z-index: 1000; /* Ensure header stays above other elements */
+            height: 56px; /* Define header height */
+        }
+
+        .navbar .navbar-brand,
+        .navbar .nav-link {
+            color: white !important; /* Ensure header links are white */
+        }
+
+        body {
+            margin: 0; /* Remove any default body margin */
+        }
+
+        .content-wrapper {
+            margin-top: 56px; /* Add space equal to the header's height */
+        }
+
+        .sidebar {
+            height: calc(100vh - 56px); /* Full height minus the header height */
+            position: sticky; /* Keeps the sidebar in view while scrolling */
+            top: 56px; /* Offset to account for header height */
+            background-color: #262626; /* Sidebar background color */
+            color: white; /* Sidebar text color */
+        }
+
+            .sidebar .nav-item {
+                border-bottom: 1px solid #ddd; /* Bottom border for each item */
+                padding: 0.5rem; /* Add padding for spacing */
+            }
+
+            .sidebar .nav-link {
+                color: white; /* Sidebar link text color */
+            }
+
+                .sidebar .nav-link:hover {
+                    background-color: #333333; /* Hover background color */
+                    color: white; /* Ensure text remains white on hover */
+                }
+    </style>
 </head>
 <body>
     <header>
-        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
+        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light border-bottom box-shadow">
             <div class="container-fluid">
-                <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">DurianNet</a>
+                <a class="navbar-brand" asp-area="" asp-controller="adminprofile" asp-action="ProfilePage">DurianNet</a>
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
                         aria-expanded="false" aria-label="Toggle navigation">
                     <span class="navbar-toggler-icon"></span>
                 </button>
-                <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
-                    <ul class="navbar-nav flex-grow-1">
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
-                        </li>
-                    </ul>
+                <div class="navbar-collapse d-sm-inline-flex justify-content-between collapse">
+                    <!-- Header navigation links are removed -->
                 </div>
             </div>
         </nav>
     </header>
-    <div class="container">
-        <main role="main" class="pb-3">
-            @RenderBody()
-        </main>
-    </div>
 
-    <footer class="border-top footer text-muted">
-        <div class="container">
-            &copy; 2024 - DurianNet - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
+    <div class="container-fluid content-wrapper">
+        <div class="row">
+            <!-- Left Navigation Bar -->
+            <nav class="col-md-2 d-none d-md-block sidebar">
+                <div class="position-sticky">
+                    <ul class="nav flex-column">
+                        <li class="nav-item">
+                            <a class="nav-link" asp-controller="durianprofile" asp-action="DurianProfilePage">Durian Profile</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" asp-controller="useraccount" asp-action="UserAccountPage">User Account</a>
+                        </li>
+                        @* @if (ViewData["IsSuperAdmin"] != null && (bool)ViewData["IsSuperAdmin"])
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link" asp-controller="account" asp-action="Registration">Registration</a>
+                            </li>
+                        } *@
+                        @{
+                            var username = ViewContext.HttpContext.Session.GetString("Username");
+                            if (username == "superadmin") // Replace "superadmin" with your actual username for SuperAdmin
+                            {
+                                <li class="nav-item">
+                                    <a class="nav-link" asp-controller="account" asp-action="Registration">Registration</a>
+                                </li>
+                            }
+                        }
+
+                        <li class="nav-item">
+                            <a class="nav-link" asp-controller="adminprofile" asp-action="ProfilePage">My Profile</a>
+                        </li>
+                        @* <li class="nav-item">
+                            <a class="nav-link" href="javascript:void(0);" onclick="logout()">Logout</a>
+                        </li> *@
+                        <li class="nav-item">
+                            <a class="nav-link" href="javascript:void(0);" onclick="confirmLogout()">Logout</a>
+                        </li>
+
+                    </ul>
+                </div>
+            </nav>
+
+            <!-- Main Content Area -->
+            <main role="main" class="col-md-10 ms-sm-auto px-4">
+                @RenderBody()
+            </main>
         </div>
-    </footer>
+    </div>
+    <script>
+        function confirmLogout() {
+            if (confirm("Are you sure you want to logout?")) {
+                logout();
+            }
+        }
+
+        async function logout() {
+            try {
+                const response = await fetch('/api/account/logout', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' }
+                });
+
+                if (response.ok) {
+                    alert("You have successfully logged out.");
+                    window.location.href = '/Account/LoginPage'; // Redirect to Login page
+                } else {
+                    const error = await response.json();
+                    alert(`Failed to logout: ${error.message || "Unknown error"}`);
+                }
+            } catch (error) {
+                alert("An error occurred while logging out. Please try again.");
+            }
+        }
+
+    </script>
+
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>

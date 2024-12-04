@@ -1,0 +1,137 @@
+﻿@{
+    ViewData["Title"] = "Edit Profile";
+}
+<div class="w-full">
+    <div class="bg-white p-8">
+        <h1 class="text-black mb-6 text-3xl font-bold">Edit Profile</h1>
+
+        <!-- Profile Picture -->
+        <div class="mb-4">
+            <img id="profilePicturePreview" src="@ViewData["ProfilePicture"]" alt="Profile Picture"
+                 class="w-40 h-40 border-gray-300 cursor-pointer rounded-full border object-cover"
+                 onclick="document.getElementById('profilePictureInput').click();" />
+            <input type="file" id="profilePictureInput" name="profilePicture" class="hidden" accept="image/*" />
+            <p class="mt-2 text-gray-600 text-left text-sm">Click the profile picture to change your profile picture.</p>
+        </div>
+
+        <!-- Form -->
+        <form id="editProfileForm" method="post" action="javascript:void(0);" enctype="multipart/form-data">
+            <div class="space-y-6 w-2/5">
+                <!-- Fullname Field -->
+                <div>
+                    <label for="fullname" class="text-black block text-lg font-bold">Fullname</label>
+                    <input type="text" id="fullname" name="fullname"
+                           class="mt-2 px-3 py-2 border-gray-300 w-full rounded-md border text-lg focus:outline-none focus:ring-2 focus:ring-[#12796F]"
+                           value="@ViewData["Fullname"]" required />
+                </div>
+
+                <!-- Email Field -->
+                <div>
+                    <label for="email" class="text-black block text-lg font-bold">Email</label>
+                    <input type="email" id="email" name="email"
+                           class="mt-2 px-3 py-2 border-gray-300 w-full rounded-md border text-lg focus:outline-none focus:ring-2 focus:ring-[#12796F]"
+                           value="@ViewData["Email"]" required />
+                </div>
+
+                <!-- Phone Number Field -->
+                <div>
+                    <label for="phone" class="text-black block text-lg font-bold">Phone Number</label>
+                    <input type="text" id="phone" name="phone"
+                           class="mt-2 px-3 py-2 border-gray-300 w-full rounded-md border text-lg focus:outline-none focus:ring-2 focus:ring-[#12796F]"
+                           value="@ViewData["PhoneNumber"]" required />
+                </div>
+            </div>
+
+            <!-- Save Button -->
+            <div class="mt-20 w-2/5">
+                <button type="button" onclick="submitEditProfileForm()"
+                        class="py-2 px-6 text-white w-full rounded-md bg-[#12796F] font-bold transition hover:bg-[#0f5d57]">
+                    Save
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+    // Load profile data from backend
+    async function loadProfile() {
+        try {
+            const response = await fetch('/api/User/GetUserByUsername');
+            if (!response.ok) throw new Error("Failed to fetch profile.");
+
+            const data = await response.json();
+            document.getElementById('fullname').value = data.fullName || '';
+            document.getElementById('email').value = data.email || '';
+            document.getElementById('phone').value = data.phoneNumber || '';
+            document.getElementById('profilePicturePreview').src = data.profilePicture || '';
+        } catch (error) {
+            alert("Failed to load profile. Please try again.");
+        }
+    }
+
+    // Convert file to Base64
+    function toBase64(file) {
+        return new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.readAsDataURL(file);
+            reader.onload = () => resolve(reader.result);
+            reader.onerror = reject;
+        });
+    }
+
+    // Submit the form
+    async function submitEditProfileForm() {
+        const fullname = document.getElementById('fullname').value.trim();
+        const email = document.getElementById('email').value.trim();
+        const phone = document.getElementById('phone').value.trim();
+        const profilePicture = document.getElementById('profilePictureInput').files[0];
+        
+        const existingProfilePicture = document.getElementById('profilePicturePreview').src;
+
+        if (!fullname || !email || !phone) {
+            alert("All fields are required.");
+            return;
+        }
+
+        // let profilePictureBase64 = null;
+        // if (profilePicture) {
+        //     profilePictureBase64 = await toBase64(profilePicture);
+        // }
+
+        let profilePictureBase64 = null;
+        if (profilePicture) {
+            profilePictureBase64 = await toBase64(profilePicture);
+        }else{
+            profilePictureBase64 = existingProfilePicture;
+        }
+
+        const payload = {
+            fullName: fullname,
+            email: email,
+            phoneNumber: phone,
+            profilePicture: profilePictureBase64,
+        };
+
+        try {
+            const response = await fetch('/api/User/UpdateUserByUsername', {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload),
+            });
+
+            if (!response.ok) throw new Error("Failed to update profile.");
+            alert("Profile updated successfully!");
+            window.location.reload();
+        } catch (error) {
+            alert("An error occurred. Please try again.");
+        }
+    }
+
+
+    // Initialize
+    document.addEventListener('DOMContentLoaded', loadProfile);
+</script>
+
+
+

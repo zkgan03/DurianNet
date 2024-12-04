@@ -65,6 +65,10 @@ namespace DurianNet.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("DurianCode")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("DurianDescription")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -88,7 +92,7 @@ namespace DurianNet.Migrations
 
                     b.HasIndex("DurianVideoId");
 
-                    b.ToTable("DurianProfiles");
+                    b.ToTable("DurianProfile");
                 });
 
             modelBuilder.Entity("DurianNet.Models.DataModels.DurianVideo", b =>
@@ -110,6 +114,50 @@ namespace DurianNet.Migrations
                     b.HasKey("VideoId");
 
                     b.ToTable("DurianVideos");
+                });
+
+            modelBuilder.Entity("DurianNet.Models.DataModels.FavoriteDurian", b =>
+                {
+                    b.Property<string>("UserId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<int>("DurianId")
+                        .HasColumnType("int");
+
+                    b.HasKey("UserId", "DurianId");
+
+                    b.HasIndex("DurianId");
+
+                    b.ToTable("FavoriteDurian");
+                });
+
+            modelBuilder.Entity("DurianNet.Models.DataModels.RefreshToken", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("Expiration")
+                        .HasColumnType("datetime2");
+
+                    b.Property<bool>("IsRevoked")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("Token")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("RefreshTokens");
                 });
 
             modelBuilder.Entity("DurianNet.Models.DataModels.Seller", b =>
@@ -171,6 +219,10 @@ namespace DurianNet.Migrations
                     b.Property<bool>("EmailConfirmed")
                         .HasColumnType("bit");
 
+                    b.Property<string>("FullName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<bool>("LockoutEnabled")
                         .HasColumnType("bit");
 
@@ -185,7 +237,16 @@ namespace DurianNet.Migrations
                         .HasMaxLength(256)
                         .HasColumnType("nvarchar(256)");
 
+                    b.Property<string>("OTP")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("OTPExpiry")
+                        .HasColumnType("datetime2");
+
                     b.Property<string>("PasswordHash")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("PasswordResetToken")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("PhoneNumber")
@@ -198,6 +259,9 @@ namespace DurianNet.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<DateTime?>("ResetTokenExpires")
+                        .HasColumnType("datetime2");
+
                     b.Property<string>("SecurityStamp")
                         .HasColumnType("nvarchar(max)");
 
@@ -207,6 +271,12 @@ namespace DurianNet.Migrations
                     b.Property<string>("UserName")
                         .HasMaxLength(256)
                         .HasColumnType("nvarchar(256)");
+
+                    b.Property<int>("UserStatus")
+                        .HasColumnType("int");
+
+                    b.Property<int>("UserType")
+                        .HasColumnType("int");
 
                     b.HasKey("Id");
 
@@ -276,6 +346,20 @@ namespace DurianNet.Migrations
                         .HasFilter("[NormalizedName] IS NOT NULL");
 
                     b.ToTable("AspNetRoles", (string)null);
+
+                    b.HasData(
+                        new
+                        {
+                            Id = "5fe3d208-0c8d-476e-a8f5-b2ebf220b138",
+                            Name = "Admin",
+                            NormalizedName = "ADMIN"
+                        },
+                        new
+                        {
+                            Id = "8341d3c1-c0d2-452c-8ff3-ab2007b5d026",
+                            Name = "User",
+                            NormalizedName = "USER"
+                        });
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
@@ -414,6 +498,36 @@ namespace DurianNet.Migrations
                     b.Navigation("DurianVideo");
                 });
 
+            modelBuilder.Entity("DurianNet.Models.DataModels.FavoriteDurian", b =>
+                {
+                    b.HasOne("DurianNet.Models.DataModels.DurianProfile", "DurianProfile")
+                        .WithMany("FavoriteDurians")
+                        .HasForeignKey("DurianId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("DurianNet.Models.DataModels.User", "User")
+                        .WithMany("FavoriteDurians")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("DurianProfile");
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("DurianNet.Models.DataModels.RefreshToken", b =>
+                {
+                    b.HasOne("DurianNet.Models.DataModels.User", "User")
+                        .WithMany("RefreshTokens")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("DurianNet.Models.DataModels.Seller", b =>
                 {
                     b.HasOne("DurianNet.Models.DataModels.User", "User")
@@ -506,9 +620,21 @@ namespace DurianNet.Migrations
                         .IsRequired();
                 });
 
+            modelBuilder.Entity("DurianNet.Models.DataModels.DurianProfile", b =>
+                {
+                    b.Navigation("FavoriteDurians");
+                });
+
             modelBuilder.Entity("DurianNet.Models.DataModels.Seller", b =>
                 {
                     b.Navigation("Comments");
+                });
+
+            modelBuilder.Entity("DurianNet.Models.DataModels.User", b =>
+                {
+                    b.Navigation("FavoriteDurians");
+
+                    b.Navigation("RefreshTokens");
                 });
 #pragma warning restore 612, 618
         }

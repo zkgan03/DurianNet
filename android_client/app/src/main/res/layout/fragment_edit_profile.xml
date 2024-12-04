@@ -53,44 +53,24 @@
         app:layout_constraintTop_toBottomOf="@+id/iv_profile" />
 
     <EditText
-        android:id="@+id/edt_profile_username"
+        android:id="@+id/edt_profile_fullname"
         android:layout_width="290dp"
         android:layout_height="50dp"
-        android:layout_marginTop="32dp"
+        android:layout_marginTop="40dp"
         android:background="@drawable/input_box"
         android:drawableLeft="@drawable/ic_username"
         android:drawablePadding="20dp"
         android:ems="10"
-        android:text="Username"
         android:inputType="text"
         android:paddingLeft="10dp"
         android:paddingTop="8dp"
         android:paddingRight="10dp"
         android:paddingBottom="8dp"
+        android:text="Fullname"
         android:textSize="24sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/lbl_edit_profile_img" />
-
-    <EditText
-        android:id="@+id/edt_profile_fullname"
-        android:layout_width="0dp"
-        android:layout_height="50dp"
-        android:layout_marginTop="16dp"
-        android:background="@drawable/input_box"
-        android:drawableLeft="@drawable/ic_username"
-        android:drawablePadding="20dp"
-        android:ems="10"
-        android:inputType="text"
-        android:text="Fullname"
-        android:paddingLeft="10dp"
-        android:paddingTop="8dp"
-        android:paddingRight="10dp"
-        android:paddingBottom="8dp"
-        android:textSize="24sp"
-        app:layout_constraintEnd_toEndOf="@+id/edt_profile_username"
-        app:layout_constraintStart_toStartOf="@+id/edt_profile_username"
-        app:layout_constraintTop_toBottomOf="@+id/edt_profile_username" />
 
     <EditText
         android:id="@+id/edt_profile_email"
@@ -133,7 +113,7 @@
         app:layout_constraintTop_toBottomOf="@+id/edt_profile_email" />
 
     <Button
-        android:id="@+id/button"
+        android:id="@+id/btn_edt_profile_save"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="32dp"

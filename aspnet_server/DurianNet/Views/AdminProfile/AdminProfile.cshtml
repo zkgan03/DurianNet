@@ -1,0 +1,108 @@
+﻿@{
+    ViewData["Title"] = "Admin Profile";
+}
+
+<div class="w-full">
+    <div class="bg-white p-8">
+        <!-- Title -->
+        <h1 class="text-black mb-6 text-3xl font-bold">My Profile</h1> <!-- Larger text for My Profile -->
+        <!-- Profile Picture -->
+        <div class="mb-6">
+            <img src="@ViewData["ProfilePicture"]" alt="Profile Picture" class="w-40 h-40 border-gray-300 rounded-full border object-cover" /> <!-- Dynamic profile picture -->
+        </div>
+
+        <!-- Admin Info -->
+        <div class="gap-4 mb-8 mr-auto grid w-2/5 grid-cols-2 text-lg">
+            <!-- 50% width, aligned left -->
+            <!-- Left Column -->
+            <div class="text-black font-bold">
+                <p>Username</p>
+                <p>Fullname</p>
+                <p>Email</p>
+                <p>Phone Number</p>
+            </div>
+            <!-- Right Column -->
+            <div class="text-black">
+                <p>@ViewData["Username"]</p>
+                <p>@ViewData["Fullname"]</p>
+                <p>@ViewData["Email"]</p>
+                <p>@ViewData["PhoneNumber"]</p>
+            </div>
+        </div>
+
+        <!-- Action Links -->
+        <div class="space-y-4 mt-20">
+            <a href="/adminprofile/ChangePasswordPage"
+               class="py-2 px-6 text-white block w-1/5 rounded bg-[#12796F] text-center font-bold transition hover:bg-[#0f5d57]">
+                Change Password
+            </a>
+            <a href="/adminprofile/EditProfilePage"
+               class="py-2 px-6 text-white block w-1/5 rounded bg-[#12796F] text-center font-bold transition hover:bg-[#0f5d57]">
+                Edit Profile
+            </a>
+            <button type="button" onclick="confirmDeleteAccount()"
+                    class="py-2 px-6 text-white block w-1/5 rounded bg-[#D97706] text-center font-bold transition hover:bg-[#b45e05]">
+                Delete Account
+            </button>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Fetch admin profile data on page load
+    async function fetchAdminProfile() {
+        try {
+            const response = await fetch('/api/User/GetUserByUsername', {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+            });
+
+            if (!response.ok) throw new Error('Failed to fetch admin profile.');
+
+            const data = await response.json();
+
+            // Update UI with fetched data
+            document.querySelector("[alt='Profile Picture']").src = data.profilePicture || '/images/default.jpg';
+            document.querySelector("div.text-black:nth-of-type(2) p:nth-child(1)").textContent = data.username;
+            document.querySelector("div.text-black:nth-of-type(2) p:nth-child(2)").textContent = data.fullName;
+            document.querySelector("div.text-black:nth-of-type(2) p:nth-child(3)").textContent = data.email;
+            document.querySelector("div.text-black:nth-of-type(2) p:nth-child(4)").textContent = data.phoneNumber;
+        } catch (error) {
+            console.error("Error fetching admin profile:", error);
+            alert("Failed to load admin profile. Please try again.");
+        }
+    }
+
+    // Confirm before deleting the account
+    async function confirmDeleteAccount() {
+        const confirmation = confirm("Are you sure you want to delete your account? This action cannot be undone.");
+        if (confirmation) {
+            deleteAccount();
+        }
+    }
+
+    // Call the API to delete the admin account
+    async function deleteAccount() {
+        try {
+            const response = await fetch('/api/User/DeleteAdmin', {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+            });
+
+            if (!response.ok) throw new Error('Failed to delete the account.');
+
+            alert("Account deleted successfully. Redirecting to login page.");
+            window.location.href = '/Account/LoginPage'; // Redirect to login page
+        } catch (error) {
+            console.error("Error deleting account:", error);
+            alert("Failed to delete account. Please try again.");
+        }
+    }
+
+    // Load admin profile data when the page is ready
+    document.addEventListener("DOMContentLoaded", fetchAdminProfile);
+</script>

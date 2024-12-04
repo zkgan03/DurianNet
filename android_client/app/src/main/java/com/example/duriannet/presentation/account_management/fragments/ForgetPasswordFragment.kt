@@ -1,60 +1,81 @@
 package com.example.duriannet.presentation.account_management.fragments
 
+import android.content.Context
 import android.os.Bundle
-import androidx.fragment.app.Fragment
+import android.util.Patterns
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
+import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
+import androidx.lifecycle.lifecycleScope
+import androidx.navigation.fragment.findNavController
 import com.example.duriannet.R
+import com.example.duriannet.databinding.FragmentForgetPasswordBinding
+import com.example.duriannet.presentation.account_management.view_models.ForgetPasswordViewModel
+import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.launch
 
-// TODO: Rename parameter arguments, choose names that match
-// the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-private const val ARG_PARAM1 = "param1"
-private const val ARG_PARAM2 = "param2"
-
-/**
- * A simple [Fragment] subclass.
- * Use the [ForgetPasswordFragment.newInstance] factory method to
- * create an instance of this fragment.
- */
+@AndroidEntryPoint
 class ForgetPasswordFragment : Fragment() {
-    // TODO: Rename and change types of parameters
-    private var param1: String? = null
-    private var param2: String? = null
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        arguments?.let {
-            param1 = it.getString(ARG_PARAM1)
-            param2 = it.getString(ARG_PARAM2)
-        }
-    }
+    private var _binding: FragmentForgetPasswordBinding? = null
+    private val binding get() = _binding!!
+    private val viewModel: ForgetPasswordViewModel by viewModels()
+    private val navController by lazy { findNavController() }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
-        // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_forget_password, container, false)
+    ): View {
+        _binding = FragmentForgetPasswordBinding.inflate(inflater, container, false)
+        return binding.root
     }
 
-    companion object {
-        /**
-         * Use this factory method to create a new instance of
-         * this fragment using the provided parameters.
-         *
-         * @param param1 Parameter 1.
-         * @param param2 Parameter 2.
-         * @return A new instance of fragment ForgetPasswordFragment.
-         */
-        // TODO: Rename and change types and number of parameters
-        @JvmStatic
-        fun newInstance(param1: String, param2: String) =
-            ForgetPasswordFragment().apply {
-                arguments = Bundle().apply {
-                    putString(ARG_PARAM1, param1)
-                    putString(ARG_PARAM2, param2)
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+
+        val sharedPreferences = requireActivity().getSharedPreferences("DurianNetPrefs", Context.MODE_PRIVATE)
+
+        binding.btnFp.setOnClickListener {
+            val email = binding.edtFpEmail.text.toString()
+
+            // Input validation
+            if (email.isEmpty()) {
+                binding.edtFpEmail.error = "Email cannot be empty"
+                return@setOnClickListener
+            }
+            if (!Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
+                binding.edtFpEmail.error = "Enter a valid email address"
+                return@setOnClickListener
+            }
+
+            viewModel.sendResetEmail(email)
+
+            // Save email to SharedPreferences for use in ResetPasswordFragment
+            sharedPreferences.edit().putString("email", email).apply()
+        }
+
+        lifecycleScope.launch {
+            viewModel.forgetPasswordState.collect { state ->
+                if (state.isEmailSent) {
+                    Toast.makeText(requireContext(), "Reset email sent", Toast.LENGTH_SHORT).show()
+                    navController.navigate(R.id.action_forget_password_to_otpFragment)
+                } else if (state.error.isNotEmpty()) {
+                    Toast.makeText(requireContext(), state.error, Toast.LENGTH_SHORT).show()
                 }
             }
+        }
+
+        binding.lblFpToLogin.setOnClickListener {
+            navController.navigate(R.id.action_forget_password_to_login)
+        }
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
     }
 }

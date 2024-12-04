@@ -1,60 +1,110 @@
 package com.example.duriannet.presentation.account_management.fragments
 
 import android.os.Bundle
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
+import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
+import androidx.lifecycle.lifecycleScope
+import androidx.navigation.fragment.findNavController
 import com.example.duriannet.R
+import com.example.duriannet.databinding.FragmentSignUpBinding
+import com.example.duriannet.presentation.account_management.state.SignUpState
+import com.example.duriannet.presentation.account_management.view_models.SignUpViewModel
+import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.launch
 
-// TODO: Rename parameter arguments, choose names that match
-// the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-private const val ARG_PARAM1 = "param1"
-private const val ARG_PARAM2 = "param2"
-
-/**
- * A simple [Fragment] subclass.
- * Use the [SignUpFragment.newInstance] factory method to
- * create an instance of this fragment.
- */
+@AndroidEntryPoint
 class SignUpFragment : Fragment() {
-    // TODO: Rename and change types of parameters
-    private var param1: String? = null
-    private var param2: String? = null
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        arguments?.let {
-            param1 = it.getString(ARG_PARAM1)
-            param2 = it.getString(ARG_PARAM2)
-        }
-    }
+    private var _binding: FragmentSignUpBinding? = null
+    private val binding get() = _binding!!
+    private val viewModel: SignUpViewModel by viewModels()
+    private val navController by lazy { findNavController() }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
-        // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_sign_up, container, false)
+    ): View {
+        _binding = FragmentSignUpBinding.inflate(inflater, container, false)
+        return binding.root
     }
 
-    companion object {
-        /**
-         * Use this factory method to create a new instance of
-         * this fragment using the provided parameters.
-         *
-         * @param param1 Parameter 1.
-         * @param param2 Parameter 2.
-         * @return A new instance of fragment SignUpFragment.
-         */
-        // TODO: Rename and change types and number of parameters
-        @JvmStatic
-        fun newInstance(param1: String, param2: String) =
-            SignUpFragment().apply {
-                arguments = Bundle().apply {
-                    putString(ARG_PARAM1, param1)
-                    putString(ARG_PARAM2, param2)
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+
+        binding.btnSignUp.setOnClickListener {
+            val username = binding.edtSignUpUsername.text.toString()
+            val email = binding.edtSignUpEmail.text.toString()
+            val password = binding.edtSignUpPassword.text.toString()
+            val confirmPassword = binding.edtSignUpConfPassword.text.toString()
+
+            // Validate input fields
+            if (username.isEmpty()) {
+                binding.edtSignUpUsername.error = "Username cannot be empty"
+                return@setOnClickListener
+            }
+
+            if (email.isEmpty()) {
+                binding.edtSignUpEmail.error = "Email cannot be empty"
+                return@setOnClickListener
+            }
+
+            if (!android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
+                binding.edtSignUpEmail.error = "Enter a valid email address"
+                return@setOnClickListener
+            }
+
+            if (password.isEmpty()) {
+                binding.edtSignUpPassword.error = "Password cannot be empty"
+                return@setOnClickListener
+            }
+
+            if (!isValidPassword(password)) {
+                binding.edtSignUpPassword.error = "Password must be at least 8 characters long and include at least one uppercase letter, one lowercase letter, one number, and one special character."
+                return@setOnClickListener
+            }
+
+            if (confirmPassword.isEmpty()) {
+                binding.edtSignUpConfPassword.error = "Confirm password cannot be empty"
+                return@setOnClickListener
+            }
+
+            if (password != confirmPassword) {
+                binding.edtSignUpConfPassword.error = "Passwords do not match"
+                return@setOnClickListener
+            }
+
+            viewModel.signUp(username, email, password, confirmPassword)
+        }
+
+        lifecycleScope.launch {
+            viewModel.signUpState.collect { state ->
+                if (state.isRegistered) {
+                    Toast.makeText(requireContext(), "Registration successful", Toast.LENGTH_SHORT).show()
+                    navController.navigate(R.id.action_sign_up_to_login)
+                } else if (state.error.isNotEmpty()) {
+                    Toast.makeText(requireContext(), state.error, Toast.LENGTH_SHORT).show()
                 }
             }
+        }
+
+        binding.lblSignUpToLogin.setOnClickListener {
+            navController.navigate(R.id.action_sign_up_to_login)
+        }
+    }
+
+    private fun isValidPassword(password: String): Boolean {
+        val passwordPattern =
+            "^(?=.*[A-Z])(?=.*[a-z])(?=.*\\d)(?=.*[@\$!%*?&#])[A-Za-z\\d@\$!%*?&#]{8,}$"
+        return password.matches(passwordPattern.toRegex())
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
     }
 }

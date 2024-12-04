@@ -1,0 +1,166 @@
+﻿
+@{
+    ViewData["Title"] = "Add Durian Profile";
+}
+
+<div class="w-full">
+    <div class="bg-white p-8">
+        <!-- Title -->
+        <h1 class="text-black mb-6 text-3xl font-bold">Add Durian Profile</h1>
+
+        <!-- Form -->
+        <form id="addDurianForm" enctype="multipart/form-data">
+            <!-- Level 1 -->
+            <div class="gap-6 mb-6 flex">
+                <!-- Durian Name -->
+                <div class="w-1/2">
+                    <label for="durianName" class="text-black block text-lg font-bold">Durian Name</label>
+                    <input type="text" id="durianName" name="durianName"
+                           class="mt-2 px-4 py-3 border-gray-300 w-full rounded-md border text-lg focus:outline-none focus:ring-2 focus:ring-[#12796F]"
+                           placeholder="Enter Durian Name" required />
+                </div>
+                <!-- Durian Image -->
+                <div class="w-1/2">
+                    <label for="durianImage" class="text-black block text-lg font-bold">Durian Image</label>
+                    <input type="file" id="durianImage" name="durianImage"
+                           class="mt-2 px-4 py-3 border-gray-300 w-full rounded-md border text-lg focus:outline-none focus:ring-2 focus:ring-[#12796F]"
+                           accept="image/*" required />
+                </div>
+            </div>
+
+            <!-- Level 2 -->
+            <div class="gap-6 mb-6 flex">
+                <!-- Characteristic -->
+                <div class="w-1/2">
+                    <label for="characteristics" class="text-black block text-lg font-bold">Characteristics</label>
+                    <input type="text" id="characteristics" name="Characteristics"
+                           class="mt-2 px-4 py-3 border-gray-300 w-full rounded-md border text-lg focus:outline-none focus:ring-2 focus:ring-[#12796F]"
+                           placeholder="Enter Characteristics" required />
+
+                </div>
+                <!-- Taste Profile -->
+                <div class="w-1/2">
+                    <label for="tasteProfile" class="text-black block text-lg font-bold">Taste Profile</label>
+                    <input type="text" id="tasteProfile" name="tasteProfile"
+                           class="mt-2 px-4 py-3 border-gray-300 w-full rounded-md border text-lg focus:outline-none focus:ring-2 focus:ring-[#12796F]"
+                           placeholder="Enter Taste Profile" required />
+                </div>
+            </div>
+
+            <!-- Level 3 -->
+            <div class="gap-6 mb-6 flex">
+                <!-- Durian Description -->
+                <div class="w-1/2">
+                    <label for="durianDescription" class="text-black block text-lg font-bold">Durian Description</label>
+                    <input type="text" id="durianDescription" name="durianDescription"
+                            class="mt-2 px-4 py-3 border-gray-300 w-full rounded-md border text-lg focus:outline-none focus:ring-2 focus:ring-[#12796F]"
+                            placeholder="Enter Durian Description" required />
+                </div>
+                <div class="w-1/2">
+                    <label for="durianCode" class="text-black block text-lg font-bold">Durian Code</label>
+                    <input type="text" id="durianCode" name="durianCode"
+                           class="mt-2 px-4 py-3 border-gray-300 w-full rounded-md border text-lg focus:outline-none focus:ring-2 focus:ring-[#12796F]"
+                           placeholder="Enter Durian Code" required />
+                </div>
+
+            </div>
+
+            <!-- Level 4 -->
+            <div class="gap-6 mb-6 flex">
+                <!-- Durian Video -->
+                <div class="w-1/2">
+                    <label for="durianVideo" class="text-black block text-lg font-bold">Durian Video</label>
+                    <input type="file" id="durianVideo" name="durianVideo"
+                           class="mt-2 px-4 py-3 border-gray-300 w-full rounded-md border text-lg focus:outline-none focus:ring-2 focus:ring-[#12796F]"
+                           accept="video/*" required />
+                </div>
+                <!-- Video Description -->
+                <div class="w-1/2">
+                    <label for="videoDescription" class="text-black block text-lg font-bold">Video Description</label>
+                    <input type="text" id="videoDescription" name="videoDescription"
+                           class="mt-2 px-4 py-3 border-gray-300 w-full rounded-md border text-lg focus:outline-none focus:ring-2 focus:ring-[#12796F]"
+                           placeholder="Enter Video Description" required />
+                </div>
+            </div>
+
+            <!-- Save Button -->
+            <div class="mt-8">
+                <button type="submit"
+                        class="py-3 px-6 text-white w-full rounded-md bg-[#12796F] font-bold transition hover:bg-[#0f5d57]">
+                    Save
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+
+    document.getElementById('addDurianForm').addEventListener('submit', async function (event) {
+        event.preventDefault();
+
+        const durianName = document.getElementById('durianName').value.trim();
+        const durianCode = document.getElementById('durianCode').value.trim();
+        const characteristics = document.getElementById('characteristics').value.trim();
+        const tasteProfile = document.getElementById('tasteProfile').value.trim();
+        const durianDescription = document.getElementById('durianDescription').value.trim();
+        const videoDescription = document.getElementById('videoDescription').value.trim();
+
+        let durianImageBase64 = null;
+        let durianVideoBase64 = null;
+
+        // Convert image to Base64
+        const durianImageFile = document.getElementById('durianImage').files[0];
+        if (durianImageFile) {
+            durianImageBase64 = await toBase64(durianImageFile);
+        }
+
+        // Convert video to Base64
+        const durianVideoFile = document.getElementById('durianVideo').files[0];
+        if (durianVideoFile) {
+            durianVideoBase64 = await toBase64(durianVideoFile);
+        }
+
+        const payload = {
+            durianName,
+            durianCode,
+            characteristics,
+            tasteProfile,
+            durianDescription,
+            videoDescription,
+            durianImage: durianImageBase64,
+            durianVideo: durianVideoBase64,
+        };
+
+        try {
+            const response = await fetch('/api/durianprofile/AddDurianProfile', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload),
+            });
+
+            if (!response.ok) {
+                const error = await response.json();
+                alert(error.message || "Failed to add durian profile.");
+                return;
+            }
+
+            alert("Durian profile added successfully!");
+            window.location.href = '/durianprofile/DurianProfilePage'; // Redirect to Durian Profile page
+        } catch (error) {
+            console.error(error);
+            alert("An error occurred while adding the durian profile.");
+        }
+    });
+
+    // Helper function to convert files to Base64
+    function toBase64(file) {
+        return new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.onload = () => resolve(reader.result);
+            reader.onerror = reject;
+            reader.readAsDataURL(file);
+        });
+    }
+
+</script>

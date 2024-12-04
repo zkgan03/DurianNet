@@ -1,60 +1,118 @@
 package com.example.duriannet.presentation.account_management.fragments
 
+import android.content.Context
 import android.os.Bundle
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import com.example.duriannet.R
+import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
+import androidx.lifecycle.lifecycleScope
+import androidx.navigation.fragment.findNavController
+import androidx.recyclerview.widget.LinearLayoutManager
+import com.example.duriannet.databinding.FragmentFavoriteDurianBinding
+import com.example.duriannet.presentation.account_management.adapter.FavoriteDurianSelectionAdapter
+import com.example.duriannet.presentation.account_management.view_models.FavoriteDurianViewModel
+import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.launch
+import android.widget.Toast
 
-// TODO: Rename parameter arguments, choose names that match
-// the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-private const val ARG_PARAM1 = "param1"
-private const val ARG_PARAM2 = "param2"
-
-/**
- * A simple [Fragment] subclass.
- * Use the [FavoriteDurianFragment.newInstance] factory method to
- * create an instance of this fragment.
- */
+@AndroidEntryPoint
 class FavoriteDurianFragment : Fragment() {
-    // TODO: Rename and change types of parameters
-    private var param1: String? = null
-    private var param2: String? = null
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        arguments?.let {
-            param1 = it.getString(ARG_PARAM1)
-            param2 = it.getString(ARG_PARAM2)
-        }
-    }
+    private var _binding: FragmentFavoriteDurianBinding? = null
+    private val binding get() = _binding!!
+    private val viewModel: FavoriteDurianViewModel by viewModels()
+    private val navController by lazy { findNavController() }
+    private lateinit var adapter: FavoriteDurianSelectionAdapter
+    private lateinit var username: String
+    private var isInitialLoad = true // Track if it's the initial load
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
-        // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_favorite_durian, container, false)
+    ): View {
+        _binding = FragmentFavoriteDurianBinding.inflate(inflater, container, false)
+        return binding.root
     }
 
-    companion object {
-        /**
-         * Use this factory method to create a new instance of
-         * this fragment using the provided parameters.
-         *
-         * @param param1 Parameter 1.
-         * @param param2 Parameter 2.
-         * @return A new instance of fragment FavoriteDurianFragment.
-         */
-        // TODO: Rename and change types and number of parameters
-        @JvmStatic
-        fun newInstance(param1: String, param2: String) =
-            FavoriteDurianFragment().apply {
-                arguments = Bundle().apply {
-                    putString(ARG_PARAM1, param1)
-                    putString(ARG_PARAM2, param2)
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+
+        val sharedPreferences = requireActivity().getSharedPreferences("DurianNetPrefs", Context.MODE_PRIVATE)
+        username = sharedPreferences.getString("username", "") ?: ""
+
+        adapter = FavoriteDurianSelectionAdapter { durian, isFavorite ->
+            viewModel.onFavoriteChange(durian.durianId, isFavorite)
+        }
+
+        binding.rvFavoriteDurianProfile.layoutManager = LinearLayoutManager(context)
+        binding.rvFavoriteDurianProfile.adapter = adapter
+
+        if (username.isNotEmpty()) {
+            viewModel.loadDurians(username)
+        }
+
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewModel.favoriteDurianState.collect { state ->
+                if (state.error.isNotEmpty()) {
+                    Toast.makeText(requireContext(), state.error, Toast.LENGTH_SHORT).show()
+                } else {
+                    println("Filtered Durians Count: ${state.filteredDurians.size}")
+                    state.filteredDurians.forEach { println("Durian: ${it.durianName}") }
+
+                    adapter.submitList(state.filteredDurians, state.favoriteDurianIds)
+                    /*if (state.filteredDurians.isEmpty()) {
+                        Toast.makeText(requireContext(), "No results found", Toast.LENGTH_SHORT).show()*/
+
+                    // Show "No results found" only after the initial load
+                    if (!isInitialLoad && state.filteredDurians.isEmpty()) {
+                        Toast.makeText(requireContext(), "No results found", Toast.LENGTH_SHORT).show()
+                    }
+
+                    // Mark initial load as completed
+                    isInitialLoad = false
+
                 }
             }
+        }
+
+
+        // Handle SearchView
+        binding.svFavoriteDurian.setOnQueryTextListener(object : android.widget.SearchView.OnQueryTextListener {
+            override fun onQueryTextSubmit(query: String?): Boolean {
+                viewModel.filterDurians(query.orEmpty())
+                return true
+            }
+
+            override fun onQueryTextChange(newText: String?): Boolean {
+                viewModel.filterDurians(newText.orEmpty())
+                return true
+            }
+        })
+
+        /*binding.btnFdSave.setOnClickListener {
+            viewModel.saveFavoriteChanges(username)
+            Toast.makeText(requireContext(), "Favorites saved successfully", Toast.LENGTH_SHORT).show()
+            navController.navigateUp()
+        }*/
+
+        binding.btnFdSave.setOnClickListener {
+            viewModel.saveFavoriteChanges(username)
+            Toast.makeText(requireContext(), "Favorites saved successfully", Toast.LENGTH_SHORT).show()
+
+            // Set a result to notify ProfileFragment
+            parentFragmentManager.setFragmentResult("favorite_updated", Bundle())
+            navController.navigateUp()
+        }
+
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
     }
 }
+
+

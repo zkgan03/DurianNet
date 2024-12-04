@@ -16,14 +16,14 @@
         android:title="Chatbot" />
    
     <item
-        android:id="@+id/detector_nav_graph"
+        android:id="@+id/detector"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:icon="@drawable/ic_imagedetection"
         android:title="ImageDetection" />
     
     <item
-        android:id="@+id/seller_locator_nav_graph"
+        android:id="@+id/seller_locator"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:icon="@drawable/ic_sellerlocator"

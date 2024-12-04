@@ -1,0 +1,85 @@
+﻿
+
+@{
+    ViewData["Title"] = "User Account Details";
+}
+
+<div class="w-full">
+    <div class="bg-white p-8">
+        <!-- Title -->
+        <h1 class="text-black mb-6 text-3xl font-bold">User Account Details</h1>
+
+        <!-- Profile Picture -->
+        <div id="profilePictureContainer" class="mb-6">
+            <img id="profilePicture" src="/images/default-profile.jpg" alt="Profile Picture"
+                 class="w-40 h-40 border-gray-300 rounded-full border object-cover" />
+        </div>
+
+        <!-- User Info -->
+        <div class="gap-4 mb-8 mr-auto grid w-2/5 grid-cols-2 text-lg">
+            <!-- Left Column -->
+            <div class="text-black font-bold">
+                <p>Username</p>
+                <p>Fullname</p>
+                <p>Email</p>
+                <p>Phone Number</p>
+                <p>User Status</p>
+            </div>
+            <!-- Right Column -->
+            <div id="userDetails" class="text-black">
+                <p id="username"></p>
+                <p id="fullname"></p>
+                <p id="email"></p>
+                <p id="phoneNumber"></p>
+                <p id="userStatus"></p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Fetch user details on page load
+    async function loadUserDetails() {
+        const urlParams = new URLSearchParams(window.location.search);
+        const userId = urlParams.get('id'); // Extract user ID from query string
+
+        if (!userId) {
+            alert("User ID is missing.");
+            return;
+        }
+
+        try {
+            const response = await fetch(`/api/user/GetUser/${userId}`);
+            if (!response.ok) throw new Error("Failed to fetch user details.");
+
+            const user = await response.json();
+
+            // Populate user details
+            document.getElementById("username").textContent = user.username || 'N/A';
+            document.getElementById("fullname").textContent = user.fullName || 'N/A';
+            document.getElementById("email").textContent = user.email || 'N/A';
+            document.getElementById("phoneNumber").textContent = user.phoneNumber || 'N/A';
+            document.getElementById("userStatus").textContent = user.userStatus || 'N/A';
+
+            // // Update profile picture if available
+            // if (user.profilePicture) {
+            //     document.getElementById("profilePicture").src = user.profilePicture;
+            // }
+
+            // Update profile picture if available
+            const profilePictureElement = document.getElementById("profilePicture");
+            if (user.profilePicture) {
+                profilePictureElement.src = user.profilePicture;
+            } else {
+                profilePictureElement.src = "/images/default-profile.jpg"; // Fallback image
+            }
+
+        } catch (error) {
+            console.error(error);
+            alert("An error occurred while loading user details.");
+        }
+    }
+
+    // Load user details on page load
+    document.addEventListener("DOMContentLoaded", loadUserDetails);
+</script>
