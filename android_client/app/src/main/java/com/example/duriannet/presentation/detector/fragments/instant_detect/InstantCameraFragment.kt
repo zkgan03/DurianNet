@@ -29,7 +29,6 @@ class InstantCameraFragment : BaseInstantDetectFragment() {
     ): View {
         Log.e(TAG, "onCreateView")
         _cameraBinding = FragmentInstantCameraBinding.inflate(inflater, container, false)
-        cameraManager = CameraManager(requireContext(), this, cameraBinding.viewFinder)
 
         return cameraBinding.root
     }
@@ -58,11 +57,12 @@ class InstantCameraFragment : BaseInstantDetectFragment() {
                 }
             )
         }
-
     }
 
     private fun setupCameraManager() {
-        cameraManager?.apply {
+        cameraManager = CameraManager(requireContext(), viewLifecycleOwner, cameraBinding.viewFinder)
+
+        cameraManager!!.apply {
 
             setOnInitializedListener {
                 activity?.runOnUiThread {
@@ -94,6 +94,11 @@ class InstantCameraFragment : BaseInstantDetectFragment() {
             }
 
             startCamera()
+
+            Log.e(TAG, "CameraManager setup, isDetectorInitialized: ${viewModel.isDetectorInitialized}")
+            if (viewModel.isDetectorInitialized) {
+                setAnalyzer()
+            }
         }
     }
 
@@ -105,8 +110,11 @@ class InstantCameraFragment : BaseInstantDetectFragment() {
 
     override fun onResume() {
         super.onResume()
+        Log.e(TAG, "onResume")
         if (cameraManager == null) {
             setupCameraManager()
+        } else if (viewModel.isDetectorInitialized && cameraManager != null) {
+            cameraManager?.setAnalyzer()
         }
     }
 
@@ -115,16 +123,15 @@ class InstantCameraFragment : BaseInstantDetectFragment() {
     override fun onPause() {
         super.onPause()
         Log.e(TAG, "onPause")
+//        releaseCameraManager()
+        cameraManager?.clearAnalyzer()
     }
 
 
     override fun onDestroyView() {
         super.onDestroyView()
-        releaseCameraManager()
-
         _cameraBinding = null;
         Log.e(TAG, "onDestroyView")
-
     }
 
 

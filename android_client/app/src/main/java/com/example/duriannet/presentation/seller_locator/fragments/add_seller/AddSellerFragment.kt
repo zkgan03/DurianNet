@@ -9,7 +9,6 @@ import android.view.MenuInflater
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.MenuProvider
 import androidx.core.view.children
@@ -20,9 +19,7 @@ import androidx.navigation.fragment.findNavController
 import com.example.duriannet.R
 import com.example.duriannet.databinding.FragmentAddSellerBinding
 import com.example.duriannet.models.DurianType
-import com.example.duriannet.models.Seller
 import com.example.duriannet.presentation.seller_locator.view_models.AddSellerViewModel
-import com.google.android.gms.maps.model.LatLng
 import com.google.android.material.chip.Chip
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -98,7 +95,7 @@ class AddSellerFragment : Fragment() {
 
 
     private fun setupUI() {
-        binding.imageViewDetectedImage.setImageBitmap(viewModel.imageResult)
+        binding.imageViewDetectedImage.setImageBitmap(viewModel.drawnImageResult)
 
         binding.chipGroupDurianTypes.removeAllViews()
         binding.chipGroupDurianTypes.apply {
@@ -117,7 +114,9 @@ class AddSellerFragment : Fragment() {
         binding.editTextDescription.setText(viewModel.inputState.value.sellerDescription)
         binding.chipGroupDurianTypes.children.forEach { chip ->
             val durianType = DurianType.valueOf((chip as Chip).text.toString())
-            chip.isChecked = viewModel.inputState.value.sellerDurianType.contains(durianType)
+            chip.isChecked = viewModel.inputState.value
+                .sellerDurianType
+                .contains(durianType)
         }
 
         binding.editTextSellerName.doOnTextChanged { text, _, _, _ ->

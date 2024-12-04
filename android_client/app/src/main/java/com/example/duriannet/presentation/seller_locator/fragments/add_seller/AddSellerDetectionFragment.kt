@@ -5,16 +5,13 @@ import android.graphics.Bitmap
 import android.graphics.RectF
 import android.os.Bundle
 import android.util.Log
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.hilt.navigation.fragment.hiltNavGraphViewModels
-import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
-import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.NavController
 import androidx.navigation.fragment.findNavController
 import com.example.duriannet.R
@@ -22,23 +19,16 @@ import com.example.duriannet.databinding.FragmentAddSellerDetectionBinding
 import com.example.duriannet.models.DetectionResult
 import com.example.duriannet.models.DurianType
 import com.example.duriannet.presentation.detector.fragments.focus_vision.BaseFocusVisionFragment
-import com.example.duriannet.presentation.detector.fragments.focus_vision.FocusVisionFragment
-import com.example.duriannet.presentation.detector.fragments.focus_vision.FocusVisionFragment.Companion
 import com.example.duriannet.presentation.seller_locator.view_models.AddSellerViewModel
 import com.example.duriannet.services.common.AccelerometerSensor
 import com.example.duriannet.services.common.CameraManager
 import com.example.duriannet.services.common.GoogleMapManager
 import com.example.duriannet.services.detector.DetectionHub
-import com.example.duriannet.services.detector.enum.DetectorStatusEnum
-import com.example.duriannet.services.detector.interfaces.IDetector
-import com.example.duriannet.services.detector.interfaces.IDetectorListener
-import com.example.duriannet.services.detector.utils.Common
 import com.example.duriannet.utils.Event
 import com.example.duriannet.utils.EventBus
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.Dispatchers
+import drawResults
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 
 @AndroidEntryPoint
 class AddSellerDetectionFragment : BaseFocusVisionFragment() {
@@ -211,9 +201,21 @@ class AddSellerDetectionFragment : BaseFocusVisionFragment() {
         accelerometerSensor.stop()
         cameraManager?.release()
 
-        viewModel.imageResult = imageResult
+        viewModel.drawnImageResult = imageResult.drawResults(
+            finalResults,
+            Pair(DetectionHub.DETECT_IMG_SIZE, DetectionHub.DETECT_IMG_SIZE)
+        )
 
-        viewModel.inputSellerDurianType(hashSetOf(DurianType.MusangKing, DurianType.BlackThorn))
+        viewModel.inputSellerDurianType(
+            finalResults.mapNotNull {
+                when (it.label) {
+                    "d197" -> DurianType.MusangKing
+                    "d24" -> DurianType.D24
+                    "d200" -> DurianType.BlackThorn
+                    else -> null
+                }
+            }.toHashSet()
+        )
 
         GoogleMapManager.getUserLocation(requireContext()) { location ->
             viewModel.inputSellerLocation(location.latitude, location.longitude)

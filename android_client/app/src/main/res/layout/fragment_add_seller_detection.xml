@@ -100,34 +100,33 @@
 
 
     <com.google.android.material.card.MaterialCardView
-        android:layout_width="wrap_content"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginStart="16dp"
-        android:layout_marginEnd="16dp"
+        android:layout_marginHorizontal="32dp"
         android:layout_marginBottom="32dp"
         android:backgroundTint="@color/chip_info_color"
         app:cardCornerRadius="16dp"
         app:cardElevation="0dp"
         app:layout_constraintBottom_toBottomOf="@+id/view_finder"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="@+id/view_finder"
+        app:layout_constraintStart_toStartOf="@+id/view_finder"
+        app:layout_constraintWidth_max="wrap"
         app:strokeWidth="0dp">
 
         <TextView
             android:id="@+id/bottom_prompt_chip"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_gravity="center_horizontal"
-            android:layout_marginStart="16dp"
-            android:layout_marginEnd="16dp"
+            android:layout_gravity="center"
             android:ellipsize="end"
-            android:gravity="center_horizontal"
+            android:gravity="center"
             android:maxLines="2"
             android:paddingHorizontal="16dp"
             android:paddingVertical="8dp"
             android:textColor="@color/white"
             android:textSize="14sp"
             tools:text="custom chip" />
+
     </com.google.android.material.card.MaterialCardView>
 
     <androidx.constraintlayout.widget.ConstraintLayout

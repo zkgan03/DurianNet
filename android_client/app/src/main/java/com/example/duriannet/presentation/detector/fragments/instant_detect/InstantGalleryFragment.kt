@@ -11,6 +11,7 @@ import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.core.graphics.drawable.toBitmap
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
@@ -23,7 +24,10 @@ import com.example.duriannet.databinding.FragmentInstantGalleryBinding
 import com.example.duriannet.models.MediaStoreData
 import com.example.duriannet.presentation.detector.adapters.GalleryItemAdapter
 import com.example.duriannet.services.common.MediaStoreDataSource
+import com.example.duriannet.utils.BitmapHelper
+import com.example.duriannet.utils.Common
 import com.google.android.material.bottomsheet.BottomSheetDialog
+import drawResults
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 
@@ -51,6 +55,14 @@ class InstantGalleryFragment : BaseInstantDetectFragment() {
 
         // setup gallery dialog
         setupBottomSheetDialog()
+
+        galleryBinding.fabDownload.setOnClickListener {
+            //get image from image view
+            Toast.makeText(requireContext(), "Saving image...", Toast.LENGTH_SHORT).show()
+            val bitmap = galleryBinding.imageResult.drawable.toBitmap()
+            Common.saveBitmap(requireContext(), System.currentTimeMillis().toString(), bitmap)
+            Toast.makeText(requireContext(), "Image saved!", Toast.LENGTH_SHORT).show()
+        }
 
         if (viewModel.isDetectorInitialized) {
             galleryBinding.progress.visibility = View.GONE
@@ -134,56 +146,21 @@ class InstantGalleryFragment : BaseInstantDetectFragment() {
 
                     val (results, height, width) = viewModel.detector!!.detectImage(resource)
 
-                    galleryBinding.imageResult.setImageBitmap(resource)
-
-                    // Desired maximum dimensions
-                    val maxWidth = galleryBinding.imageResult.width
-                    val maxHeight = galleryBinding.imageResult.height
-
-                    Log.e(TAG, "maxWidth: $maxWidth, maxHeight $maxHeight")
-
-                    // Calculate the aspect ratio
-                    val aspectRatio = resource.width.toFloat() / resource.height.toFloat()
-
-                    // Determine the width and height of image in in the image view
-                    // while maintaining the aspect ratio
-                    val (imgWidth, imgHeight) = when {
-                        // landscape image
-                        resource.width > resource.height -> {
-                            Pair(maxWidth, (maxWidth / aspectRatio).toInt())
-                        }
-
-                        //portrait image
-                        resource.width < resource.height -> {
-                            Pair((maxHeight * aspectRatio).toInt(), maxHeight)
-                        }
-
-                        // square image
-                        else -> {
-                            if (maxWidth > maxHeight)
-                                Pair(maxHeight, maxHeight)
-                            else
-                                Pair(maxWidth, maxWidth)
-                        }
-                    }
-
-                    // Calculate the position to center the bounding box overlay
-                    val offsetLeft = (maxWidth - imgWidth) / 2.0f
-                    val offsetTop = (maxHeight - imgHeight) / 2.0f
-
-                    galleryBinding.overlay.apply {
-                        clear()
-                        setResults(
-                            detectionResults = results,
+                    galleryBinding.imageResult.setImageBitmap(
+                        resource.drawResults(
+                            results = results,
                             detectionSize = Pair(height, width),
-                            oriSize = Pair(imgHeight, imgWidth), // the bounding box need to be scaled based on the imageview size
-                            offset = Pair(offsetTop, offsetLeft),
+                            strokeWidth = 16f,
+                            borderColor = requireContext().getColor(R.color.accent_dark_green),
+                            textSize = 100f
                         )
-                    }
+                    )
 
-                    galleryBinding.imageResult.visibility = View.VISIBLE
-                    galleryBinding.progress.visibility = View.GONE
-                    galleryBinding.videoView.visibility = View.GONE
+                    galleryBinding.apply {
+                        imageResult.visibility = View.VISIBLE
+                        progress.visibility = View.GONE
+                        fabDownload.visibility = View.VISIBLE
+                    }
                 }
 
                 override fun onLoadCleared(placeholder: android.graphics.drawable.Drawable?) {

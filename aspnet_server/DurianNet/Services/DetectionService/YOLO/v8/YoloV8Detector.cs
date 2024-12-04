@@ -10,7 +10,7 @@ namespace DurianNet.Services.DetectionService.YOLO.v8
 
         public YoloV8Detector()
         {
-            _predictor = YoloV8Predictor.Create("./AiModels/yolov8s.onnx");
+            _predictor = YoloV8Predictor.Create("./Assets/Detection_Model/durian_2_v8s_640.onnx");
         }
 
         public void UpdateConfiguration(float confidence, float iouThreshold)

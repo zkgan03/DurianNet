@@ -33,10 +33,11 @@ import com.example.duriannet.databinding.ItemUserCommentedBinding
 import com.example.duriannet.databinding.ItemUserNotCommentedBinding
 import com.example.duriannet.models.Comment
 import com.example.duriannet.models.Seller
+import com.example.duriannet.models.asSeller
 import com.example.duriannet.presentation.seller_locator.adapter.MarkerInfoWindowAdapter
 import com.example.duriannet.presentation.seller_locator.adapter.SearchResultsAdapter
 import com.example.duriannet.presentation.seller_locator.adapter.SellerCommentsAdapter
-import com.example.duriannet.presentation.seller_locator.event.MapEvent
+import com.example.duriannet.presentation.seller_locator.events.MapEvent
 import com.example.duriannet.presentation.seller_locator.state.CommentData
 import com.example.duriannet.presentation.seller_locator.state.MapScreenState
 import com.example.duriannet.presentation.seller_locator.view_models.MapViewModel
@@ -95,8 +96,6 @@ class MapFragment : Fragment() {
             if (!Common.hasPermissions(requireContext(), PERMISSIONS_REQUIRED)) {
                 Toast.makeText(requireContext(), "Permission request denied", Toast.LENGTH_LONG).show()
                 requireActivity().onBackPressedDispatcher.onBackPressed() // close activity if permission denied
-            } else {
-                initMap()
             }
         }
 
@@ -145,7 +144,6 @@ class MapFragment : Fragment() {
         //observe the states
         setupUI()
         setupStateObservers()
-        initMap()
         setupBottomSheetDialog()
 
     }
@@ -164,12 +162,17 @@ class MapFragment : Fragment() {
 
         isGpsSettingOpened = false // when activity is resumed, the setting must be closed
 
-        viewModel.onEvent(MapEvent.RefreshSellers) // refresh sellers
+//        viewModel.onEvent(MapEvent.RefreshSellers) // refresh sellers
 
         // Request permissions
         if (!Common.hasPermissions(requireContext(), PERMISSIONS_REQUIRED)) {
             requestAllPermissionLauncher.launch(PERMISSIONS_REQUIRED)
         } else {
+
+
+            viewModel.initViewModel()
+
+            initMap()
 
             // observe GPS status after resumed (to get permission on location)
             locationAccessChecker.observeGpsStatus()
@@ -183,8 +186,6 @@ class MapFragment : Fragment() {
                     }
                 }
                 .launchIn(viewLifecycleOwner.lifecycleScope)
-
-
         }
     }
 
@@ -268,25 +269,25 @@ class MapFragment : Fragment() {
 
         // SearchView setup
         // search results adapter
-        adapter.setOnItemClickedListener { seller ->
+        adapter.setOnItemClickedListener { sellerSearchResult ->
             // item clicked
-            viewModel.onEvent(MapEvent.SelectSeller(seller.sellerId)) // select seller
-            viewModel.onEvent(MapEvent.UpdateQuery(seller.name)) // update query value
+            viewModel.onEvent(MapEvent.SelectSeller(sellerSearchResult.sellerId)) // select seller
+            viewModel.onEvent(MapEvent.UpdateQuery(sellerSearchResult.name)) // update query value
 
 //            viewModel.updateQuery(seller.name) // update query value
 
             binding.searchView.hide() // hide search view
             googleMapManager?.apply {
-                moveToLocation(seller.latLng) // move to location
-                onSelect(seller) // select place
+                moveToLocation(LatLng(sellerSearchResult.latitude, sellerSearchResult.longitude)) // move to location
+                onSelect(sellerSearchResult.asSeller()) // select place
             }
 
         }
 
         binding.apply {
-            GoogleMapManager.getUserLocation(requireContext()) { location ->
-                adapter.updateUserLocation(Pair(location.latitude, location.longitude))
-            }
+//            GoogleMapManager.getUserLocation(requireContext()) { location ->
+//                adapter.updateUserLocation(Pair(location.latitude, location.longitude))
+//            }
 
             recyclerResults.adapter = adapter
             recyclerResults.layoutManager = LinearLayoutManager(requireContext())
@@ -343,6 +344,7 @@ class MapFragment : Fragment() {
 
     // Initialize the map
     private fun initMap() {
+//        if (googleMapManager != null) return
 
         val mapFragment = binding.mapFragment.getFragment() as SupportMapFragment
 

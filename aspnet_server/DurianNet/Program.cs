@@ -8,6 +8,7 @@ using DurianNet.Services.DetectionService;
 using DurianNet.Services.DetectionService.YOLO.v10;
 using DurianNet.Services.DurianVideoService;
 using DurianNet.Services.FavoriteDurianService;
+using DurianNet.Services.DetectionService.YOLO.v8;
 using DurianNet.Services.SellerService;
 using DurianNet.Services.TokenService;
 using DurianNet.Services.UserService;
@@ -60,7 +61,7 @@ builder.Services.AddSwaggerGen(option =>
 });
 
 //Setup dependencies
-builder.Services.AddSingleton<IDetector, YoloV10Detector>();
+builder.Services.AddSingleton<IDetector, YoloV8Detector>();
 builder.Services.AddScoped<ISellerService, SellerService>();
 builder.Services.AddScoped<ICommentService, CommentService>();
 builder.Services.AddScoped<DurianNet.Services.DurianProfileService.IDurianProfileRepository, DurianNet.Services.DurianProfileService.DurianProfileRepository>();

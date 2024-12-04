@@ -12,7 +12,7 @@
     <string name="default_iou_threshold">0.45</string>
 
     <string-array name="detection_models">
-        <item>YoloV8m 320x320 (Local)</item>
-        <item>YoloV10s 640x640 (Server)</item>
+        <item>YoloV8s 320x320 (Local)</item>
+        <item>YoloV8s 640x640 (Server)</item>
     </string-array>
 </resources>

@@ -25,18 +25,13 @@ import javax.inject.Inject
 class AddSellerViewModel @Inject constructor(
     private val sellerRepository: SellerRepository,
 ) : ViewModel() {
-    var imageResult: Bitmap? = null
-        get() = field?.drawResults(detectionResults, detectionSize)
-
-    var detectionResults: Array<DetectionResult> = emptyArray()
-
-    var detectionSize = Pair(0, 0)
+    var drawnImageResult: Bitmap? = null
 
     private val _inputState = MutableStateFlow(SellerInputState())
     val inputState = _inputState.asStateFlow()
 
 
-    fun addSeller(onSuccess : () -> Unit) {
+    fun addSeller(onSuccess: () -> Unit) {
         viewModelScope.launch {
             withContext(Dispatchers.IO) {
 
@@ -52,7 +47,7 @@ class AddSellerViewModel @Inject constructor(
                 val durianType = _inputState.value.sellerDurianType
                 val latitude = _inputState.value.sellerLocation.first
                 val longitude = _inputState.value.sellerLocation.second
-                val image = BitmapHelper.encodeBase64Image(imageResult!!)
+                val image = BitmapHelper.encodeBase64Image(drawnImageResult!!)
 
                 //TODO : Replace with actual user id
                 val result = sellerRepository.addSeller(

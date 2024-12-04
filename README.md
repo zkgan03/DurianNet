@@ -12,5 +12,5 @@
 ## Installation Guide
 
 1. Database setup
-   - Reconfigure the `Data Source` of Connection String (`DefaultConnection`) in side `appsettings.json` file
-   - run `dotnet ef database update` in project directory.
+   - Install [SQL 2022 Express](https://www.microsoft.com/en-my/sql-server/sql-server-downloads)
+   - Run command `dotnet ef database update` in project directory.

@@ -9,24 +9,29 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.duriannet.R
 import com.example.duriannet.databinding.ItemSearchResultBinding
 import com.example.duriannet.models.Seller
+import com.example.duriannet.models.SellerSearchResult
 import com.example.duriannet.services.common.GoogleMapManager
 
 class SearchResultsAdapter(
-    private var userLocation: Pair<Double, Double> = Pair(0.0, 0.0),
-    private var onItemClicked: (Seller) -> Unit = {},
-) : ListAdapter<Seller, SearchResultsAdapter.ViewHolder>(object : DiffUtil.ItemCallback<Seller>() {
-    override fun areItemsTheSame(oldItem: Seller, newItem: Seller): Boolean {
+    private var onItemClicked: (SellerSearchResult) -> Unit = {},
+) : ListAdapter<SellerSearchResult, SearchResultsAdapter.ViewHolder>(object : DiffUtil.ItemCallback<SellerSearchResult>() {
+    override fun areItemsTheSame(oldItem: SellerSearchResult, newItem: SellerSearchResult): Boolean {
         return oldItem.sellerId == newItem.sellerId
     }
 
-    override fun areContentsTheSame(oldItem: Seller, newItem: Seller): Boolean {
+    override fun areContentsTheSame(oldItem: SellerSearchResult, newItem: SellerSearchResult): Boolean {
         return oldItem == newItem
     }
 }) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
-        val view = LayoutInflater.from(parent.context).inflate(R.layout.item_search_result, parent, false)
-        return ViewHolder(view)
+        return ViewHolder(
+            ItemSearchResultBinding.bind(
+                LayoutInflater
+                    .from(parent.context)
+                    .inflate(R.layout.item_search_result, parent, false)
+            )
+        )
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
@@ -34,35 +39,20 @@ class SearchResultsAdapter(
         holder.bind(searchResult)
     }
 
-    fun updateUserLocation(userLocation: Pair<Double, Double>) {
-        this.userLocation = userLocation
-        notifyDataSetChanged()
-    }
-
-    fun setOnItemClickedListener(onItemClicked: (Seller) -> Unit) {
+    fun setOnItemClickedListener(onItemClicked: (SellerSearchResult) -> Unit) {
         this.onItemClicked = onItemClicked
     }
 
-    inner class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
-        private val binding = ItemSearchResultBinding.bind(view)
+    inner class ViewHolder(private val binding: ItemSearchResultBinding) : RecyclerView.ViewHolder(binding.root) {
 
-        fun bind(seller: Seller) {
-            binding.distanceFromCurrentLocation.text =
-                String.format(
-                    "%.2f km",
-                    GoogleMapManager.calculateDistanceInMeter(
-                        userLocation.first,
-                        userLocation.second,
-                        seller.latLng.latitude,
-                        seller.latLng.longitude
-                    ) / 1000.0f
-                )
+        fun bind(seller: SellerSearchResult) {
+            binding.distanceFromCurrentLocation.text = String.format("%.2f km", seller.distanceFromCurrentLocationInKm)
 
             binding.sellerName.text = seller.name
             binding.sellerAddress.text = GoogleMapManager.getAddress(
                 itemView.context,
-                seller.latLng.latitude,
-                seller.latLng.longitude
+                seller.latitude,
+                seller.longitude
             )
             binding.itemView.setOnClickListener {
                 onItemClicked(seller)
