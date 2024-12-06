@@ -1,9 +1,10 @@
 ﻿using DurianNet.Data;
+using DurianNet.Dtos.Account;
 using DurianNet.Dtos.Request.User;
-using DurianNet.Helpers;
 using DurianNet.Mappers;
 using DurianNet.Models.DataModels;
 using DurianNet.Services.EmailService;
+using DurianNet.Services.TokenService;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -13,15 +14,20 @@ using System.Security.Claims;
 
 namespace DurianNet.Controllers.api
 {
-    [Route("api/[controller]")]
+    //[Route("api/[controller]")]
+    [Route("api/user")]
     [ApiController]
     public class UserController : ControllerBase
     {
         private readonly ApplicationDBContext _context;
+        private readonly UserManager<User> _userManager;
+        private readonly ITokenService _tokenService; // Add ITokenService
 
-        public UserController(ApplicationDBContext context)
+        public UserController(UserManager<User> userManager, ApplicationDBContext context, ITokenService tokenService)
         {
+            _userManager = userManager;
             _context = context;
+            _tokenService = tokenService; // Assign it in the constructor
         }
 
         //for testing
@@ -41,194 +47,6 @@ namespace DurianNet.Controllers.api
             return Ok(userDtos);
         }
 
-        //user only
-        [HttpGet("GetEverythingFromUsers")]
-        public async Task<IActionResult> GetEverythingFromUsers()
-        {
-            //var users = await _context.Users.ToListAsync();  // Retrieve all users
-            // Retrieve all users with UserType = User
-            var users = await _context.Users
-                                      .Where(user => user.UserType == UserType.User)
-                                      .ToListAsync();
-
-            if (users == null || !users.Any())
-            {
-                return NotFound("No users found.");
-            }
-
-            // Map the users to a list of UserDetailsDto
-            var userDtos = users.Select(user => user.UserDetailsDto()).ToList();
-
-            return Ok(userDtos);
-        }
-
-        //search username
-        [HttpGet("GetAllUsers")]
-        public async Task<IActionResult> GetAllUsers([FromQuery] QueryObject query)
-        {
-            if (query == null)
-            {
-                return BadRequest("Query parameters are missing.");
-            }
-
-            Console.WriteLine($"Query.Username: {query.Username}"); // Debugging
-
-            //var usersQuery = _context.Users.AsQueryable();
-            // Initialize the query with the condition UserType = User
-            var usersQuery = _context.Users.Where(u => u.UserType == UserType.User);
-
-            if (!string.IsNullOrWhiteSpace(query.Username))
-            {
-                usersQuery = usersQuery.Where(u => u.UserName.ToLower().Contains(query.Username.ToLower())); // Case-insensitive
-            }
-
-            var users = await usersQuery.ToListAsync();
-
-            if (users == null || !users.Any())
-            {
-                return NotFound("No users found.");
-            }
-
-            try
-            {
-                var userDtos = users.Select(u => u.ToUserListDto()).ToList();
-                return Ok(userDtos);
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"Error in DTO mapping: {ex.Message}"); // Debugging
-                return StatusCode(500, "An error occurred while processing the data.");
-            }
-        }
-
-        //GetUser
-        [HttpGet("GetUser/{id}")]
-        public async Task<IActionResult> GetUserById(string id)
-        {
-
-            var user = await _context.Users.FindAsync(id);
-            if (user == null)
-            {
-                return NotFound("User not found");
-            }
-            return Ok(user.ToUserDetailsDto());
-        }
-
-
-        [HttpGet("GetUserByUsername/{username?}")]
-        public async Task<IActionResult> GetUserByUsername(string? username)
-        {
-            // If username is not provided in the route, use the session value
-            if (string.IsNullOrEmpty(username))
-            {
-                username = HttpContext.Session.GetString("Username");
-
-                if (string.IsNullOrEmpty(username))
-                {
-                    return Unauthorized("Session expired or username not found.");
-                }
-            }
-
-            // Find the user by username
-            var user = await _context.Users.SingleOrDefaultAsync(u => u.UserName == username);
-
-            if (user == null)
-            {
-                return NotFound("User not found.");
-            }
-
-            return Ok(user.ToUserDetailsDto());
-        }
-
-
-
-        //[HttpPost("Register")]
-        //public async Task<IActionResult> Register([FromBody] RegisterRequestDto dto)
-        //{
-        //    var user = dto.ToUserFromRegisterRequest();
-        //    _context.Users.Add(user);
-        //    await _context.SaveChangesAsync();
-        //    return Ok(user.ToUserDetailsDto());
-        //}
-
-        //admin no use
-        //UpdateUserByUsername
-        /*[HttpPut("UpdateUser/{id}")]
-        public async Task<IActionResult> UpdateUser(string id, [FromBody] UpdateUserProfileRequestDto dto)
-        {
-            var user = await _context.Users.FindAsync(id);
-            if (user == null)
-            {
-                return NotFound("User not found");
-            }
-
-            user.UpdateUserFromDto(dto);
-            await _context.SaveChangesAsync();
-            return Ok(user.ToUserDetailsDto());
-        }*/
-
-        //admin no use
-        /*[HttpPut("UpdateUserByUsername/{username?}")]
-        public async Task<IActionResult> UpdateUserByUsername(string? username, [FromBody] UpdateUserProfileRequestDto dto)
-        {
-            if (string.IsNullOrEmpty(username))
-            {
-                username = HttpContext.Session.GetString("Username");
-                if (string.IsNullOrEmpty(username)) return Unauthorized("Session expired or username not found.");
-            }
-
-            var user = await _context.Users.SingleOrDefaultAsync(u => u.UserName == username);
-            if (user == null) return NotFound("User not found");
-
-            // Update fields
-            user.FullName = dto.FullName;
-            user.Email = dto.Email;
-            user.PhoneNumber = dto.PhoneNumber;
-
-            // Update profile picture
-            if (!string.IsNullOrEmpty(dto.ProfilePicture))
-            {
-                user.ProfilePicture = dto.ProfilePicture; // Save Base64 string or store it in a file
-            }
-
-            await _context.SaveChangesAsync();
-            return Ok(user.ToUserDetailsDto());
-        }*/
-
-        [HttpPost("ForgotPassword")]
-        public async Task<IActionResult> ForgotPassword([FromBody] ForgotPasswordRequestDto dto)
-        {
-            if (string.IsNullOrEmpty(dto.Email))
-                return BadRequest("Email cannot be empty.");
-
-            // Find the user by email
-            var user = await _context.Users.FirstOrDefaultAsync(u => u.Email == dto.Email);
-            if (user == null)
-                return NotFound("No user found with the provided email address.");
-
-            // Save the email in the session
-            HttpContext.Session.SetString("ResetPasswordEmail", dto.Email);
-
-            // Determine whether the user is an admin or regular user
-            bool isAdmin = user.UserType == UserType.Admin || user.UserType == UserType.SuperAdmin;
-
-            try
-            {
-                // Use the EmailService to send the password recovery email
-                EmailService.SendPasswordRecoveryEmail(user.Email, isAdmin);
-
-                // Return success response
-                return Ok("Password recovery email sent successfully.");
-            }
-            catch (Exception ex)
-            {
-                // Handle errors during email sending
-                return StatusCode(500, $"An error occurred while sending the email: {ex.Message}");
-            }
-        }
-
-        
-        
         [HttpGet("GetSessionEmail")]
         public IActionResult GetSessionEmail()
         {
@@ -239,90 +57,239 @@ namespace DurianNet.Controllers.api
             return Ok($"Email in session: {email}");
         }
 
-        //user account
-        [HttpPut("DeleteUser/{id}")]
-        public async Task<IActionResult> DeleteUser(string id)
+        [HttpPost("appLogin")]
+        public async Task<IActionResult> appLogin([FromBody] LoginDto loginDto)
         {
-            // Find the user by ID
-            var user = await _context.Users.FindAsync(id);
-            if (user == null)
-            {
-                return NotFound("User not found");
-            }
+            if (!ModelState.IsValid) return BadRequest(ModelState);
 
-            // Change the user status to "deleted"
-            user.UserStatus = UserStatus.Deleted;  // Assuming you have an enum or status field for user status
+            var user = await _userManager.Users.FirstOrDefaultAsync(u => u.UserName.ToLower() == loginDto.Username.ToLower());
+            if (user == null) return Unauthorized("Invalid username or password");
 
-            // Save the changes to the database
-            await _context.SaveChangesAsync();
-
-            // Return success response with updated user status
-            return Ok(user.ToUserDetailsDto());
-        }
-
-        //admin profile
-        [HttpPut("DeleteAdmin/{username?}")]
-        public async Task<IActionResult> DeleteAdminByUsername(string? username)
-        {
-            // Retrieve username from session if not provided in the route
-            if (string.IsNullOrEmpty(username))
-            {
-                username = HttpContext.Session.GetString("Username");
-                if (string.IsNullOrEmpty(username))
-                {
-                    return Unauthorized("Session expired or username not found.");
-                }
-            }
-
-            // Find the user by username
-            var user = await _context.Users.SingleOrDefaultAsync(u => u.UserName == username);
-            if (user == null)
-            {
-                return NotFound("User not found");
-            }
-
-            // Clear session data
-            HttpContext.Session.Remove("Username");
-            HttpContext.Session.Remove("ResetPasswordEmail");
-            HttpContext.Response.Cookies.Delete("AuthToken");
-
-            // Change the user status to "deleted"
-            user.UserStatus = UserStatus.Deleted; 
-
-            // Save the changes to the database
-            await _context.SaveChangesAsync();
-
-            // Return success response with the updated user details
-            return Ok(user.ToUserDetailsDto());
-        }
-
-
-        //user account
-        [HttpPut("RecoverUser/{id}")]
-        public async Task<IActionResult> RecoverUser(string id)
-        {
-            // Find the user by ID
-            var user = await _context.Users.FindAsync(id);
-            if (user == null)
-            {
-                return NotFound("User not found");
-            }
-
-            // Change the user status to "Active"
+            // Check if the user is deleted
             if (user.UserStatus == UserStatus.Deleted)
-            {
-                user.UserStatus = UserStatus.Active;  // Change status to Active
-            }
-            else
-            {
-                return BadRequest("User status is already active or in an invalid state for recovery.");
-            }
+                return Unauthorized("User account is deleted. Contact support.");
 
-            // Save the changes to the database
+            var result = await _userManager.CheckPasswordAsync(user, loginDto.Password);
+            if (!result) return Unauthorized("Invalid username or password");
+
+            // Generate Token
+            var token = _tokenService.CreateToken(user);
+
+            return Ok(new
+            {
+                UserName = user.UserName,
+                Email = user.Email,
+                Token = token
+            });
+        }
+
+        [HttpPut("appDeleteAccount/{username}")]
+        public async Task<IActionResult> appDeleteAccount(string username)
+        {
+            var user = await _userManager.FindByNameAsync(username);
+            if (user == null) return NotFound("User not found");
+
+            // Update user status to deleted
+            user.UserStatus = UserStatus.Deleted;
+            await _userManager.UpdateAsync(user);
+
+            return Ok("User account deleted successfully");
+        }
+
+        [HttpPost("appLogout")]
+        public IActionResult appLogout()
+        {
+            // Clear client-side data like token and shared preferences
+            return Ok("Logged out successfully.");
+        }
+
+
+        //signup
+        [HttpPost("appRegister")]
+        public async Task<IActionResult> appRegister([FromBody] RegisterDto registerDto)
+        {
+            if (!ModelState.IsValid) return BadRequest(ModelState);
+
+            var appUser = new User
+            {
+                UserName = registerDto.Username,
+                Email = registerDto.Email,
+                ProfilePicture = "defaultProfilePicture.jpg",
+                UserStatus = UserStatus.Active,
+                UserType = UserType.User
+            };
+
+            var result = await _userManager.CreateAsync(appUser, registerDto.Password);
+            if (!result.Succeeded) return StatusCode(500, result.Errors);
+
+            return Ok(new { appUser.UserName, appUser.Email });
+        }
+
+        //change password
+        [HttpPut("appChangePassword/{username}")]
+        public async Task<IActionResult> appChangePassword(string username, [FromBody] ChangePasswordRequestDto dto)
+        {
+            if (string.IsNullOrWhiteSpace(dto.CurrentPassword) || string.IsNullOrWhiteSpace(dto.Password))
+                return BadRequest("Current password or new password is missing.");
+
+            var user = await _userManager.FindByNameAsync(username);
+            if (user == null) return NotFound("User not found");
+
+            var result = await _userManager.ChangePasswordAsync(user, dto.CurrentPassword, dto.Password);
+            if (!result.Succeeded) return BadRequest(result.Errors);
+
+            return Ok("Password changed successfully");
+        }
+
+        [HttpPost("appForgotPassword")]
+        public async Task<IActionResult> appForgotPassword([FromBody] ForgotPasswordRequestDto dto)
+        {
+            if (string.IsNullOrWhiteSpace(dto.Email))
+                return BadRequest("Email cannot be empty.");
+
+            var user = await _context.Users.FirstOrDefaultAsync(u => u.Email == dto.Email);
+            if (user == null) return NotFound("No user found with the provided email.");
+
+            // Generate a new OTP
+            var otp = new Random().Next(1000, 9999).ToString();
+            var expiry = DateTime.UtcNow.AddMinutes(10); // OTP expires in 10 minutes
+
+            // Update user with OTP and expiry
+            user.OTP = otp;
+            user.OTPExpiry = expiry;
+
+            _context.Users.Update(user);
             await _context.SaveChangesAsync();
 
-            // Return success response with updated user status
-            return Ok(user.ToUserDetailsDto());
+            // Send the OTP via email
+            try
+            {
+                EmailService.SendOtpEmail(user.Email, otp);
+                return Ok("OTP sent successfully.");
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"An error occurred while sending the email: {ex.Message}");
+            }
         }
+
+
+        [HttpPost("validateOTP")]
+        public async Task<IActionResult> ValidateOTP([FromBody] ValidateOTPRequestDto dto)
+        {
+            var user = await _context.Users.FirstOrDefaultAsync(u => u.Email == dto.Email);
+
+            if (user == null) return NotFound("User not found.");
+            if (user.OTP != dto.OTP) return BadRequest("Invalid OTP.");
+            if (user.OTPExpiry == null || user.OTPExpiry < DateTime.UtcNow) return BadRequest("OTP has expired.");
+
+            // Clear OTP after validation
+            user.OTP = null;
+            user.OTPExpiry = null;
+            _context.Users.Update(user);
+            await _context.SaveChangesAsync();
+
+            return Ok("OTP validated successfully.");
+        }
+
+
+
+        //reset password (get email and new password)
+        [HttpPost("appResetPassword")]
+        public async Task<IActionResult> appResetPassword([FromBody] AppResetPasswordRequestDto dto)
+        {
+            if (string.IsNullOrWhiteSpace(dto.Email) || string.IsNullOrWhiteSpace(dto.NewPassword))
+                return BadRequest("Email and new password cannot be empty");
+
+            // Find the user by email
+            var user = await _context.Users.FirstOrDefaultAsync(u => u.Email == dto.Email);
+            if (user == null) return NotFound("User not found");
+
+            // Reset the password
+            user.PasswordHash = _userManager.PasswordHasher.HashPassword(user, dto.NewPassword);
+            var result = await _userManager.UpdateAsync(user);
+
+            if (!result.Succeeded)
+                return StatusCode(500, $"Failed to reset password: {string.Join(", ", result.Errors.Select(e => e.Description))}");
+
+            return Ok("Password reset successfully");
+        }
+
+        //display edit profile
+        //display user profile
+        [HttpGet("appGetUserByUsername/{username}")]
+        public async Task<IActionResult> appGetUserByUsername(string username)
+        {
+            var user = await _userManager.Users.SingleOrDefaultAsync(u => u.UserName == username);
+            if (user == null) return NotFound("User not found");
+
+            return Ok(new { user.UserName, user.Email, user.FullName, user.PhoneNumber, user.ProfilePicture });
+        }
+
+        [HttpPut("appUpdateUserByUsername/{username}")]
+        public async Task<IActionResult> appUpdateUserByUsername(string username, [FromForm] UpdateUserProfileRequestDto dto)
+        {
+            var user = await _context.Users.SingleOrDefaultAsync(u => u.UserName == username);
+            if (user == null) return NotFound("User not found");
+
+            user.FullName = dto.FullName ?? user.FullName;
+            user.Email = dto.Email ?? user.Email;
+            user.PhoneNumber = dto.PhoneNumber ?? user.PhoneNumber;
+
+            // Handle profile picture upload
+            if (dto.ProfilePicture != null)
+            {
+                var uploadsFolder = Path.Combine("wwwroot", "images");
+                Directory.CreateDirectory(uploadsFolder);
+
+                var fileName = $"{Guid.NewGuid()}_{dto.ProfilePicture.FileName}";
+                var filePath = Path.Combine(uploadsFolder, fileName);
+
+                using (var stream = new FileStream(filePath, FileMode.Create))
+                {
+                    await dto.ProfilePicture.CopyToAsync(stream);
+                }
+
+                user.ProfilePicture = $"/images/{fileName}"; // Save relative path
+            }
+
+            _context.Users.Update(user);
+            await _context.SaveChangesAsync();
+
+            return Ok("User profile updated successfully");
+        }
+
+
+        [HttpPut("appUpdateUserWithImage/{username}")]
+        public async Task<IActionResult> UpdateUserWithImage(string username, [FromForm] UpdateUserProfileRequestDto dto)
+        {
+            var user = await _userManager.Users.SingleOrDefaultAsync(u => u.UserName == username);
+            if (user == null)
+                return NotFound("User not found");
+
+            user.FullName = dto.FullName ?? user.FullName;
+            user.Email = dto.Email ?? user.Email;
+            user.PhoneNumber = dto.PhoneNumber ?? user.PhoneNumber;
+
+            if (dto.ProfilePicture != null)
+            {
+                var uploadsFolder = Path.Combine("wwwroot", "images");
+                Directory.CreateDirectory(uploadsFolder);
+
+                var fileName = $"{Guid.NewGuid()}_{dto.ProfilePicture.FileName}";
+                var filePath = Path.Combine(uploadsFolder, fileName);
+
+                using (var stream = new FileStream(filePath, FileMode.Create))
+                {
+                    await dto.ProfilePicture.CopyToAsync(stream);
+                }
+
+                user.ProfilePicture = $"/images/{fileName}";
+            }
+
+            await _userManager.UpdateAsync(user);
+            return Ok("Profile updated successfully");
+        }
+
     }
 }

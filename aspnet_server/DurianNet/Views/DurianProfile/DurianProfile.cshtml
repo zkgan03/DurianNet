@@ -55,7 +55,7 @@
 <script>
     async function fetchDurianProfiles(query = '') {
         try {
-            const response = await fetch(`/api/durianprofile/GetAllDurianProfiles?DurianName=${encodeURIComponent(query)}`);
+            const response = await fetch(`/durianprofile/GetAllDurianProfiles?DurianName=${encodeURIComponent(query)}`);
             if (!response.ok) {
                 if (response.status === 404) {
                     alert("No results found.");
@@ -109,7 +109,7 @@
             return;
         }
         try {
-            const response = await fetch(`/api/durianprofile/DeleteDurianProfile/${id}`, {
+            const response = await fetch(`/durianprofile/DeleteDurianProfile/${id}`, {
                 method: 'DELETE'
             });
             if (response.ok) {

@@ -108,7 +108,7 @@
         document.cookie = `durianId=${durianId};path=/`;
 
         try {
-            const response = await fetch(`/api/durianprofile/GetDurianProfile/${durianId}`);
+            const response = await fetch(`/durianprofile/GetDurianProfile/${durianId}`);
             if (!response.ok) throw new Error("Failed to load durian details.");
 
             const data = await response.json();
@@ -163,7 +163,7 @@
         };
 
         try {
-            const response = await fetch(`/api/durianprofile/UpdateDurianProfile`, {
+            const response = await fetch(`/durianprofile/UpdateDurianProfile`, {
                 method: 'PUT',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(payload),

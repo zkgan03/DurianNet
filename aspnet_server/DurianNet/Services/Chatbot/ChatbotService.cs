@@ -9,7 +9,10 @@ using LangChain.Providers;
 using LangChain.Providers.Ollama;
 using Ollama;
 using DurianNet.Utils;
+using DurianNet.Dtos;
 using DurianNet.Dtos.Request.Chat;
+using DurianNet.Services.Chatbot;
+
 
 namespace DurianNet.Services.Chatbot
 {

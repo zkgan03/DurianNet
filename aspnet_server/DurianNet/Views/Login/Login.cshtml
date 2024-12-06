@@ -64,7 +64,8 @@
             errorMessageDiv.textContent = ""; // Clear previous messages
 
             try {
-                const response = await fetch('/api/account/loginAdmin', {
+                //const response = await fetch('/api/account/loginAdmin', {
+                const response = await fetch('/account/loginAdmin', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ username, password })

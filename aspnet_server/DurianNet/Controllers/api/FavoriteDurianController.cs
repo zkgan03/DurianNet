@@ -16,7 +16,7 @@ namespace DurianNet.Controllers.api
             _context = context;
         }
 
-        // GET: api/favoriteDurian/{username}
+        /*// GET: api/favoriteDurian/{username}
         [HttpGet("{username}")]
         public async Task<IActionResult> GetFavoriteDurians(string username)
         {
@@ -66,7 +66,7 @@ namespace DurianNet.Controllers.api
             await _context.SaveChangesAsync();
 
             return Ok("Durian added to favorites.");
-        }
+        }*/
 
         //// DELETE: api/favoriteDurian
         //[HttpDelete]
@@ -88,7 +88,7 @@ namespace DurianNet.Controllers.api
         //    return Ok("Durian removed from favorites.");
         //}
 
-        [HttpDelete]
+        /*[HttpDelete]
         public async Task<IActionResult> RemoveFavoriteDurian([FromBody] RemoveFavoriteDurianRequest request)
         {
             var user = await _context.Users
@@ -125,5 +125,6 @@ namespace DurianNet.Controllers.api
     {
         public string Username { get; set; }
         public string DurianName { get; set; }
+    }*/
     }
 }

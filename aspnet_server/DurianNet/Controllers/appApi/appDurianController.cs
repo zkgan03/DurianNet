@@ -17,7 +17,7 @@ namespace DurianNet.Controllers.appApi
             _context = context;
         }
 
-        // search favorite durian
+        /*// search favorite durian
         //search durian profile
         [HttpGet("appGetAllDurianProfiles")]
         public async Task<IActionResult> appGetAllDurianProfiles([FromQuery] string? searchQuery)
@@ -132,7 +132,7 @@ namespace DurianNet.Controllers.appApi
             await _context.SaveChangesAsync();
 
             return Ok("Favorite durian removed successfully");
-        }
+        }*/
 
     }
 }

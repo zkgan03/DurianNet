@@ -26,30 +26,7 @@ namespace DurianNet.Controllers.appApi
             _tokenService = tokenService; // Assign it in the constructor
         }
 
-        //login
         /*[HttpPost("appLogin")]
-        public async Task<IActionResult> appLogin([FromBody] LoginDto loginDto)
-        {
-            if (!ModelState.IsValid) return BadRequest(ModelState);
-
-            var user = await _userManager.Users.FirstOrDefaultAsync(u => u.UserName.ToLower() == loginDto.Username.ToLower());
-            if (user == null) return Unauthorized("Invalid username or password");
-
-            var result = await _userManager.CheckPasswordAsync(user, loginDto.Password);
-            if (!result) return Unauthorized("Invalid username or password");
-
-            // Generate Token
-            var token = _tokenService.CreateToken(user);
-
-            return Ok(new
-            {
-                UserName = user.UserName,
-                Email = user.Email,
-                Token = token // Include the token in the response
-            });
-        }*/
-
-        [HttpPost("appLogin")]
         public async Task<IActionResult> appLogin([FromBody] LoginDto loginDto)
         {
             if (!ModelState.IsValid) return BadRequest(ModelState);
@@ -218,21 +195,6 @@ namespace DurianNet.Controllers.appApi
             return Ok(new { user.UserName, user.Email, user.FullName, user.PhoneNumber, user.ProfilePicture });
         }
 
-        //edit profile
-        /*[HttpPut("appUpdateUserByUsername/{username}")]
-        public async Task<IActionResult> appUpdateUserByUsername(string username, [FromBody] UpdateUserProfileRequestDto dto)
-        {
-            var user = await _userManager.Users.SingleOrDefaultAsync(u => u.UserName == username);
-            if (user == null) return NotFound("User not found");
-
-            user.FullName = dto.FullName ?? user.FullName;
-            user.Email = dto.Email ?? user.Email;
-            user.PhoneNumber = dto.PhoneNumber ?? user.PhoneNumber;
-
-            await _userManager.UpdateAsync(user);
-            return Ok("User profile updated successfully");
-        }*/
-
         [HttpPut("appUpdateUserByUsername/{username}")]
         public async Task<IActionResult> appUpdateUserByUsername(string username, [FromForm] UpdateUserProfileRequestDto dto)
         {
@@ -296,7 +258,7 @@ namespace DurianNet.Controllers.appApi
 
             await _userManager.UpdateAsync(user);
             return Ok("Profile updated successfully");
-        }
+        }*/
 
     }
 }

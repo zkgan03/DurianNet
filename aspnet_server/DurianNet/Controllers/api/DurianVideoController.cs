@@ -16,7 +16,7 @@ namespace DurianNet.Controllers.api
             _context = context;
         }
 
-        [HttpGet("GetAllDurianVideos")]
+        /*[HttpGet("GetAllDurianVideos")]
         public async Task<IActionResult> GetAllDurianVideos()
         {
             var durianVideos = await _context.DurianVideos.ToListAsync();
@@ -47,7 +47,7 @@ namespace DurianNet.Controllers.api
             _context.DurianVideos.Remove(video);
             await _context.SaveChangesAsync();
             return NoContent();
-        }
+        }*/
 
     }
 }
