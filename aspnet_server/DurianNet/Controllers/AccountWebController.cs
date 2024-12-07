@@ -166,7 +166,7 @@ public class AccountWebController : Controller
             .FirstOrDefaultAsync(x => x.UserName.ToLower() == loginDto.Username.ToLower());
 
         if (user == null)
-            return Unauthorized(new { message = "Invalid username!" });
+            return Unauthorized(new { message = "Invalid username or password!" });
 
         if (user.UserType != UserType.Admin && user.UserType != UserType.SuperAdmin)
             return Unauthorized(new { message = "Only admins and super admins can log in to the admin web interface." });
@@ -355,7 +355,7 @@ public class AccountWebController : Controller
             {
                 UserName = registerDto.Username,
                 Email = registerDto.Email,
-                ProfilePicture = "default.jpg", // Default profile picture
+                ProfilePicture = "/images/defaultProfilePicture.jpg", // Default profile picture
                 UserStatus = UserStatus.Active,
                 UserType = UserType.Admin
             };
