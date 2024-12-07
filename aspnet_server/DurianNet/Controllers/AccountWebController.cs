@@ -315,7 +315,7 @@ public class AccountWebController : Controller
         }
     }
 
-    [HttpPost("registerAdmin")]
+    /*[HttpPost("registerAdmin")]
     public async Task<IActionResult> RegisterAdmin([FromBody] RegisterDto registerDto)
     {
         try
@@ -386,7 +386,78 @@ public class AccountWebController : Controller
             Console.WriteLine($"Error during admin registration: {ex.Message}");
             return StatusCode(500, "An unexpected error occurred during admin registration.");
         }
+    }*/
+
+    [HttpPost("registerAdmin")]
+    public async Task<IActionResult> RegisterAdmin([FromBody] RegisterDto registerDto)
+    {
+        try
+        {
+            // Check if ModelState is valid
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(new { message = "Invalid input." });
+            }
+
+            // Validate username length
+            if (registerDto.Username.Length < 5)
+            {
+                return BadRequest(new { message = "Username must be at least 5 characters long." });
+            }
+
+            // Validate password strength
+            var passwordPattern = @"^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)(?=.*[@$!%*?&_])[A-Za-z\d@$!%*?&_]{8,}$";
+
+            if (!Regex.IsMatch(registerDto.Password, passwordPattern))
+            {
+                return BadRequest(new { message = "Password must be at least 8 characters long and include at least one uppercase letter, one lowercase letter, one number, and one special character." });
+            }
+
+            // Check if username or email already exists
+            if (await _userManager.Users.AnyAsync(u => u.UserName == registerDto.Username))
+            {
+                return BadRequest(new { message = "Username is already taken." });
+            }
+            if (await _userManager.Users.AnyAsync(u => u.Email == registerDto.Email))
+            {
+                return BadRequest(new { message = "Email is already in use." });
+            }
+
+            // Create user
+            var appUser = new User
+            {
+                UserName = registerDto.Username,
+                Email = registerDto.Email,
+                ProfilePicture = "/images/defaultProfilePicture.jpg", // Default profile picture
+                UserStatus = UserStatus.Active,
+                UserType = UserType.Admin
+            };
+
+            var createdUser = await _userManager.CreateAsync(appUser, registerDto.Password);
+
+            if (!createdUser.Succeeded)
+            {
+                var errors = string.Join(", ", createdUser.Errors.Select(e => e.Description));
+                return StatusCode(500, new { message = errors });
+            }
+
+            // Add user to Admin role
+            var roleResult = await _userManager.AddToRoleAsync(appUser, "Admin");
+            if (!roleResult.Succeeded)
+            {
+                var errors = string.Join(", ", roleResult.Errors.Select(e => e.Description));
+                return StatusCode(500, new { message = errors });
+            }
+
+            return Ok(new { message = "Registration successful." });
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error during admin registration: {ex.Message}");
+            return StatusCode(500, new { message = "An unexpected error occurred during registration." });
+        }
     }
+
 
     [HttpPost("logout")]
     public async Task<IActionResult> Logout()
