@@ -56,15 +56,6 @@ namespace DurianNet.Controllers.api
             return Ok(new { AccessToken = newAccessToken, RefreshToken = newRefreshToken.Token });
         }
 
-
-
-        
-
-
-
-
-
-
     }
 }
 
