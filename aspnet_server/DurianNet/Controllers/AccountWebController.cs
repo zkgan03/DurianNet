@@ -248,12 +248,17 @@ public class AccountWebController : Controller
     public async Task<IActionResult> ForgotPassword([FromBody] ForgotPasswordRequestDto dto)
     {
         if (string.IsNullOrEmpty(dto.Email))
-            return BadRequest("Email cannot be empty.");
+            return BadRequest(new { message = "Email cannot be empty." });
+
+        // Validate email format
+        var emailPattern = @"^[^@\s]+@[^@\s]+\.[^@\s]+$";
+        if (!Regex.IsMatch(dto.Email, emailPattern))
+            return BadRequest(new { message = "Invalid email format." });
 
         // Find the user by email
         var user = await _context.Users.FirstOrDefaultAsync(u => u.Email == dto.Email);
         if (user == null)
-            return NotFound("No user found with the provided email address.");
+            return NotFound(new { message = "No user found with the provided email address." });
 
         // Save the email in the session
         HttpContext.Session.SetString("ResetPasswordEmail", dto.Email);
@@ -272,7 +277,7 @@ public class AccountWebController : Controller
         catch (Exception ex)
         {
             // Handle errors during email sending
-            return StatusCode(500, $"An error occurred while sending the email: {ex.Message}");
+            return StatusCode(500, new { message = $"An error occurred while sending the email: {ex.Message}" });
         }
     }
 
@@ -280,17 +285,24 @@ public class AccountWebController : Controller
     public async Task<IActionResult> ResetPassword([FromBody] ResetPasswordRequestDto dto)
     {
         if (string.IsNullOrWhiteSpace(dto.NewPassword))
-            return BadRequest("New password cannot be empty.");
+            return BadRequest(new { message = "New password cannot be empty." });
+
+        // Validate password strength
+        var passwordPattern = @"^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)(?=.*[@$!%*?&_])[A-Za-z\d@$!%*?&_]{8,}$";
+        if (!Regex.IsMatch(dto.NewPassword, passwordPattern))
+        {
+            return BadRequest(new { message = "Password must be at least 8 characters long and include at least one uppercase letter, one lowercase letter, one number, and one special character." });
+        }
 
         // Retrieve email from session
         var email = HttpContext.Session.GetString("ResetPasswordEmail");
         if (string.IsNullOrEmpty(email))
-            return BadRequest("No email found for password reset. Please initiate the Forgot Password process again.");
+            return BadRequest(new { message = "No email found for password reset. Please initiate the Forgot Password process again." });
 
         // Find the user by email
         var user = await _userManager.FindByEmailAsync(email);
         if (user == null)
-            return BadRequest("No user found with the provided email.");
+            return BadRequest(new { message = "No user found with the provided email." });
 
         try
         {
@@ -302,91 +314,19 @@ public class AccountWebController : Controller
             {
                 var errors = string.Join(", ", result.Errors.Select(e => e.Description));
                 Console.WriteLine($"Password reset failed: {errors}");
-                return StatusCode(500, $"An error occurred while resetting the password: {errors}");
+                return StatusCode(500, new { message = $"An error occurred while resetting the password: {errors}" });
             }
 
             Console.WriteLine("Password reset successful.");
-            return Ok("Password reset successfully.");
+            return Ok(new { message = "Password reset successfully." });
         }
         catch (Exception ex)
         {
             Console.WriteLine($"Exception in ResetPassword: {ex.Message}");
-            return StatusCode(500, "An unexpected error occurred while resetting the password.");
+            return StatusCode(500, new { message = "An unexpected error occurred while resetting the password." });
         }
     }
 
-    /*[HttpPost("registerAdmin")]
-    public async Task<IActionResult> RegisterAdmin([FromBody] RegisterDto registerDto)
-    {
-        try
-        {
-            // Check if ModelState is valid
-            if (!ModelState.IsValid)
-            {
-                return BadRequest("Invalid input.");
-            }
-
-            // Validate username length
-            if (registerDto.Username.Length < 5)
-            {
-                return BadRequest("Username must be at least 5 characters long.");
-            }
-
-            // Validate password strength
-            var passwordPattern = @"^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)(?=.*[@$!%*?&_])[A-Za-z\d@$!%*?&_]{8,}$";
-
-            if (!Regex.IsMatch(registerDto.Password, passwordPattern))
-            {
-                return BadRequest("Password must be at least 8 characters long and include at least one uppercase letter, one lowercase letter, one number, and one special character.");
-            }
-
-            // Check if username or email already exists
-            if (await _userManager.Users.AnyAsync(u => u.UserName == registerDto.Username))
-            {
-                return BadRequest("Username is already taken.");
-            }
-            if (await _userManager.Users.AnyAsync(u => u.Email == registerDto.Email))
-            {
-                return BadRequest("Email is already in use.");
-            }
-
-            // Create user
-            var appUser = new User
-            {
-                UserName = registerDto.Username,
-                Email = registerDto.Email,
-                ProfilePicture = "/images/defaultProfilePicture.jpg", // Default profile picture
-                UserStatus = UserStatus.Active,
-                UserType = UserType.Admin
-            };
-
-            var createdUser = await _userManager.CreateAsync(appUser, registerDto.Password);
-
-            if (!createdUser.Succeeded)
-            {
-                return StatusCode(500, createdUser.Errors);
-            }
-
-            // Add user to Admin role
-            var roleResult = await _userManager.AddToRoleAsync(appUser, "Admin");
-            if (!roleResult.Succeeded)
-            {
-                return StatusCode(500, roleResult.Errors);
-            }
-
-            return Ok(new NewUserDto
-            {
-                UserName = appUser.UserName,
-                Email = appUser.Email,
-                Token = _tokenService.CreateToken(appUser)
-            });
-        }
-        catch (Exception ex)
-        {
-            Console.WriteLine($"Error during admin registration: {ex.Message}");
-            return StatusCode(500, "An unexpected error occurred during admin registration.");
-        }
-    }*/
 
     [HttpPost("registerAdmin")]
     public async Task<IActionResult> RegisterAdmin([FromBody] RegisterDto registerDto)
