@@ -194,7 +194,7 @@ public class AdminProfileWebController : Controller
     }
 
 
-    [HttpPut("UpdateAdminProfileByUsername/{username?}")]
+    /*[HttpPut("UpdateAdminProfileByUsername/{username?}")]
     public async Task<IActionResult> UpdateAdminProfileByUsername(string? username, [FromBody] AdminUpdateUserProfileRequestDto dto)
     {
         if (string.IsNullOrEmpty(username))
@@ -225,6 +225,46 @@ public class AdminProfileWebController : Controller
         {
             Console.WriteLine($"Update Error: {ex.Message}");
             return StatusCode(500, "Failed to update profile.");
+        }
+    }*/
+
+    [HttpPut("UpdateAdminProfileByUsername/{username?}")]
+    public async Task<IActionResult> UpdateAdminProfileByUsername(string? username, [FromBody] AdminUpdateUserProfileRequestDto dto)
+    {
+        if (string.IsNullOrEmpty(username))
+        {
+            username = HttpContext.Session.GetString("Username");
+            if (string.IsNullOrEmpty(username))
+                return Unauthorized(new { message = "Session expired or username not found." });
+        }
+
+        var user = await _context.Users.SingleOrDefaultAsync(u => u.UserName == username);
+        if (user == null)
+            return NotFound(new { message = "User not found." });
+
+        try
+        {
+            if (string.IsNullOrWhiteSpace(dto.FullName) || string.IsNullOrWhiteSpace(dto.Email) || string.IsNullOrWhiteSpace(dto.PhoneNumber))
+            {
+                return BadRequest(new { message = "All fields are required." });
+            }
+
+            user.FullName = dto.FullName;
+            user.Email = dto.Email;
+            user.PhoneNumber = dto.PhoneNumber;
+
+            if (!string.IsNullOrEmpty(dto.ProfilePicture))
+            {
+                user.ProfilePicture = dto.ProfilePicture;
+            }
+
+            await _context.SaveChangesAsync();
+            return Ok(new { message = "Profile updated successfully.", profilePicture = user.ProfilePicture });
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error updating profile: {ex.Message}");
+            return StatusCode(500, new { message = "An unexpected error occurred while updating the profile." });
         }
     }
 
