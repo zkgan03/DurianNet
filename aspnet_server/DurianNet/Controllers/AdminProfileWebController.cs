@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using DurianNet.Dtos.Request.User;
 using DurianNet.Mappers;
+using System.Text.RegularExpressions;
 
 [ApiController]
 [Route("adminprofile")]
@@ -120,215 +121,78 @@ public class AdminProfileWebController : Controller
         return Ok(user.ToUserDetailsDto());
     }
 
+    //[HttpPut("ChangePassword/{username?}")]
+    //public async Task<IActionResult> ChangePassword(string? username, [FromBody] ChangePasswordRequestDto dto)
+    //{
+    //    if (string.IsNullOrWhiteSpace(dto.CurrentPassword) || string.IsNullOrWhiteSpace(dto.Password))
+    //        return BadRequest("Current password or new password is missing.");
+
+    //    // If the username is not provided in the route, retrieve it from the session
+    //    if (string.IsNullOrEmpty(username))
+    //    {
+    //        username = HttpContext.Session.GetString("Username");
+    //        if (string.IsNullOrEmpty(username))
+    //            return Unauthorized("User not found.");
+    //    }
+
+    //    // Find the user by username
+    //    var user = await _userManager.FindByNameAsync(username);
+    //    if (user == null)
+    //        return NotFound("User not found.");
+
+    //    // Attempt to change the password
+    //    var result = await _userManager.ChangePasswordAsync(user, dto.CurrentPassword, dto.Password);
+    //    if (!result.Succeeded)
+    //    {
+    //        var errorMessages = string.Join(", ", result.Errors.Select(e => e.Description));
+    //        Console.WriteLine($"Change password failed: {errorMessages}");
+    //        return BadRequest(result.Errors);
+    //    }
+
+    //    return Ok("Password changed successfully.");
+    //}
+
     [HttpPut("ChangePassword/{username?}")]
     public async Task<IActionResult> ChangePassword(string? username, [FromBody] ChangePasswordRequestDto dto)
     {
         if (string.IsNullOrWhiteSpace(dto.CurrentPassword) || string.IsNullOrWhiteSpace(dto.Password))
-            return BadRequest("Current password or new password is missing.");
+            return BadRequest(new { message = "Current password or new password is missing." });
+
+        // Validate password strength
+        var passwordPattern = @"^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)(?=.*[@$!%*?&_])[A-Za-z\d@$!%*?&_]{8,}$";
+        if (!Regex.IsMatch(dto.Password, passwordPattern))
+        {
+            return BadRequest(new { message = "Password must be at least 8 characters long and include at least one uppercase letter, one lowercase letter, one number, and one special character." });
+        }
 
         // If the username is not provided in the route, retrieve it from the session
         if (string.IsNullOrEmpty(username))
         {
             username = HttpContext.Session.GetString("Username");
             if (string.IsNullOrEmpty(username))
-                return Unauthorized("User not found.");
+                return Unauthorized(new { message = "Session expired or username not found." });
         }
 
         // Find the user by username
         var user = await _userManager.FindByNameAsync(username);
         if (user == null)
-            return NotFound("User not found.");
+            return NotFound(new { message = "User not found." });
 
         // Attempt to change the password
         var result = await _userManager.ChangePasswordAsync(user, dto.CurrentPassword, dto.Password);
         if (!result.Succeeded)
         {
-            var errorMessages = string.Join(", ", result.Errors.Select(e => e.Description));
-            Console.WriteLine($"Change password failed: {errorMessages}");
-            return BadRequest(result.Errors);
+            var errors = result.Errors.Select(e =>
+                e.Code == "PasswordMismatch" ? "Incorrect current password." : e.Description // Replace error message
+            );
+
+            var errorMessages = string.Join(", ", errors);
+            return BadRequest(new { message = errorMessages });
         }
 
-        return Ok("Password changed successfully.");
+        return Ok(new { message = "Password changed successfully." });
     }
 
-    /*[HttpPut("UpdateUserByUsername/{username?}")]
-    public async Task<IActionResult> UpdateUserByUsername(string? username, [FromForm] UpdateUserProfileRequestDto dto)
-    {
-        if (string.IsNullOrEmpty(username))
-        {
-            username = HttpContext.Session.GetString("Username");
-            if (string.IsNullOrEmpty(username)) return Unauthorized("Session expired or username not found.");
-        }
-
-        var user = await _context.Users.SingleOrDefaultAsync(u => u.UserName == username);
-        if (user == null) return NotFound("User not found");
-
-        // Update fields
-        user.FullName = dto.FullName;
-        user.Email = dto.Email;
-        user.PhoneNumber = dto.PhoneNumber;
-
-        // Handle profile picture upload
-        if (dto.ProfilePicture != null)
-        {
-            // Generate a unique file name
-            var fileName = $"{Guid.NewGuid()}_{dto.ProfilePicture.FileName}";
-
-            // Define the file path
-            var filePath = Path.Combine("wwwroot/images", fileName);
-
-            // Save the file
-            using (var stream = new FileStream(filePath, FileMode.Create))
-            {
-                await dto.ProfilePicture.CopyToAsync(stream);
-            }
-
-            // Store the relative path in the database
-            user.ProfilePicture = $"/uploads/{fileName}";
-        }
-
-        await _context.SaveChangesAsync();
-        return Ok(user.ToUserDetailsDto());
-    }*/
-
-    /*[HttpPut("UpdateUserByUsername/{username?}")]
-    public async Task<IActionResult> UpdateUserByUsername(string? username, [FromForm] UpdateUserProfileRequestDto dto)
-    {
-        if (string.IsNullOrEmpty(username))
-        {
-            username = HttpContext.Session.GetString("Username");
-            if (string.IsNullOrEmpty(username)) return Unauthorized("Session expired or username not found.");
-        }
-
-        var user = await _context.Users.SingleOrDefaultAsync(u => u.UserName == username);
-        if (user == null) return NotFound("User not found");
-
-        // Update fields
-        user.FullName = dto.FullName;
-        user.Email = dto.Email;
-        user.PhoneNumber = dto.PhoneNumber;
-
-        // Handle profile picture upload
-        if (dto.ProfilePicture != null)
-        {
-            var fileName = $"{Guid.NewGuid()}_{dto.ProfilePicture.FileName}";
-            var filePath = Path.Combine("wwwroot/images", fileName);
-
-            // Ensure directory exists
-            Directory.CreateDirectory(Path.GetDirectoryName(filePath));
-
-            using (var stream = new FileStream(filePath, FileMode.Create))
-            {
-                await dto.ProfilePicture.CopyToAsync(stream);
-            }
-
-            // Store the relative path in the database
-            user.ProfilePicture = $"/images/{fileName}";
-        }
-
-        await _context.SaveChangesAsync();
-        return Ok(user.ToUserDetailsDto());
-    }*/
-
-    /*[HttpPut("UpdateUserByUsername/{username?}")]
-    public async Task<IActionResult> UpdateUserByUsername(string? username, [FromForm] UpdateUserProfileRequestDto dto, [FromForm] string? ExistingProfilePicture)
-    {
-        if (string.IsNullOrEmpty(username))
-        {
-            username = HttpContext.Session.GetString("Username");
-            if (string.IsNullOrEmpty(username)) return Unauthorized("Session expired or username not found.");
-        }
-
-        var user = await _context.Users.SingleOrDefaultAsync(u => u.UserName == username);
-        if (user == null) return NotFound("User not found");
-
-        // Update fields
-        user.FullName = dto.FullName;
-        user.Email = dto.Email;
-        user.PhoneNumber = dto.PhoneNumber;
-
-        // Handle profile picture upload
-        if (dto.ProfilePicture != null)
-        {
-            // Save the new profile picture
-            var fileName = $"{Guid.NewGuid()}_{dto.ProfilePicture.FileName}";
-            var filePath = Path.Combine("wwwroot/images", fileName);
-
-            // Ensure directory exists
-            Directory.CreateDirectory(Path.GetDirectoryName(filePath));
-
-            using (var stream = new FileStream(filePath, FileMode.Create))
-            {
-                await dto.ProfilePicture.CopyToAsync(stream);
-            }
-
-            // Update the profile picture path
-            user.ProfilePicture = $"/images/{fileName}";
-        }
-        else if (!string.IsNullOrEmpty(ExistingProfilePicture))
-        {
-            // Use the existing profile picture
-            user.ProfilePicture = ExistingProfilePicture;
-        }
-
-        await _context.SaveChangesAsync();
-        return Ok(user.ToUserDetailsDto());
-    }*/
-
-    /*[HttpPut("UpdateUserByUsername/{username?}")]
-    public async Task<IActionResult> UpdateUserByUsername(string? username, [FromForm] UpdateUserProfileRequestDto dto, [FromForm] string? ExistingProfilePicture)
-    {
-        if (string.IsNullOrEmpty(username))
-        {
-            username = HttpContext.Session.GetString("Username");
-            if (string.IsNullOrEmpty(username)) return Unauthorized("Session expired or username not found.");
-        }
-
-        Console.WriteLine($"Username: {username}");
-        Console.WriteLine($"FullName: {dto.FullName}");
-        Console.WriteLine($"Email: {dto.Email}");
-        Console.WriteLine($"PhoneNumber: {dto.PhoneNumber}");
-        Console.WriteLine($"ExistingProfilePicture: {ExistingProfilePicture}");
-        Console.WriteLine($"ProfilePicture: {dto.ProfilePicture?.FileName}");
-
-        var user = await _context.Users.SingleOrDefaultAsync(u => u.UserName == username);
-        if (user == null) return NotFound("User not found");
-
-        // Update other fields
-        user.FullName = dto.FullName;
-        user.Email = dto.Email;
-        user.PhoneNumber = dto.PhoneNumber;
-
-        // Handle profile picture
-        if (dto.ProfilePicture != null && dto.ProfilePicture.Length > 0)
-        {
-            // Save new profile picture
-            var fileName = $"{Guid.NewGuid()}_{dto.ProfilePicture.FileName}";
-            var filePath = Path.Combine("wwwroot/images", fileName);
-
-            Directory.CreateDirectory(Path.GetDirectoryName(filePath));
-
-            using (var stream = new FileStream(filePath, FileMode.Create))
-            {
-                await dto.ProfilePicture.CopyToAsync(stream);
-            }
-
-            user.ProfilePicture = $"/images/{fileName}"; // Update with new path
-        }
-        else if (!string.IsNullOrEmpty(ExistingProfilePicture))
-        {
-            // Use existing profile picture path
-            user.ProfilePicture = ExistingProfilePicture;
-        }
-        else
-        {
-            // If no profile picture provided at all, return an error or handle it
-            return BadRequest("Profile picture is required.");
-        }
-
-        await _context.SaveChangesAsync();
-        return Ok(user.ToUserDetailsDto());
-    }*/
 
     [HttpPut("UpdateAdminProfileByUsername/{username?}")]
     public async Task<IActionResult> UpdateAdminProfileByUsername(string? username, [FromBody] AdminUpdateUserProfileRequestDto dto)
