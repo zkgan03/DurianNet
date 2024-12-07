@@ -22,6 +22,22 @@ namespace DurianNet.Mappers
             };
         }
 
+        public static DurianProfileResponseDto ToDurianProfileDtoWithNullCheck(this DurianProfile profile)
+        {
+            return new DurianProfileResponseDto
+            {
+                DurianId = profile.DurianId,
+                DurianName = profile.DurianName,
+                DurianCode = profile.DurianCode,
+                DurianDescription = profile.DurianDescription,
+                Characteristics = profile.Characteristics,
+                TasteProfile = profile.TasteProfile,
+                DurianImage = profile.DurianImage,
+                DurianVideoUrl = profile.DurianVideo?.VideoUrl ?? string.Empty, // Return empty string if null
+                DurianVideoDescription = profile.DurianVideo?.Description ?? "No description available" // Return fallback if null
+            };
+        }
+
         public static DurianListResponseDto ToDurianListDto(this DurianProfile profile)
         {
             return new DurianListResponseDto
