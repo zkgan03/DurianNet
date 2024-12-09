@@ -73,12 +73,6 @@ class UserRepository @Inject constructor(private val userApi: UserApi) {
         userApi.resetPassword(ResetPasswordRequestDto(email, newPassword))
     }
 
-    /*suspend fun validateOTP(email: String, otp: String): Result<Unit> {
-        return runCatching {
-            userApi.validateOTP(ValidateOTPRequestDto(email, otp))
-        }
-    }*/
-
     suspend fun validateOTP(email: String, otp: String): Result<Unit> {
         return runCatching {
             val response = userApi.validateOTP(ValidateOTPRequestDto(email, otp))
@@ -89,7 +83,6 @@ class UserRepository @Inject constructor(private val userApi: UserApi) {
             }
         }
     }
-
 
     suspend fun deleteAccount(username: String): Result<Unit> {
         return runCatching {
@@ -134,6 +127,4 @@ class UserRepository @Inject constructor(private val userApi: UserApi) {
             null
         }
     }
-
-
 }
