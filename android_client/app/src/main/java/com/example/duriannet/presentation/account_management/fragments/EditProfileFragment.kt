@@ -99,14 +99,23 @@ class EditProfileFragment : Fragment() {
             }
 
             // Determine if a new profile image is uploaded
-            if (profileImagePath.isNullOrEmpty()) {
+            /*if (profileImagePath.isNullOrEmpty()) {
                 // No new image, use the current profile picture from state
                 viewModel.updateProfile(
                     username = username,
                     fullName = fullName,
                     email = email,
                     phoneNumber = phoneNumber,
-                    profilePicture = viewModel.editProfileState.value.profilePicture // Use the current profile picture URL
+                    profilePicture = "noImage"
+                    //profilePicture = viewModel.editProfileState.value.profilePicture // Use the current profile picture URL
+                )*/
+            if (profileImagePath.isNullOrEmpty()) {
+                // No new image, update the profile without updating the image
+                viewModel.updateUserWithoutImage(
+                    username = username,
+                    fullName = fullName,
+                    email = email,
+                    phoneNumber = phoneNumber
                 )
             } else {
                 // A new image is selected, upload it

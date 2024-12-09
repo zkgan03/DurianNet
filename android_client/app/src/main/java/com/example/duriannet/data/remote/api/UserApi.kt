@@ -40,6 +40,13 @@ interface UserApi {
         @Part profilePicture: MultipartBody.Part
     ): Response<Unit>
 
+    @PUT("api/user/appUpdateUserWithoutImage/{username}")
+    suspend fun updateUserWithoutImage(
+        @Path("username") username: String,
+        @Body request: UpdateUserProfileRequestDto
+    ): Response<Unit>
+
+
     @POST("api/user/appForgotPassword")
     suspend fun forgotPassword(@Body request: ForgotPasswordRequestDto): Response<Unit>
 

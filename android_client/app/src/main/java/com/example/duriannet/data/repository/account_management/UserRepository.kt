@@ -127,4 +127,9 @@ class UserRepository @Inject constructor(private val userApi: UserApi) {
             null
         }
     }
+
+    suspend fun updateUserWithoutImage(username: String, request: UpdateUserProfileRequestDto) = runCatching {
+        userApi.updateUserWithoutImage(username, request)
+    }
+
 }

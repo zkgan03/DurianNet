@@ -258,6 +258,30 @@ namespace DurianNet.Controllers.api
             return Ok("User profile updated successfully");
         }
 
+        [HttpPut("appUpdateUserWithoutImage/{username}")]
+        public async Task<IActionResult> appUpdateUserWithoutImage(string username, [FromBody] UpdateUserWithoutImageRequestDto dto)
+        {
+            var user = await _context.Users.SingleOrDefaultAsync(u => u.UserName == username);
+            if (user == null) return NotFound("User not found");
+
+            // Update user's Full Name, Email, and Phone Number
+            user.FullName = dto.FullName ?? user.FullName;
+            user.Email = dto.Email ?? user.Email;
+            user.PhoneNumber = dto.PhoneNumber ?? user.PhoneNumber;
+
+            // Retain the existing profile image
+            if (dto.ProfilePicture == "noImage")
+            {
+                user.ProfilePicture = user.ProfilePicture; // No changes to profile picture
+            }
+
+            // Save changes in the database
+            _context.Users.Update(user);
+            await _context.SaveChangesAsync();
+
+            return Ok("User profile updated successfully without changing the profile image");
+        }
+
 
         [HttpPut("appUpdateUserWithImage/{username}")]
         public async Task<IActionResult> UpdateUserWithImage(string username, [FromForm] UpdateUserProfileRequestDto dto)
