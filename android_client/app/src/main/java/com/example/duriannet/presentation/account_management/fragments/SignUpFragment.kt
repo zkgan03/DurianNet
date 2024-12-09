@@ -48,6 +48,11 @@ class SignUpFragment : Fragment() {
                 return@setOnClickListener
             }
 
+            if (username.length < 5) {
+                binding.edtSignUpUsername.error = "Username must be at least 5 characters long"
+                return@setOnClickListener
+            }
+
             if (email.isEmpty()) {
                 binding.edtSignUpEmail.error = "Email cannot be empty"
                 return@setOnClickListener
@@ -99,7 +104,7 @@ class SignUpFragment : Fragment() {
 
     private fun isValidPassword(password: String): Boolean {
         val passwordPattern =
-            "^(?=.*[A-Z])(?=.*[a-z])(?=.*\\d)(?=.*[@\$!%*?&#])[A-Za-z\\d@\$!%*?&#]{8,}$"
+            "^(?=.*[A-Z])(?=.*[a-z])(?=.*\\d)(?=.*[@\$!%*?&#_])[A-Za-z\\d@\$!%*?&#_]{8,}$"
         return password.matches(passwordPattern.toRegex())
     }
 

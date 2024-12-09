@@ -32,24 +32,6 @@ class UserRepository @Inject constructor(private val userApi: UserApi) {
         userApi.register(RegisterRequestDto(username, email, password))
     }
 
-    /*suspend fun changePassword(username: String, currentPassword: String, newPassword: String) =
-        runCatching {
-            userApi.changePassword(username, ChangePasswordRequestDto(currentPassword, newPassword))
-        }*/
-
-    /*suspend fun changePassword(username: String, currentPassword: String, newPassword: String): Result<Unit> {
-        return runCatching {
-            val response = userApi.changePassword(username, ChangePasswordRequestDto(currentPassword, newPassword))
-            if (response.isSuccessful) {
-                // Success
-            } else {
-                // Extract the error message from the server response
-                val errorMessage = response.errorBody()?.string() ?: "Failed to change password"
-                throw Exception(errorMessage)
-            }
-        }
-    }*/
-
     suspend fun changePassword(username: String, currentPassword: String, newPassword: String): Result<Unit> {
         return runCatching {
             val response = userApi.changePassword(username, ChangePasswordRequestDto(currentPassword, newPassword))
@@ -68,12 +50,6 @@ class UserRepository @Inject constructor(private val userApi: UserApi) {
         }
     }
 
-
-
-    /*suspend fun getProfile(username: String) = runCatching {
-        userApi.getUserByUsername(username)
-    }*/
-
     suspend fun getProfile(username: String): Result<UserProfileDto> {
         return runCatching {
             val response = userApi.getUserByUsername(username)
@@ -84,7 +60,6 @@ class UserRepository @Inject constructor(private val userApi: UserApi) {
             }
         }
     }
-
 
     suspend fun updateProfile(username: String, request: UpdateUserProfileRequestDto) = runCatching {
         userApi.updateUser(username, request)
@@ -98,11 +73,23 @@ class UserRepository @Inject constructor(private val userApi: UserApi) {
         userApi.resetPassword(ResetPasswordRequestDto(email, newPassword))
     }
 
-    suspend fun validateOTP(email: String, otp: String): Result<Unit> {
+    /*suspend fun validateOTP(email: String, otp: String): Result<Unit> {
         return runCatching {
             userApi.validateOTP(ValidateOTPRequestDto(email, otp))
         }
+    }*/
+
+    suspend fun validateOTP(email: String, otp: String): Result<Unit> {
+        return runCatching {
+            val response = userApi.validateOTP(ValidateOTPRequestDto(email, otp))
+            if (!response.isSuccessful) {
+                // Extract error message from response
+                val errorMessage = response.errorBody()?.string() ?: "Invalid OTP or OTP expired"
+                throw Exception(errorMessage)
+            }
+        }
     }
+
 
     suspend fun deleteAccount(username: String): Result<Unit> {
         return runCatching {

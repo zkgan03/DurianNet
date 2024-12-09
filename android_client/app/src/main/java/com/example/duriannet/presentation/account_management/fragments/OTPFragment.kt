@@ -47,23 +47,33 @@ class OTPFragment : Fragment() {
                 return@setOnClickListener
             }
 
+            // Call ViewModel to validate OTP
             viewModel.validateOTP(email, otp)
         }
 
-        lifecycleScope.launch {
+        // Listen for OTP validation state
+        viewLifecycleOwner.lifecycleScope.launch {
             viewModel.otpValidationState.collect { state ->
                 when (state) {
                     is OTPValidationState.Loading -> {
-                        // Show loading
+                        //binding.progressBar.visibility = View.VISIBLE // Show loading
+                        binding.btnOtpConfirm.isEnabled = false
                     }
                     is OTPValidationState.Success -> {
-                        Toast.makeText(requireContext(), "OTP validated", Toast.LENGTH_SHORT).show()
-                        navController.navigate(R.id.action_otp_to_resetPasswordFragment)
+                        //binding.progressBar.visibility = View.GONE // Hide loading
+                        binding.btnOtpConfirm.isEnabled = true
+                        Toast.makeText(requireContext(), "OTP validated successfully", Toast.LENGTH_SHORT).show()
+                        navController.navigate(R.id.action_otp_to_resetPasswordFragment) // Navigate to reset password
                     }
                     is OTPValidationState.Error -> {
+                        //binding.progressBar.visibility = View.GONE // Hide loading
+                        binding.btnOtpConfirm.isEnabled = true
                         Toast.makeText(requireContext(), state.message, Toast.LENGTH_SHORT).show()
                     }
-                    else -> {}
+                    else -> {
+                        //binding.progressBar.visibility = View.GONE // Hide loading
+                        binding.btnOtpConfirm.isEnabled = true
+                    }
                 }
             }
         }
@@ -74,3 +84,4 @@ class OTPFragment : Fragment() {
         _binding = null
     }
 }
+
