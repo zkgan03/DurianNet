@@ -49,6 +49,11 @@ class ChangePasswordFragment : Fragment() {
                 return@setOnClickListener
             }
 
+            if (!isValidPassword(newPassword)) {
+                binding.edtNewPassword.error = "Password must be at least 8 characters long and include at least one uppercase letter, one lowercase letter, one number, and one special character (@, $, !, %, *, ?, &, #, or _)."
+                return@setOnClickListener
+            }
+
             if (confirmPassword.isEmpty()) {
                 binding.edtConfPassword.error = "Confirm password cannot be empty"
                 return@setOnClickListener
@@ -104,6 +109,11 @@ class ChangePasswordFragment : Fragment() {
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
+    }
+
+    private fun isValidPassword(password: String): Boolean {
+        val passwordPattern = "^(?=.*[A-Z])(?=.*[a-z])(?=.*\\d)(?=.*[@\$!%*?&#_])[A-Za-z\\d@\$!%*?&#_]{8,}$"
+        return password.matches(passwordPattern.toRegex())
     }
 }
 
