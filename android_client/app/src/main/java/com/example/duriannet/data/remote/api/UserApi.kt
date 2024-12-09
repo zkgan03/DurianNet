@@ -2,6 +2,7 @@ package com.example.duriannet.data.remote.api
 
 import com.example.duriannet.data.remote.dtos.request.user.*
 import com.example.duriannet.data.remote.dtos.response.NewUserDto
+import com.example.duriannet.data.remote.dtos.response.UserDetailsDto
 import com.example.duriannet.data.remote.dtos.response.UserProfileDto
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
@@ -54,5 +55,7 @@ interface UserApi {
     @POST("api/user/appLogout")
     suspend fun logout(): Response<Unit>
 
+    @GET("api/user/GetEverything")
+    suspend fun getAllUsers(): Response<List<UserDetailsDto>>
 
 }

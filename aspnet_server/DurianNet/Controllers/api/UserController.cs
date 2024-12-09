@@ -30,7 +30,6 @@ namespace DurianNet.Controllers.api
             _tokenService = tokenService; // Assign it in the constructor
         }
 
-        //for testing
         [HttpGet("GetEverything")]
         public async Task<IActionResult> GetEverything()
         {

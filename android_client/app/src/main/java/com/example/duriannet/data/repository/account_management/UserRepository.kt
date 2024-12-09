@@ -3,6 +3,7 @@ package com.example.duriannet.data.repository.account_management
 import com.example.duriannet.data.remote.api.UserApi
 import com.example.duriannet.data.remote.dtos.request.user.*
 import com.example.duriannet.data.remote.dtos.response.NewUserDto
+import com.example.duriannet.data.remote.dtos.response.UserDetailsDto
 import com.example.duriannet.data.remote.dtos.response.UserProfileDto
 import com.google.gson.Gson
 import kotlinx.coroutines.Dispatchers
@@ -10,6 +11,7 @@ import kotlinx.coroutines.withContext
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.MultipartBody
 import okhttp3.RequestBody.Companion.toRequestBody
+import retrofit2.Response
 import javax.inject.Inject
 
 class UserRepository @Inject constructor(private val userApi: UserApi) {
@@ -116,23 +118,6 @@ class UserRepository @Inject constructor(private val userApi: UserApi) {
         }
     }
 
-    /*suspend fun updateProfileWithImage(
-        username: String,
-        fullName: String,
-        email: String,
-        phoneNumber: String,
-        profilePicture: MultipartBody.Part
-    ): Result<Unit> {
-        return runCatching {
-            val fullNameBody = fullName.toRequestBody("text/plain".toMediaTypeOrNull())
-            val emailBody = email.toRequestBody("text/plain".toMediaTypeOrNull())
-            val phoneNumberBody = phoneNumber.toRequestBody("text/plain".toMediaTypeOrNull())
-
-            val response = userApi.updateProfileWithImage(username, fullNameBody, emailBody, phoneNumberBody, profilePicture)
-            if (!response.isSuccessful) throw Exception("Failed to update profile: ${response.message()}")
-        }
-    }*/
-
     suspend fun updateProfileWithImage(
         username: String,
         fullName: String,
@@ -147,6 +132,19 @@ class UserRepository @Inject constructor(private val userApi: UserApi) {
                 "phoneNumber" to phoneNumber.toRequestBody("text/plain".toMediaTypeOrNull())
             )
             userApi.updateProfileWithImage(username, requestBodyMap, profilePicture)
+        }
+    }
+
+    suspend fun getAllUsers(): List<UserDetailsDto>? {
+        return try {
+            val response = userApi.getAllUsers()
+            if (response.isSuccessful) {
+                response.body()
+            } else {
+                null
+            }
+        } catch (e: Exception) {
+            null
         }
     }
 
