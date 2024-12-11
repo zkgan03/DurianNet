@@ -1,4 +1,4 @@
-﻿namespace DurianNet.Helpers
+﻿namespace DurianNet.Dtos.Request.User
 {
     public class QueryObject
     {

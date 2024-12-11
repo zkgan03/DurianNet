@@ -86,8 +86,8 @@ using Azure;
 using Microsoft.AspNetCore.Mvc;
 using System.Text.Json;
 using LangChain.Providers;
-using DurianNet.Dtos;
 using DurianNet.Services.Chatbot;
+using DurianNet.Dtos.Request.Chat;
 
 namespace DurianNet.Controllers.appApi
 {

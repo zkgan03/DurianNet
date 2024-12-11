@@ -1,6 +1,5 @@
 ﻿using DurianNet.Data;
 using DurianNet.Dtos.Request.DurianProfile;
-using DurianNet.Helpers;
 using DurianNet.Mappers;
 using DurianNet.Models.DataModels;
 using Microsoft.AspNetCore.Mvc;
@@ -22,7 +21,7 @@ namespace DurianNet.Controllers.api
         }
 
         [HttpGet("GetAllDurianProfiles")]
-        public async Task<IActionResult> GetAllDurianProfiles([FromQuery] DurianQueryObject query)
+        public async Task<IActionResult> GetAllDurianProfiles([FromQuery] DurianQueryRequestDto query)
         {
             if (query == null)
             {

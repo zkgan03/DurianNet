@@ -1,4 +1,4 @@
-﻿namespace DurianNet.Dtos
+﻿namespace DurianNet.Dtos.Request.Chat
 {
     public class ChatHistory
     {
