@@ -1,6 +1,6 @@
-﻿namespace DurianNet.Helpers
+﻿namespace DurianNet.Dtos.Request.DurianProfile
 {
-    public class DurianQueryObject
+    public class DurianQueryRequestDto
     {
         public string? DurianName { get; set; } = null;
     }

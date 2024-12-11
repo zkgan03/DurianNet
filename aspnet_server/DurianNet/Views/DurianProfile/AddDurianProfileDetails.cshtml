@@ -90,6 +90,8 @@
                     Save
                 </button>
             </div>
+            <!-- Add the error message div -->
+            <div id="errorMessage" class="text-red-600 mt-4 text-lg"></div>
         </form>
     </div>
 </div>
@@ -105,6 +107,10 @@
         const tasteProfile = document.getElementById('tasteProfile').value.trim();
         const durianDescription = document.getElementById('durianDescription').value.trim();
         const videoDescription = document.getElementById('videoDescription').value.trim();
+        const errorMessageDiv = document.getElementById('errorMessage');
+
+        errorMessageDiv.textContent = ''; // Clear any previous error messages
+
 
         let durianImageBase64 = null;
         let durianVideoBase64 = null;
@@ -133,7 +139,7 @@
         };
 
         try {
-            const response = await fetch('/api/durianprofile/AddDurianProfile', {
+            const response = await fetch('/durianprofile/AddDurianProfile', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(payload),
@@ -141,7 +147,7 @@
 
             if (!response.ok) {
                 const error = await response.json();
-                alert(error.message || "Failed to add durian profile.");
+                errorMessageDiv.textContent = error.message || 'Failed to add durian profile.';
                 return;
             }
 
@@ -149,7 +155,7 @@
             window.location.href = '/durianprofile/DurianProfilePage'; // Redirect to Durian Profile page
         } catch (error) {
             console.error(error);
-            alert("An error occurred while adding the durian profile.");
+            errorMessageDiv.textContent = 'An unexpected error occurred. Please try again.';
         }
     });
 

@@ -3,6 +3,7 @@ package com.example.duriannet.data.repository.account_management
 import com.example.duriannet.data.remote.api.UserApi
 import com.example.duriannet.data.remote.dtos.request.user.*
 import com.example.duriannet.data.remote.dtos.response.NewUserDto
+import com.example.duriannet.data.remote.dtos.response.UserDetailsDto
 import com.example.duriannet.data.remote.dtos.response.UserProfileDto
 import com.google.gson.Gson
 import kotlinx.coroutines.Dispatchers
@@ -10,6 +11,7 @@ import kotlinx.coroutines.withContext
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.MultipartBody
 import okhttp3.RequestBody.Companion.toRequestBody
+import retrofit2.Response
 import javax.inject.Inject
 
 class UserRepository @Inject constructor(private val userApi: UserApi) {
@@ -30,24 +32,6 @@ class UserRepository @Inject constructor(private val userApi: UserApi) {
         userApi.register(RegisterRequestDto(username, email, password))
     }
 
-    /*suspend fun changePassword(username: String, currentPassword: String, newPassword: String) =
-        runCatching {
-            userApi.changePassword(username, ChangePasswordRequestDto(currentPassword, newPassword))
-        }*/
-
-    /*suspend fun changePassword(username: String, currentPassword: String, newPassword: String): Result<Unit> {
-        return runCatching {
-            val response = userApi.changePassword(username, ChangePasswordRequestDto(currentPassword, newPassword))
-            if (response.isSuccessful) {
-                // Success
-            } else {
-                // Extract the error message from the server response
-                val errorMessage = response.errorBody()?.string() ?: "Failed to change password"
-                throw Exception(errorMessage)
-            }
-        }
-    }*/
-
     suspend fun changePassword(username: String, currentPassword: String, newPassword: String): Result<Unit> {
         return runCatching {
             val response = userApi.changePassword(username, ChangePasswordRequestDto(currentPassword, newPassword))
@@ -66,12 +50,6 @@ class UserRepository @Inject constructor(private val userApi: UserApi) {
         }
     }
 
-
-
-    /*suspend fun getProfile(username: String) = runCatching {
-        userApi.getUserByUsername(username)
-    }*/
-
     suspend fun getProfile(username: String): Result<UserProfileDto> {
         return runCatching {
             val response = userApi.getUserByUsername(username)
@@ -82,7 +60,6 @@ class UserRepository @Inject constructor(private val userApi: UserApi) {
             }
         }
     }
-
 
     suspend fun updateProfile(username: String, request: UpdateUserProfileRequestDto) = runCatching {
         userApi.updateUser(username, request)
@@ -98,7 +75,12 @@ class UserRepository @Inject constructor(private val userApi: UserApi) {
 
     suspend fun validateOTP(email: String, otp: String): Result<Unit> {
         return runCatching {
-            userApi.validateOTP(ValidateOTPRequestDto(email, otp))
+            val response = userApi.validateOTP(ValidateOTPRequestDto(email, otp))
+            if (!response.isSuccessful) {
+                // Extract error message from response
+                val errorMessage = response.errorBody()?.string() ?: "Invalid OTP or OTP expired"
+                throw Exception(errorMessage)
+            }
         }
     }
 
@@ -115,23 +97,6 @@ class UserRepository @Inject constructor(private val userApi: UserApi) {
             if (!response.isSuccessful) throw Exception("Failed to log out: ${response.message()}")
         }
     }
-
-    /*suspend fun updateProfileWithImage(
-        username: String,
-        fullName: String,
-        email: String,
-        phoneNumber: String,
-        profilePicture: MultipartBody.Part
-    ): Result<Unit> {
-        return runCatching {
-            val fullNameBody = fullName.toRequestBody("text/plain".toMediaTypeOrNull())
-            val emailBody = email.toRequestBody("text/plain".toMediaTypeOrNull())
-            val phoneNumberBody = phoneNumber.toRequestBody("text/plain".toMediaTypeOrNull())
-
-            val response = userApi.updateProfileWithImage(username, fullNameBody, emailBody, phoneNumberBody, profilePicture)
-            if (!response.isSuccessful) throw Exception("Failed to update profile: ${response.message()}")
-        }
-    }*/
 
     suspend fun updateProfileWithImage(
         username: String,
@@ -150,5 +115,21 @@ class UserRepository @Inject constructor(private val userApi: UserApi) {
         }
     }
 
+    suspend fun getAllUsers(): List<UserDetailsDto>? {
+        return try {
+            val response = userApi.getAllUsers()
+            if (response.isSuccessful) {
+                response.body()
+            } else {
+                null
+            }
+        } catch (e: Exception) {
+            null
+        }
+    }
+
+    suspend fun updateUserWithoutImage(username: String, request: UpdateUserProfileRequestDto) = runCatching {
+        userApi.updateUserWithoutImage(username, request)
+    }
 
 }

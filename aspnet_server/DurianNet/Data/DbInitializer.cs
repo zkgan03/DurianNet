@@ -32,11 +32,11 @@ namespace DurianNet.Data
 
         public static List<User> dummyUsers = new()
     {
-        new() { Id = "1", UserName = "Alice", ProfilePicture = "images/image_1.jpg" },
-        new() { Id = "2", UserName = "Bob", ProfilePicture = "images/image_1.jpg" },
-        new() { Id = "3", UserName = "Charlie" , ProfilePicture = "images/image_1.jpg"},
-        new() { Id = "4", UserName = "David", ProfilePicture = "images/image_1.jpg" },
-        new() { Id = "5", UserName = "Eve" , ProfilePicture = "images/image_1.jpg"}
+        new() { Id = "1", UserName = "Alice", ProfilePicture = "/images/24068ea4-3da7-4f8c-a015-9128b21b08a6_tzuyu-5.jpg", Email = "sample@gmail.com", PhoneNumber = "0112223335", FullName = "Alice Teng"},
+        new() { Id = "2", UserName = "Bob", ProfilePicture = "/images/24068ea4-3da7-4f8c-a015-9128b21b08a6_tzuyu-5.jpg", Email = "sample@gmail.com", PhoneNumber = "0112223335", FullName = "Bob Bi" },
+        new() { Id = "3", UserName = "Charlie" , ProfilePicture = "/images/24068ea4-3da7-4f8c-a015-9128b21b08a6_tzuyu-5.jpg", Email = "sample@gmail.com", PhoneNumber = "0112223335", FullName = "Charlie Nick"},
+        new() { Id = "4", UserName = "David", ProfilePicture = "/images/24068ea4-3da7-4f8c-a015-9128b21b08a6_tzuyu-5.jpg", Email = "sample@gmail.com", PhoneNumber = "0112223335", FullName = "David Tan" },
+        new() { Id = "5", UserName = "Eve" , ProfilePicture = "/images/24068ea4-3da7-4f8c-a015-9128b21b08a6_tzuyu-5.jpg", Email = "sample@gmail.com", PhoneNumber = "0112223335", FullName = "Eve Chris"}
     };
 
         public static List<Comment> dummyComments = new()
@@ -47,11 +47,35 @@ namespace DurianNet.Data
         new() {   Rating = 5, Content = "Highly recommend.", User = dummyUsers[3] },
         new() {   Rating = 4, Content = "Will visit again.", User = dummyUsers[4] }
     };
-
+        
         public static DurianVideo dummyDurianVideo = new()
         {
-            VideoUrl = "https://www.youtube.com",
-            Description = "Durian tasting video"
+            VideoUrl = "/videos/durian_6a0a6e29-23b0-4728-bd06-5bfe0cdcb6b0_638679020407002779.mp4",
+            Description = "Durian video."
+        };
+
+        public static DurianVideo dummyDurianVideo1 = new()
+        {
+            VideoUrl = "/videos/durian_4_638687825269441804.mp4",
+            Description = "Musang King video."
+        };
+
+        public static DurianVideo dummyDurianVideo2 = new()
+        {
+            VideoUrl = "/videos/durian_5_638687829388111389.mp4",
+            Description = "D24 video."
+        };
+
+        public static DurianVideo dummyDurianVideo3 = new()
+        {
+            VideoUrl = "/videos/durian_6_638687829673040223.mp4",
+            Description = "Red Prawn video."
+        };
+
+        public static DurianVideo dummyDurianVideo4 = new()
+        {
+            VideoUrl = "/videos/durian_12_638687829876950101.mp4",
+            Description = "Black Thorn video."
         };
 
 
@@ -64,8 +88,8 @@ namespace DurianNet.Data
             DurianDescription = "Musang King is known for its rich flavor and creamy texture.",
             Characteristics = "Golden yellow flesh, small seeds, strong aroma",
             TasteProfile = "Sweet, slightly bitter, creamy",
-            DurianImage = "images/image_1.jpg",
-            DurianVideo = dummyDurianVideo
+            DurianImage = "/images/durian_4_638686914287027975.png",
+            DurianVideo = dummyDurianVideo1
         },
         new()
         {
@@ -74,8 +98,8 @@ namespace DurianNet.Data
             DurianDescription = "D24 is popular for its balanced taste and smooth texture.",
             Characteristics = "Pale yellow flesh, medium seeds, mild aroma",
             TasteProfile = "Sweet, slightly bitter, smooth",
-            DurianImage = "images/image_1.jpg",
-            DurianVideo = dummyDurianVideo
+            DurianImage = "/images/durian_5_638686914454729134.png",
+            DurianVideo = dummyDurianVideo2
         },
         new()
         {
@@ -84,8 +108,8 @@ namespace DurianNet.Data
             DurianDescription = "Red Prawn is famous for its reddish flesh and unique taste.",
             Characteristics = "Reddish flesh, small seeds, strong aroma",
             TasteProfile = "Sweet, slightly alcoholic, creamy",
-            DurianImage = "images/image_1.jpg",
-            DurianVideo = dummyDurianVideo
+            DurianImage = "/images/durian_6_638686914528679000.png",
+            DurianVideo = dummyDurianVideo3
         },
         new()
         {
@@ -94,8 +118,8 @@ namespace DurianNet.Data
             DurianDescription = "Black Thorn is prized for its rich and complex flavor.",
             Characteristics = "Dark yellow flesh, small seeds, strong aroma",
             TasteProfile = "Sweet, slightly bitter, rich",
-            DurianImage = "images/image_1.jpg",
-            DurianVideo = dummyDurianVideo
+            DurianImage = "/images/durian_12_638686914613516761.png",
+            DurianVideo = dummyDurianVideo4
         }
     };
 

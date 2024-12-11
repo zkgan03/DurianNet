@@ -42,6 +42,30 @@ class ResetPasswordFragment : Fragment() {
         binding.btnResetPassword.setOnClickListener {
             val newPassword = binding.edtRpNewPassword.text.toString()
             val confirmPassword = binding.edtRpConfPassword.text.toString()
+
+            // ** Start Validation **
+            if (newPassword.isEmpty()) {
+                binding.edtRpNewPassword.error = "New password cannot be empty"
+                return@setOnClickListener
+            }
+
+            val passwordPattern = "^(?=.*[A-Z])(?=.*[a-z])(?=.*\\d)(?=.*[@\$!%*?&#_])[A-Za-z\\d@\$!%*?&#_]{8,}$"
+            if (!newPassword.matches(passwordPattern.toRegex())) {
+                binding.edtRpNewPassword.error = "Password must be at least 8 characters long and include at least one uppercase letter, one lowercase letter, one number, and one special character."
+                return@setOnClickListener
+            }
+
+            if (confirmPassword.isEmpty()) {
+                binding.edtRpConfPassword.error = "Confirm password cannot be empty"
+                return@setOnClickListener
+            }
+
+            if (newPassword != confirmPassword) {
+                binding.edtRpConfPassword.error = "Passwords do not match"
+                return@setOnClickListener
+            }
+            // ** End Validation **
+
             viewModel.resetPassword(newPassword, confirmPassword, email)
         }
 
