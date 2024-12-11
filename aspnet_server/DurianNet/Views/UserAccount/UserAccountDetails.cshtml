@@ -38,10 +38,10 @@
 </div>
 
 <script>
-    // Fetch user details on page load
     async function loadUserDetails() {
         const urlParams = new URLSearchParams(window.location.search);
-        const userId = urlParams.get('id'); // Extract user ID from query string
+        //const userId = urlParams.get('id'); // Extract user ID from query string
+        const userId = '@ViewData["UserId"]';
 
         if (!userId) {
             alert("User ID is missing.");
@@ -49,7 +49,8 @@
         }
 
         try {
-            const response = await fetch(`/api/user/GetUser/${userId}`);
+            // Pass the ID as part of the request
+            const response = await fetch(`/useraccount/GetUser/${userId}`);
             if (!response.ok) throw new Error("Failed to fetch user details.");
 
             const user = await response.json();
@@ -61,24 +62,16 @@
             document.getElementById("phoneNumber").textContent = user.phoneNumber || 'N/A';
             document.getElementById("userStatus").textContent = user.userStatus || 'N/A';
 
-            // // Update profile picture if available
-            // if (user.profilePicture) {
-            //     document.getElementById("profilePicture").src = user.profilePicture;
-            // }
-
             // Update profile picture if available
             const profilePictureElement = document.getElementById("profilePicture");
-            if (user.profilePicture) {
-                profilePictureElement.src = user.profilePicture;
-            } else {
-                profilePictureElement.src = "/images/default-profile.jpg"; // Fallback image
-            }
+            profilePictureElement.src = user.profilePicture || "/images/default-profile.jpg";
 
         } catch (error) {
-            console.error(error);
+            console.error("Error fetching user details:", error);
             alert("An error occurred while loading user details.");
         }
     }
+
 
     // Load user details on page load
     document.addEventListener("DOMContentLoaded", loadUserDetails);

@@ -17,6 +17,7 @@ import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import android.widget.Toast
+import kotlinx.coroutines.delay
 
 @AndroidEntryPoint
 class FavoriteDurianFragment : Fragment() {
@@ -43,6 +44,9 @@ class FavoriteDurianFragment : Fragment() {
         val sharedPreferences = requireActivity().getSharedPreferences("DurianNetPrefs", Context.MODE_PRIVATE)
         username = sharedPreferences.getString("username", "") ?: ""
 
+        // Hide the SearchView programmatically
+        binding.svFavoriteDurian.visibility = View.GONE
+
         adapter = FavoriteDurianSelectionAdapter { durian, isFavorite ->
             viewModel.onFavoriteChange(durian.durianId, isFavorite)
         }
@@ -63,8 +67,6 @@ class FavoriteDurianFragment : Fragment() {
                     state.filteredDurians.forEach { println("Durian: ${it.durianName}") }
 
                     adapter.submitList(state.filteredDurians, state.favoriteDurianIds)
-                    /*if (state.filteredDurians.isEmpty()) {
-                        Toast.makeText(requireContext(), "No results found", Toast.LENGTH_SHORT).show()*/
 
                     // Show "No results found" only after the initial load
                     if (!isInitialLoad && state.filteredDurians.isEmpty()) {
@@ -92,21 +94,18 @@ class FavoriteDurianFragment : Fragment() {
             }
         })
 
-        /*binding.btnFdSave.setOnClickListener {
-            viewModel.saveFavoriteChanges(username)
-            Toast.makeText(requireContext(), "Favorites saved successfully", Toast.LENGTH_SHORT).show()
-            navController.navigateUp()
-        }*/
-
+        // Save Button Click Listener
         binding.btnFdSave.setOnClickListener {
-            viewModel.saveFavoriteChanges(username)
-            Toast.makeText(requireContext(), "Favorites saved successfully", Toast.LENGTH_SHORT).show()
+            lifecycleScope.launch {
+                viewModel.saveFavoriteChanges(username)
+                delay(500) // Wait for 1 second to give server time to process
+                Toast.makeText(requireContext(), "Favorites saved successfully", Toast.LENGTH_SHORT).show()
 
-            // Set a result to notify ProfileFragment
-            parentFragmentManager.setFragmentResult("favorite_updated", Bundle())
-            navController.navigateUp()
+                // Set a result to notify ProfileFragment to reload its data
+                parentFragmentManager.setFragmentResult("favorite_updated", Bundle())
+                navController.navigateUp()
+            }
         }
-
     }
 
     override fun onDestroyView() {
