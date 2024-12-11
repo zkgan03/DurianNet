@@ -11,6 +11,8 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
+using DurianNet.Dtos.Request.User;
+
 
 namespace DurianNet.Controllers.api
 {
