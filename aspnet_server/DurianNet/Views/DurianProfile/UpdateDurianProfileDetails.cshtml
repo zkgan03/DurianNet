@@ -89,6 +89,8 @@
                     Update
                 </button>
             </div>
+            <!-- Add the error message div -->
+            <div id="errorMessage" class="text-red-600 mt-4 text-lg"></div>
         </form>
     </div>
 </div>
@@ -108,7 +110,7 @@
         document.cookie = `durianId=${durianId};path=/`;
 
         try {
-            const response = await fetch(`/api/durianprofile/GetDurianProfile/${durianId}`);
+            const response = await fetch(`/durianprofile/GetDurianProfile/${durianId}`);
             if (!response.ok) throw new Error("Failed to load durian details.");
 
             const data = await response.json();
@@ -135,6 +137,9 @@
         const tasteProfile = document.getElementById('tasteProfile').value.trim();
         const durianDescription = document.getElementById('durianDescription').value.trim();
         const videoDescription = document.getElementById('videoDescription').value.trim();
+        const errorMessageDiv = document.getElementById('errorMessage');
+
+        errorMessageDiv.textContent = ''; // Clear any previous error messages
 
         let durianImageBase64 = null;
         let durianVideoBase64 = null;
@@ -163,7 +168,7 @@
         };
 
         try {
-            const response = await fetch(`/api/durianprofile/UpdateDurianProfile`, {
+            const response = await fetch(`/durianprofile/UpdateDurianProfile`, {
                 method: 'PUT',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(payload),
@@ -171,7 +176,7 @@
 
             if (!response.ok) {
                 const error = await response.json();
-                alert(error.message || "Failed to update durian profile.");
+                errorMessageDiv.textContent = error.message || 'Failed to add durian profile.';
                 return;
             }
 
@@ -179,7 +184,7 @@
             window.location.href = '/durianprofile/DurianProfilePage';
         } catch (error) {
             console.error(error);
-            alert("An error occurred. Please try again.");
+            errorMessageDiv.textContent = 'An unexpected error occurred. Please try again.';
         }
     }
 

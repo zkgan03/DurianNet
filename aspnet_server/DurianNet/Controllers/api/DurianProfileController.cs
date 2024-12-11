@@ -1,6 +1,5 @@
 ﻿using DurianNet.Data;
 using DurianNet.Dtos.Request.DurianProfile;
-using DurianNet.Helpers;
 using DurianNet.Mappers;
 using DurianNet.Models.DataModels;
 using Microsoft.AspNetCore.Mvc;
@@ -8,9 +7,11 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Newtonsoft.Json;
 
+
 namespace DurianNet.Controllers.api
 {
-    [Route("api/[controller]")]
+    //[Route("api/[controller]")]
+    [Route("api/durian")]
     [ApiController]
     public class DurianProfileController : ControllerBase
     {
@@ -21,203 +22,121 @@ namespace DurianNet.Controllers.api
             _context = context;
         }
 
-        [HttpGet("GetAllDurianProfiles")]
-        public async Task<IActionResult> GetAllDurianProfiles([FromQuery] DurianQueryObject query)
+        // search favorite durian
+        //search durian profile
+        [HttpGet("appGetAllDurianProfiles")]
+        public async Task<IActionResult> appGetAllDurianProfiles([FromQuery] string? searchQuery)
         {
-            if (query == null)
-            {
-                return BadRequest("Query parameters are missing.");
-            }
-
-            // Call the repository to get filtered DurianProfiles based on DurianName
             var durianProfiles = await _context.DurianProfiles
-                                                .Where(dp => dp.DurianName.Contains(query.DurianName ?? ""))
-                                                .Include(dp => dp.DurianVideo)
-                                                .ToListAsync();
+                .Where(dp => string.IsNullOrEmpty(searchQuery) || dp.DurianName.Contains(searchQuery))
+                .Include(dp => dp.DurianVideo)
+                .ToListAsync();
 
-            if (durianProfiles == null || !durianProfiles.Any())
+            if (!durianProfiles.Any())
             {
                 return NotFound("No durian profiles found.");
             }
 
-            var profileDtos = durianProfiles.Select(dp => dp.ToDurianProfileDto()).ToList();
-            return Ok(profileDtos);
+            return Ok(durianProfiles.Select(dp => new
+            {
+                dp.DurianId,
+                dp.DurianName,
+                dp.DurianCode,
+                dp.DurianDescription,
+                dp.Characteristics,
+                dp.TasteProfile,
+                dp.DurianImage,
+                VideoUrl = dp.DurianVideo?.VideoUrl,
+                VideoDescription = dp.DurianVideo?.Description
+            }));
         }
 
-
-        [HttpGet("GetDurianProfile/{id}")]
-        public async Task<IActionResult> GetDurianProfileById(int id)
+        //display favorite durian
+        //display durian profile
+        [HttpGet("appGetAllDurianProfilesForUser")]
+        public async Task<IActionResult> appGetAllDurianProfilesForUser()
         {
-            var durianProfile = await _context.DurianProfiles.Include(dp => dp.DurianVideo).FirstOrDefaultAsync(dp => dp.DurianId == id);
-            if (durianProfile == null)
-            {
-                return NotFound("Durian profile not found");
-            }
-
-            // Store the Durian ID in session
-            HttpContext.Session.SetInt32("DurianId", id);
-
-            return Ok(durianProfile.ToDurianProfileDto());
+            var durians = await _context.DurianProfiles.ToListAsync();
+            return Ok(durians.Select(d => new { d.DurianId, d.DurianName, d.DurianImage }));
         }
 
-        [HttpPost("AddDurianProfile")]
-        public async Task<IActionResult> AddDurianProfile([FromBody] AddDurianProfileRequestDto dto)
+        //display durian profile details
+        [HttpGet("appGetDurianProfile/{id}")]
+        public async Task<IActionResult> appGetDurianProfile(int id)
         {
-            // Check for duplicate Durian Name
-            if (await _context.DurianProfiles.AnyAsync(dp => dp.DurianName == dto.DurianName))
+            var durian = await _context.DurianProfiles.Include(d => d.DurianVideo).FirstOrDefaultAsync(d => d.DurianId == id);
+            if (durian == null) return NotFound("Durian not found");
+
+            return Ok(new
             {
-                return BadRequest("Durian name already exists.");
-            }
+                durian.DurianName,
+                durian.DurianCode,
+                durian.DurianDescription,
+                durian.Characteristics,
+                durian.TasteProfile,
+                durian.DurianImage,
+                durian.DurianVideo.VideoUrl,
+                durian.DurianVideo.Description
+            });
+        }
 
-            string imageUrl = null;
-            string videoUrl = null;
+        //favorite durian for profile
+        [HttpGet("appGetFavoriteDurians/{username}")]
+        public async Task<IActionResult> appGetFavoriteDurians(string username)
+        {
+            var user = await _context.Users.Include(u => u.FavoriteDurians).ThenInclude(fd => fd.DurianProfile)
+                .FirstOrDefaultAsync(u => u.UserName.ToLower() == username.ToLower());
 
-            // Handle Durian Image upload
-            if (!string.IsNullOrEmpty(dto.DurianImage))
+            if (user == null) return NotFound("User not found");
+
+            var favorites = user.FavoriteDurians.Select(fd => new
             {
-                string imageDirectory = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/images");
-                if (!Directory.Exists(imageDirectory))
-                {
-                    Directory.CreateDirectory(imageDirectory);
-                }
+                fd.DurianProfile.DurianId,
+                fd.DurianProfile.DurianName,
+                fd.DurianProfile.DurianImage
+            });
 
-                string imageName = $"durian_{Guid.NewGuid()}_{DateTime.Now.Ticks}.png"; // Unique file name
-                string imagePath = Path.Combine(imageDirectory, imageName);
-                var imageBytes = Convert.FromBase64String(dto.DurianImage.Split(',')[1]); // Remove Base64 metadata prefix
-                await System.IO.File.WriteAllBytesAsync(imagePath, imageBytes);
-                imageUrl = $"/images/{imageName}";
-            }
+            return Ok(favorites);
+        }
 
-            // Handle Durian Video upload
-            if (!string.IsNullOrEmpty(dto.DurianVideo))
-            {
-                string videoDirectory = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/videos");
-                if (!Directory.Exists(videoDirectory))
-                {
-                    Directory.CreateDirectory(videoDirectory);
-                }
+        //favorite durian for profile
+        [HttpPost("appAddFavoriteDurian")]
+        public async Task<IActionResult> appAddFavoriteDurian([FromBody] AddFavoriteDurianRequest request)
+        {
+            var user = await _context.Users.Include(u => u.FavoriteDurians)
+                .FirstOrDefaultAsync(u => u.UserName.ToLower() == request.Username.ToLower());
 
-                string videoName = $"durian_{Guid.NewGuid()}_{DateTime.Now.Ticks}.mp4"; // Unique file name
-                string videoPath = Path.Combine(videoDirectory, videoName);
-                var videoBytes = Convert.FromBase64String(dto.DurianVideo.Split(',')[1]); // Remove Base64 metadata prefix
-                await System.IO.File.WriteAllBytesAsync(videoPath, videoBytes);
-                videoUrl = $"/videos/{videoName}";
-            }
+            if (user == null) return NotFound("User not found");
 
-            // Save Durian Video record
-            var video = dto.ToDurianVideoFromAddRequest(videoUrl); // Pass video URL explicitly
-            _context.DurianVideos.Add(video);
+            var durian = await _context.DurianProfiles.FirstOrDefaultAsync(dp => dp.DurianName.ToLower() == request.DurianName.ToLower());
+            if (durian == null) return NotFound("Durian not found");
+
+            if (user.FavoriteDurians.Any(fd => fd.DurianId == durian.DurianId))
+                return BadRequest("Durian already in favorites");
+
+            user.FavoriteDurians.Add(new FavoriteDurian { UserId = user.Id, DurianId = durian.DurianId });
             await _context.SaveChangesAsync();
 
-            // Save Durian Profile record
-            var profile = dto.ToDurianProfileFromAddRequest(imageUrl, video.VideoId); // Pass image URL explicitly
-            _context.DurianProfiles.Add(profile);
+            return Ok("Favorite durian added successfully");
+        }
+
+        [HttpPost("appRemoveFavoriteDurian")]
+        public async Task<IActionResult> appRemoveFavoriteDurian([FromBody] RemoveFavoriteDurianRequest request)
+        {
+            var user = await _context.Users
+                .Include(u => u.FavoriteDurians)
+                .ThenInclude(fd => fd.DurianProfile)
+                .FirstOrDefaultAsync(u => u.UserName.ToLower() == request.Username.ToLower());
+
+            if (user == null) return NotFound("User not found");
+
+            var favorite = user.FavoriteDurians.FirstOrDefault(fd => fd.DurianProfile.DurianName.ToLower() == request.DurianName.ToLower());
+            if (favorite == null) return NotFound("Favorite durian not found");
+
+            user.FavoriteDurians.Remove(favorite);
             await _context.SaveChangesAsync();
 
-            return Ok(profile.ToDurianProfileDto());
-        }
-
-
-
-        [HttpPut("UpdateDurianProfile")]
-        public async Task<IActionResult> UpdateDurianProfile([FromBody] UpdateDurianProfileRequestDto dto)
-        {
-            // Retrieve DurianId from session
-            var durianId = HttpContext.Session.GetInt32("DurianId");
-            if (!durianId.HasValue)
-            {
-                return BadRequest("Durian ID is missing from the session.");
-            }
-
-            var profile = await _context.DurianProfiles.Include(p => p.DurianVideo).FirstOrDefaultAsync(p => p.DurianId == durianId.Value);
-
-            if (profile == null)
-            {
-                return NotFound("Durian profile not found");
-            }
-
-            // Update Durian Image if provided
-            if (!string.IsNullOrEmpty(dto.DurianImage))
-            {
-                string imageDirectory = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/images");
-                if (!Directory.Exists(imageDirectory))
-                {
-                    Directory.CreateDirectory(imageDirectory);
-                }
-
-                string imageName = $"durian_{durianId.Value}_{DateTime.Now.Ticks}.png"; // Unique file name
-                string imagePath = Path.Combine(imageDirectory, imageName);
-                var imageBytes = Convert.FromBase64String(dto.DurianImage.Split(',')[1]); // Remove metadata prefix
-                await System.IO.File.WriteAllBytesAsync(imagePath, imageBytes);
-                profile.DurianImage = $"/images/{imageName}";
-            }
-
-            // Update Durian Video if provided
-            if (!string.IsNullOrEmpty(dto.DurianVideo))
-            {
-                string videoDirectory = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/videos");
-                if (!Directory.Exists(videoDirectory))
-                {
-                    Directory.CreateDirectory(videoDirectory);
-                }
-
-                string videoName = $"durian_{durianId.Value}_{DateTime.Now.Ticks}.mp4"; // Unique file name
-                string videoPath = Path.Combine(videoDirectory, videoName);
-                var videoBytes = Convert.FromBase64String(dto.DurianVideo.Split(',')[1]); // Remove metadata prefix
-                await System.IO.File.WriteAllBytesAsync(videoPath, videoBytes);
-                profile.DurianVideo.VideoUrl = $"/videos/{videoName}";
-            }
-
-            // Update other fields
-            profile.DurianCode = dto.DurianCode;
-            profile.DurianName = dto.DurianName;
-            profile.Characteristics = dto.Characteristics;
-            profile.TasteProfile = dto.TasteProfile;
-            profile.DurianDescription = dto.DurianDescription;
-
-            // Update video description if provided
-            if (!string.IsNullOrEmpty(dto.VideoDescription) && profile.DurianVideo != null)
-            {
-                profile.DurianVideo.Description = dto.VideoDescription;
-            }
-
-            await _context.SaveChangesAsync();
-            return Ok(profile.ToDurianProfileDto());
-        }
-
-
-
-
-
-
-        [HttpDelete("DeleteDurianProfile/{id}")]
-        public async Task<IActionResult> DeleteDurianProfile(int id)
-        {
-            var profile = await _context.DurianProfiles.FindAsync(id);
-            if (profile == null)
-            {
-                return NotFound("Durian profile not found");
-            }
-
-            _context.DurianProfiles.Remove(profile);
-            await _context.SaveChangesAsync();
-            return NoContent();
-        }
-
-        [HttpGet("GetAllDurianProfilesForUser")]
-        public async Task<IActionResult> GetAllDurianProfilesForUser()
-        {
-            var durianProfiles = await _context.DurianProfiles.ToListAsync();
-            var profileDtos = durianProfiles.Select(dp => dp.ToDurianProfileForUserDto()).ToList();
-            return Ok(profileDtos);
-        }
-
-        [HttpGet("GetAllDurianProfilesForAdmin")]
-        public async Task<IActionResult> GetAllDurianProfilesForAdmin()
-        {
-            var durianProfiles = await _context.DurianProfiles.ToListAsync();
-            var profileDtos = durianProfiles.Select(dp => dp.ToDurianProfileForAdminDto()).ToList();
-            return Ok(profileDtos);
+            return Ok("Favorite durian removed successfully");
         }
 
     }

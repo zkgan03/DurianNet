@@ -52,7 +52,8 @@
     // Fetch admin profile data on page load
     async function fetchAdminProfile() {
         try {
-            const response = await fetch('/api/User/GetUserByUsername', {
+            //const response = await fetch('/api/User/GetUserByUsername', {
+            const response = await fetch('/adminprofile/GetUserByUsername', {
                 method: 'GET',
                 headers: {
                     'Content-Type': 'application/json',
@@ -86,7 +87,8 @@
     // Call the API to delete the admin account
     async function deleteAccount() {
         try {
-            const response = await fetch('/api/User/DeleteAdmin', {
+            //const response = await fetch('/api/User/DeleteAdmin', {
+            const response = await fetch('/adminprofile/DeleteAdmin', {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',

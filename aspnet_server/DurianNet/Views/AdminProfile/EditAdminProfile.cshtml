@@ -49,6 +49,8 @@
                     Save
                 </button>
             </div>
+            <!-- Error Message Div -->
+            <div id="errorMessage" class="text-red-600 mt-4 text-lg"></div>
         </form>
     </div>
 </div>
@@ -57,7 +59,8 @@
     // Load profile data from backend
     async function loadProfile() {
         try {
-            const response = await fetch('/api/User/GetUserByUsername');
+            //const response = await fetch('/api/User/GetUserByUsername');
+            const response = await fetch('/adminprofile/GetUserByUsername');
             if (!response.ok) throw new Error("Failed to fetch profile.");
 
             const data = await response.json();
@@ -80,53 +83,144 @@
         });
     }
 
-    // Submit the form
+    // async function submitEditProfileForm() {
+    //     const fullname = document.getElementById('fullname').value.trim();
+    //     const email = document.getElementById('email').value.trim();
+    //     const phone = document.getElementById('phone').value.trim();
+    //     const profilePictureInput = document.getElementById('profilePictureInput').files[0];
+    //     const existingProfilePicture = document.getElementById('profilePicturePreview').src;
+
+    //     if (!fullname || !email || !phone) {
+    //         alert("All fields are required.");
+    //         return;
+    //     }
+
+    //     let profilePicturePath = existingProfilePicture;
+
+    //     try {
+    //         // Step 1: Upload new profile picture if selected
+    //         if (profilePictureInput) {
+    //             const uploadResponse = await fetch('/adminprofile/UploadProfilePicture', {
+    //                 method: 'POST',
+    //                 headers: { 'Content-Type': 'application/json' },
+    //                 body: JSON.stringify({
+    //                     fileName: profilePictureInput.name,
+    //                     fileContent: await fileToBase64(profilePictureInput),
+    //                 }),
+    //             });
+
+    //             if (!uploadResponse.ok) {
+    //                 throw new Error("Failed to upload profile picture.");
+    //             }
+
+    //             const uploadData = await uploadResponse.json();
+    //             profilePicturePath = uploadData.filePath; // New path from server
+    //         }
+
+    //         // Step 2: Update profile with new or existing picture
+    //         const updateResponse = await fetch('/adminprofile/UpdateAdminProfileByUsername', {
+    //             method: 'PUT',
+    //             headers: { 'Content-Type': 'application/json' },
+    //             body: JSON.stringify({
+    //                 FullName: fullname,
+    //                 Email: email,
+    //                 PhoneNumber: phone,
+    //                 ProfilePicture: profilePicturePath, // Use updated path
+    //             }),
+    //         });
+
+    //         if (!updateResponse.ok) {
+    //             const errorData = await updateResponse.json();
+    //             throw new Error(errorData.message || "Failed to update profile.");
+    //         }
+
+    //         const updateData = await updateResponse.json();
+    //         document.getElementById('profilePicturePreview').src = updateData.profilePicture;
+
+    //         alert("Profile updated successfully!");
+    //         window.location.reload();
+    //     } catch (error) {
+    //         console.error("Error:", error);
+    //         alert("An error occurred. Please try again.");
+    //     }
+    // }
+
     async function submitEditProfileForm() {
         const fullname = document.getElementById('fullname').value.trim();
         const email = document.getElementById('email').value.trim();
         const phone = document.getElementById('phone').value.trim();
-        const profilePicture = document.getElementById('profilePictureInput').files[0];
-        
+        const profilePictureInput = document.getElementById('profilePictureInput').files[0];
         const existingProfilePicture = document.getElementById('profilePicturePreview').src;
+        const errorMessageDiv = document.getElementById('errorMessage');
+
+        errorMessageDiv.textContent = ''; // Clear previous errors
 
         if (!fullname || !email || !phone) {
-            alert("All fields are required.");
+            errorMessageDiv.textContent = "All fields are required.";
             return;
         }
 
-        // let profilePictureBase64 = null;
-        // if (profilePicture) {
-        //     profilePictureBase64 = await toBase64(profilePicture);
-        // }
-
-        let profilePictureBase64 = null;
-        if (profilePicture) {
-            profilePictureBase64 = await toBase64(profilePicture);
-        }else{
-            profilePictureBase64 = existingProfilePicture;
-        }
-
-        const payload = {
-            fullName: fullname,
-            email: email,
-            phoneNumber: phone,
-            profilePicture: profilePictureBase64,
-        };
+        let profilePicturePath = existingProfilePicture;
 
         try {
-            const response = await fetch('/api/User/UpdateUserByUsername', {
+            // Step 1: Upload new profile picture if selected
+            if (profilePictureInput) {
+                const uploadResponse = await fetch('/adminprofile/UploadProfilePicture', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        fileName: profilePictureInput.name,
+                        fileContent: await fileToBase64(profilePictureInput),
+                    }),
+                });
+
+                if (!uploadResponse.ok) {
+                    const uploadError = await uploadResponse.json();
+                    throw new Error(uploadError.message || "Failed to upload profile picture.");
+                }
+
+                const uploadData = await uploadResponse.json();
+                profilePicturePath = uploadData.filePath; // New path from server
+            }
+
+            // Step 2: Update profile with new or existing picture
+            const updateResponse = await fetch('/adminprofile/UpdateAdminProfileByUsername', {
                 method: 'PUT',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(payload),
+                body: JSON.stringify({
+                    FullName: fullname,
+                    Email: email,
+                    PhoneNumber: phone,
+                    ProfilePicture: profilePicturePath, // Use updated path
+                }),
             });
 
-            if (!response.ok) throw new Error("Failed to update profile.");
+            const updateData = await updateResponse.json();
+
+            if (!updateResponse.ok) {
+                errorMessageDiv.textContent = updateData.message || "Failed to update profile.";
+                return;
+            }
+
+            document.getElementById('profilePicturePreview').src = updateData.profilePicture;
             alert("Profile updated successfully!");
             window.location.reload();
         } catch (error) {
-            alert("An error occurred. Please try again.");
+            console.error("Error:", error);
+            errorMessageDiv.textContent = error.message || "An error occurred. Please try again.";
         }
     }
+
+    // Helper function to convert file to Base64
+    function fileToBase64(file) {
+        return new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.readAsDataURL(file);
+            reader.onload = () => resolve(reader.result.split(',')[1]); // Remove Base64 prefix
+            reader.onerror = reject;
+        });
+    }
+
 
 
     // Initialize

@@ -8,19 +8,6 @@ data class DurianListResponseDto(
     val durianImage: String
 )
 
-/*data class DurianProfileResponseDto(
-    val durianId: Int,
-    val durianName: String,
-    val durianCode: String,
-    val durianDescription: String,
-    val characteristics: String,
-    val tasteProfile: String,
-    val durianImage: String,
-    val durianVideoUrl: String,
-    //val durianVideoDescription: String
-    @SerializedName("description") val durianVideoDescription: String // Map "description" from JSON to this field
-)*/
-
 data class DurianProfileResponseDto(
     val durianId: Int,
     val durianName: String,
