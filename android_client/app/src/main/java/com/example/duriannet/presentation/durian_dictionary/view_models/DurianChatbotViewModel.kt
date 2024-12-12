@@ -42,13 +42,20 @@ class DurianChatbotViewModel @Inject constructor(
             )
         }
 
-        // Collect the response from the repository
         viewModelScope.launch {
-            chatbotRepository.streamChat(messageDtos).collect { rawResponse ->
-                val cleanedResponse = cleanResponse(rawResponse) // Sanitize the response
+            try {
+                chatbotRepository.streamChat(messageDtos).collect { rawResponse ->
+                    val cleanedResponse = cleanResponse(rawResponse) // Sanitize the response
+                    val updatedMessages = _messages.value.toMutableList()
+                    updatedMessages.removeLast() // Remove the loading message
+                    updatedMessages.add(Message(cleanedResponse, isSent = false)) // Add the cleaned response
+                    _messages.value = updatedMessages
+                }
+            } catch (e: Exception) {
+                e.printStackTrace()
                 val updatedMessages = _messages.value.toMutableList()
                 updatedMessages.removeLast() // Remove the loading message
-                updatedMessages.add(Message(cleanedResponse, isSent = false)) // Add the cleaned response
+                updatedMessages.add(Message("Server is not available. Please try again later.", isSent = false)) // Add system error message
                 _messages.value = updatedMessages
             }
         }
