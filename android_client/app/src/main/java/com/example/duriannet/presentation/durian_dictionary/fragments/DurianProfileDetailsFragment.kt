@@ -14,6 +14,7 @@ import com.bumptech.glide.Glide
 import com.example.duriannet.R
 import com.example.duriannet.databinding.FragmentDurianProfileDetailsBinding
 import com.example.duriannet.presentation.durian_dictionary.view_models.DurianProfileDetailsViewModel
+import com.example.duriannet.utils.Constant
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
@@ -64,7 +65,7 @@ class DurianProfileDetailsFragment : Fragment() {
                 binding.txtDurianTaste.text = durian.tasteProfile
 
                 // Resolve and load image
-                val baseUrl = "http://10.0.2.2:5176"
+                val baseUrl = Constant.SERVER_BASE_URL
                 val fullImageUrl = if (durian.durianImage.startsWith("http")) {
                     durian.durianImage
                 } else {

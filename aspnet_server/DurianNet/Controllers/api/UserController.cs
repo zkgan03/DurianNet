@@ -128,7 +128,9 @@ namespace DurianNet.Controllers.api
                 Email = registerDto.Email,
                 ProfilePicture = "defaultProfilePicture.jpg",
                 UserStatus = UserStatus.Active,
-                UserType = UserType.User
+                UserType = UserType.User,
+                FullName = "-", // Provide default value
+                PhoneNumber = "-" // Provide default value
             };
 
             // 5. Create the user using the UserManager
