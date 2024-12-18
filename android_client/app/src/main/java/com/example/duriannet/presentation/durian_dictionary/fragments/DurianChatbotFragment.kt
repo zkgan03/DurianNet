@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
@@ -45,7 +46,11 @@ class DurianChatbotFragment : Fragment() {
         }
 
         binding.send.setOnClickListener {
-            val messageText = binding.messageBox.text.toString()
+            val messageText = binding.messageBox.text.toString().trim()
+            if (messageText.isBlank()) {
+                Toast.makeText(requireContext(), "Please enter a message", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
             viewModel.sendMessage(messageText)
             binding.messageBox.text.clear()
         }

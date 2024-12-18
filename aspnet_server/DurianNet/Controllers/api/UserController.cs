@@ -11,6 +11,8 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
+using DurianNet.Dtos.Request.User;
+
 
 namespace DurianNet.Controllers.api
 {
@@ -102,27 +104,44 @@ namespace DurianNet.Controllers.api
             return Ok("Logged out successfully.");
         }
 
-
-        //signup
         [HttpPost("appRegister")]
         public async Task<IActionResult> appRegister([FromBody] RegisterDto registerDto)
         {
-            if (!ModelState.IsValid) return BadRequest(ModelState);
+            // 1. Validate the ModelState
+            if (!ModelState.IsValid)
+                return BadRequest("Invalid input. Please check the provided data.");
 
+            // 2. Check if the username already exists
+            var existingUserByUsername = await _userManager.FindByNameAsync(registerDto.Username);
+            if (existingUserByUsername != null)
+                return BadRequest("Username is already taken. Please choose a different one.");
+
+            // 3. Check if the email already exists
+            var existingUserByEmail = await _userManager.Users.FirstOrDefaultAsync(u => u.Email.ToLower() == registerDto.Email.ToLower());
+            if (existingUserByEmail != null)
+                return BadRequest("Email is already registered. Please use a different email.");
+
+            // 4. Create the new user
             var appUser = new User
             {
                 UserName = registerDto.Username,
                 Email = registerDto.Email,
                 ProfilePicture = "defaultProfilePicture.jpg",
                 UserStatus = UserStatus.Active,
-                UserType = UserType.User
+                UserType = UserType.User,
+                FullName = "-", // Provide default value
+                PhoneNumber = "-" // Provide default value
             };
 
+            // 5. Create the user using the UserManager
             var result = await _userManager.CreateAsync(appUser, registerDto.Password);
-            if (!result.Succeeded) return StatusCode(500, result.Errors);
+            if (!result.Succeeded)
+                return StatusCode(500, "An error occurred while creating the user.");
 
-            return Ok(new { appUser.UserName, appUser.Email });
+            // 6. Return the success response
+            return Ok("Registration successful.");
         }
+
 
         //change password
         [HttpPut("appChangePassword/{username}")]

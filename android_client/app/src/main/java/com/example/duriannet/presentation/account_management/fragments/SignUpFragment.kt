@@ -69,7 +69,7 @@ class SignUpFragment : Fragment() {
             }
 
             if (!isValidPassword(password)) {
-                binding.edtSignUpPassword.error = "Password must be at least 8 characters long and include at least one uppercase letter, one lowercase letter, one number, and one special character."
+                binding.edtSignUpPassword.error = "Password must be at least 12 characters long and include at least one uppercase letter, one lowercase letter, one number, and one special character."
                 return@setOnClickListener
             }
 
@@ -104,7 +104,7 @@ class SignUpFragment : Fragment() {
 
     private fun isValidPassword(password: String): Boolean {
         val passwordPattern =
-            "^(?=.*[A-Z])(?=.*[a-z])(?=.*\\d)(?=.*[@\$!%*?&#_])[A-Za-z\\d@\$!%*?&#_]{8,}$"
+            "^(?=.*[A-Z])(?=.*[a-z])(?=.*\\d)(?=.*[@\$!%*?&#_])[A-Za-z\\d@\$!%*?&#_]{12,}$"
         return password.matches(passwordPattern.toRegex())
     }
 
