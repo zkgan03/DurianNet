@@ -5,7 +5,6 @@ import androidx.lifecycle.viewModelScope
 import com.example.duriannet.data.remote.dtos.request.user.UpdateUserProfileRequestDto
 import com.example.duriannet.data.repository.account_management.UserRepository
 import com.example.duriannet.presentation.account_management.state.EditProfileState
-import com.example.duriannet.utils.Common
 import com.example.duriannet.utils.Constant
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -31,11 +30,10 @@ class EditProfileViewModel @Inject constructor(
                 _editProfileState.value = profile?.let {
                     _editProfileState.value.copy(
                         username = it.userName,
-                        fullName = it.fullName,
-                        email = it.email,
-                        phoneNumber = it.phoneNumber,
+                        fullName = it.fullName ?: "-", // Default if null
+                        email = it.email ?: "-", // Default if null
+                        phoneNumber = it.phoneNumber ?: "-", // Default if null
                         profilePicture = it.profilePicture?.let { picture ->
-                            //if (picture.startsWith("http")) picture else "$baseUrl/$picture"
                             if (picture.startsWith("http")) picture else "$baseUrl${if (picture.startsWith("/")) picture else "/$picture"}"
                         }
                     )

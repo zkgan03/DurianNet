@@ -21,8 +21,15 @@ class ChatbotRepository @Inject constructor(
             val response = durianApi.chatWithHistory(chatRequest)
 
             if (!response.isSuccessful) {
+                trySend("API Error: ${response.code()} - ${response.message()}")
                 close(Exception("API Error: ${response.code()} ${response.message()}"))
             }
+
+            /*if (!response.isSuccessful) {
+                trySend("API Error: ${response.code()} - ${response.message()}")
+                close(Exception("API Error: ${response.code()} - ${response.message()}"))
+                return@callbackFlow
+            }*/
 
             val reader = response.body()?.byteStream()?.bufferedReader(Charsets.UTF_8)
             val stringBuilder = StringBuilder()
@@ -37,14 +44,32 @@ class ChatbotRepository @Inject constructor(
                         stringBuilder.append(extractedText)
                     } catch (e: Exception) {
                         println("Error parsing line: $line")
+                        trySend("Error parsing the chatbot response.")
                     }
                 }
             }
+
+            /*reader?.forEachLine { line ->
+                if (line.startsWith("data:")) {
+                    val rawData = line.substringAfter("data: ").trim()
+                    try {
+                        val jsonNode = objectMapper.readTree(rawData)
+                        val extractedText = jsonNode["data"]?.asText() ?: ""
+                        if (extractedText.isNotEmpty()) {
+                            trySend(extractedText) // Send the response
+                        }
+                    } catch (e: Exception) {
+                        trySend("Error parsing the chatbot response.")
+                        println("Error parsing line: $line")
+                    }
+                }
+            }*/
 
             // Emit the combined message
             trySend(stringBuilder.toString())
             reader?.close()
         } catch (e: Exception) {
+            trySend("Server is not available. Please try again later.")
             close(e)
         }
         awaitClose()
