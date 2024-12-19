@@ -28,9 +28,18 @@ class UserRepository @Inject constructor(private val userApi: UserApi) {
         }
     }
 
-    suspend fun register(username: String, email: String, password: String) = runCatching {
-        userApi.register(RegisterRequestDto(username, email, password))
+    suspend fun register(username: String, email: String, password: String): Result<String> {
+        return runCatching {
+            val response = userApi.register(RegisterRequestDto(username, email, password))
+            if (response.isSuccessful) {
+                "Registration successful"
+            } else {
+                val errorResponse = response.errorBody()?.string() ?: "Unknown error occurred"
+                throw Exception(errorResponse) // Pass the error message for the ViewModel to handle
+            }
+        }
     }
+
 
     suspend fun changePassword(username: String, currentPassword: String, newPassword: String): Result<Unit> {
         return runCatching {

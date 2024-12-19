@@ -80,6 +80,10 @@ class EditProfileFragment : Fragment() {
                     binding.edtProfileFullname.error = "Full name is required"
                     return@setOnClickListener
                 }
+                fullName == "-" -> {
+                    binding.edtProfileFullname.error = "Full name cannot be '-'"
+                    return@setOnClickListener
+                }
                 email.isEmpty() -> {
                     binding.edtProfileEmail.error = "Email is required"
                     return@setOnClickListener
