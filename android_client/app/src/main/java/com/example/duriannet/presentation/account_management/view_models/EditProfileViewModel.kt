@@ -5,6 +5,8 @@ import androidx.lifecycle.viewModelScope
 import com.example.duriannet.data.remote.dtos.request.user.UpdateUserProfileRequestDto
 import com.example.duriannet.data.repository.account_management.UserRepository
 import com.example.duriannet.presentation.account_management.state.EditProfileState
+import com.example.duriannet.utils.Common
+import com.example.duriannet.utils.Constant
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -22,7 +24,7 @@ class EditProfileViewModel @Inject constructor(
 
     fun loadProfile(username: String) {
         viewModelScope.launch {
-            val baseUrl = "http://10.0.2.2:5176"
+            val baseUrl = Constant.SERVER_BASE_URL
             val result = userRepository.getProfile(username)
             if (result.isSuccess) {
                 val profile = result.getOrNull()
