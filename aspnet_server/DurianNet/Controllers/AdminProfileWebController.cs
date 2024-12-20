@@ -8,7 +8,9 @@ using Microsoft.EntityFrameworkCore;
 using DurianNet.Dtos.Request.User;
 using DurianNet.Mappers;
 using System.Text.RegularExpressions;
+using Microsoft.AspNetCore.Authorization;
 
+[Authorize(Policy = "AdminPolicy")]
 [ApiController]
 [Route("adminprofile")]
 public class AdminProfileWebController : Controller
@@ -121,37 +123,6 @@ public class AdminProfileWebController : Controller
         return Ok(user.ToUserDetailsDto());
     }
 
-    //[HttpPut("ChangePassword/{username?}")]
-    //public async Task<IActionResult> ChangePassword(string? username, [FromBody] ChangePasswordRequestDto dto)
-    //{
-    //    if (string.IsNullOrWhiteSpace(dto.CurrentPassword) || string.IsNullOrWhiteSpace(dto.Password))
-    //        return BadRequest("Current password or new password is missing.");
-
-    //    // If the username is not provided in the route, retrieve it from the session
-    //    if (string.IsNullOrEmpty(username))
-    //    {
-    //        username = HttpContext.Session.GetString("Username");
-    //        if (string.IsNullOrEmpty(username))
-    //            return Unauthorized("User not found.");
-    //    }
-
-    //    // Find the user by username
-    //    var user = await _userManager.FindByNameAsync(username);
-    //    if (user == null)
-    //        return NotFound("User not found.");
-
-    //    // Attempt to change the password
-    //    var result = await _userManager.ChangePasswordAsync(user, dto.CurrentPassword, dto.Password);
-    //    if (!result.Succeeded)
-    //    {
-    //        var errorMessages = string.Join(", ", result.Errors.Select(e => e.Description));
-    //        Console.WriteLine($"Change password failed: {errorMessages}");
-    //        return BadRequest(result.Errors);
-    //    }
-
-    //    return Ok("Password changed successfully.");
-    //}
-
     [HttpPut("ChangePassword/{username?}")]
     public async Task<IActionResult> ChangePassword(string? username, [FromBody] ChangePasswordRequestDto dto)
     {
@@ -192,41 +163,6 @@ public class AdminProfileWebController : Controller
 
         return Ok(new { message = "Password changed successfully." });
     }
-
-
-    /*[HttpPut("UpdateAdminProfileByUsername/{username?}")]
-    public async Task<IActionResult> UpdateAdminProfileByUsername(string? username, [FromBody] AdminUpdateUserProfileRequestDto dto)
-    {
-        if (string.IsNullOrEmpty(username))
-        {
-            username = HttpContext.Session.GetString("Username");
-            if (string.IsNullOrEmpty(username)) return Unauthorized("Session expired or username not found.");
-        }
-
-        var user = await _context.Users.SingleOrDefaultAsync(u => u.UserName == username);
-        if (user == null) return NotFound("User not found");
-
-        try
-        {
-            user.FullName = dto.FullName;
-            user.Email = dto.Email;
-            user.PhoneNumber = dto.PhoneNumber;
-
-            if (!string.IsNullOrEmpty(dto.ProfilePicture))
-            {
-                user.ProfilePicture = dto.ProfilePicture;
-            }
-
-            await _context.SaveChangesAsync();
-            Console.WriteLine($"Updated Profile Picture: {user.ProfilePicture}");
-            return Ok(user.ToUserDetailsDto());
-        }
-        catch (Exception ex)
-        {
-            Console.WriteLine($"Update Error: {ex.Message}");
-            return StatusCode(500, "Failed to update profile.");
-        }
-    }*/
 
     [HttpPut("UpdateAdminProfileByUsername/{username?}")]
     public async Task<IActionResult> UpdateAdminProfileByUsername(string? username, [FromBody] AdminUpdateUserProfileRequestDto dto)

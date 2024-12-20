@@ -7,7 +7,9 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using DurianNet.Mappers;
+using Microsoft.AspNetCore.Authorization;
 
+[Authorize(Policy = "AdminPolicy")]
 [ApiController]
 [Route("useraccount")]
 public class UserAccountWebController : Controller
