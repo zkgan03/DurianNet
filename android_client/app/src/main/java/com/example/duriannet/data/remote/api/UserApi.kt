@@ -61,8 +61,16 @@ interface UserApi {
 
     @POST("api/user/appLogout")
     suspend fun logout(): Response<Unit>
+    //suspend fun logout(@Body logoutRequest: LogoutRequest): Response<Unit>
+
 
     @GET("api/user/GetEverything")
     suspend fun getAllUsers(): Response<List<UserDetailsDto>>
+
+    /*@POST("api/user/refreshToken")
+    suspend fun refreshToken(@Body refreshTokenRequest: RefreshTokenRequest): Response<NewUserDto>*/
+
+    @GET("api/user/authorizedAction")
+    suspend fun authorizedAction(): Response<UserInfoResponse>
 
 }

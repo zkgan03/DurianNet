@@ -1,5 +1,6 @@
 package com.example.duriannet.data.repository.account_management
 
+import com.example.duriannet.data.local.prefs.AuthPreferences
 import com.example.duriannet.data.remote.api.UserApi
 import com.example.duriannet.data.remote.dtos.request.user.*
 import com.example.duriannet.data.remote.dtos.response.NewUserDto
@@ -14,12 +15,21 @@ import okhttp3.RequestBody.Companion.toRequestBody
 import retrofit2.Response
 import javax.inject.Inject
 
-class UserRepository @Inject constructor(private val userApi: UserApi) {
+class UserRepository @Inject constructor(
+    private val userApi: UserApi,
+    private val authPreferences: AuthPreferences
+) {
     suspend fun login(username: String, password: String): Result<NewUserDto> {
         return runCatching {
             val response = userApi.login(LoginRequestDto(username, password))
             if (response.isSuccessful) {
-                response.body() ?: throw Exception("Empty response from server")
+                val newUserDto = response.body() ?: throw Exception("Empty response from server")
+
+                // Save tokens to shared preferences after successful login
+                //authPreferences.saveTokens(newUserDto.accessToken, newUserDto.refreshToken)
+                authPreferences.saveTokens(newUserDto.accessToken) // Save access token
+
+                newUserDto
             } else {
                 // Extract the error message from the server response
                 val errorMessage = response.errorBody()?.string() ?: "Login failed"
@@ -100,12 +110,21 @@ class UserRepository @Inject constructor(private val userApi: UserApi) {
         }
     }
 
-    suspend fun logout(): Result<Unit> {
+    /*suspend fun logout(): Result<Unit> {
         return runCatching {
             val response = userApi.logout()
             if (!response.isSuccessful) throw Exception("Failed to log out: ${response.message()}")
         }
+    }*/
+
+    suspend fun logout(): Result<Unit> {
+        return runCatching {
+            val response = userApi.logout()
+            authPreferences.clearTokens()
+            if (!response.isSuccessful) throw Exception("Failed to log out: ${response.message()}")
+        }
     }
+
 
     suspend fun updateProfileWithImage(
         username: String,

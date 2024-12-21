@@ -1,9 +1,16 @@
 package com.example.duriannet.data.remote.dtos.response
 
-data class NewUserDto(
+/*data class NewUserDto(
     val username: String,
     val email: String,
     val token: String
+)*/
+
+data class NewUserDto(
+    val username: String,
+    val email: String,
+    val accessToken: String,
+    //val refreshToken: String
 )
 
 data class UserProfileDto(

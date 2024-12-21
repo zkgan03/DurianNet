@@ -12,10 +12,12 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import com.example.duriannet.R
+import com.example.duriannet.data.local.prefs.AuthPreferences
 import com.example.duriannet.databinding.FragmentLoginBinding
 import com.example.duriannet.presentation.account_management.view_models.LoginViewModel
 import com.example.duriannet.utils.showToast
 import dagger.hilt.android.AndroidEntryPoint
+import jakarta.inject.Inject
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 
@@ -26,6 +28,9 @@ class LoginFragment : Fragment() {
     private val binding get() = _binding!!
     private val viewModel: LoginViewModel by viewModels()
     private val navController by lazy { findNavController() }
+
+    @Inject
+    lateinit var authPreferences: AuthPreferences
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -41,10 +46,12 @@ class LoginFragment : Fragment() {
         val sharedPreferences = requireActivity().getSharedPreferences("DurianNetPrefs", Context.MODE_PRIVATE)
 
         // Check if token exists for auto-login
-        val token = sharedPreferences.getString("token", null)
+        //val token = sharedPreferences.getString("token", null)
+        val rememberMe = sharedPreferences.getString("rememberMe", null)
         val username = sharedPreferences.getString("username", null)
 
-        if (token != null && username != null) {
+        //if (token != null && username != null) {
+        if (rememberMe != null && username != null) {
             lifecycleScope.launch {
                 try {
                     // Call the API to get all users
@@ -68,7 +75,7 @@ class LoginFragment : Fragment() {
         binding.btnLogin.setOnClickListener {
             val username = binding.edtLoginUsername.text.toString()
             val password = binding.edtLoginPassword.text.toString()
-            val rememberMe = binding.chkRememberMe.isChecked
+            val rememberMeChecked = binding.chkRememberMe.isChecked
 
             if (username.isEmpty()) {
                 binding.edtLoginUsername.error = "Username cannot be empty"
@@ -81,7 +88,7 @@ class LoginFragment : Fragment() {
 
             viewModel.login(username, password)
 
-            observeViewModel(sharedPreferences, rememberMe)
+            observeViewModel(sharedPreferences, rememberMeChecked)
         }
 
         binding.lblForgetPassword.setOnClickListener {
@@ -93,7 +100,7 @@ class LoginFragment : Fragment() {
         }
     }
 
-    private fun observeViewModel(sharedPreferences: SharedPreferences, rememberMe: Boolean) {
+    private fun observeViewModel(sharedPreferences: SharedPreferences, rememberMeChecked: Boolean) {
         viewLifecycleOwner.lifecycleScope.launchWhenStarted {
             viewModel.serverMessage.collect { message ->
                 message?.let {
@@ -110,8 +117,10 @@ class LoginFragment : Fragment() {
                     if (navController.currentDestination?.id == R.id.loginFragment) {
                         val editor = sharedPreferences.edit()
                         editor.putString("username", state.username)
-                        if (rememberMe) {
-                            editor.putString("token", state.token)
+                        if (rememberMeChecked) {
+                            editor.putString("rememberMe", "true") // Save rememberMe flag
+                        } else {
+                            editor.remove("rememberMe") // Remove flag if not checked
                         }
                         editor.apply()
 

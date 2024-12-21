@@ -1,6 +1,9 @@
 package com.example.duriannet.presentation.account_management.fragments
 
+import android.content.BroadcastReceiver
 import android.content.Context
+import android.content.Intent
+import android.content.IntentFilter
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -10,6 +13,7 @@ import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
+import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.bumptech.glide.Glide
@@ -57,6 +61,16 @@ class ProfileFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        val logoutReceiver = object : BroadcastReceiver() {
+            override fun onReceive(context: Context?, intent: Intent?) {
+                // Handle logout and navigate to login screen
+                findNavController().navigate(R.id.loginFragment)
+            }
+        }
+
+        LocalBroadcastManager.getInstance(requireContext())
+            .registerReceiver(logoutReceiver, IntentFilter("com.example.duriannet.LOGOUT"))
+
         val sharedPreferences =
             requireActivity().getSharedPreferences("DurianNetPrefs", Context.MODE_PRIVATE)
         val username = sharedPreferences.getString("username", "") ?: ""
@@ -78,28 +92,6 @@ class ProfileFragment : Fragment() {
         if (username.isNotEmpty()) {
             profileViewModel.loadProfile(username)
         }
-
-        /*viewLifecycleOwner.lifecycleScope.launch {
-            profileViewModel.profileState.collect { state ->
-                if (state.error.isNotEmpty()) {
-                    Toast.makeText(requireContext(), state.error, Toast.LENGTH_SHORT).show()
-                } else {
-                    binding.txtProfileUsername.text = state.username
-                    binding.txtProfileFullname.text = state.fullName
-                    binding.txtProfileEmail.text = state.email
-                    binding.txtProfilePhoneNumber.text = state.phoneNumber
-
-                    Glide.with(requireContext())
-                        .load(state.profileImageUrl) // Load the resolved image URL
-                        .placeholder(R.drawable.unknownuser) // Placeholder image
-                        .error(R.drawable.unknownuser) // Fallback image
-                        .centerCrop() // Optional for circular images
-                        .into(binding.ivProfile)
-
-                    adapter.submitList(state.favoriteDurians)
-                }
-            }
-        }*/
 
         viewLifecycleOwner.lifecycleScope.launch {
             profileViewModel.profileState.collect { state ->

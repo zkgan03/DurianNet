@@ -7,5 +7,7 @@ namespace DurianNet.Services.TokenService
         string CreateToken(User user);
         RefreshToken GenerateRefreshToken();
         Task RevokeRefreshToken(User user, string refreshToken);
+
+        string GenerateAccessToken(User user);
     }
 }
