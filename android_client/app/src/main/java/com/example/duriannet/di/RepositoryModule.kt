@@ -1,5 +1,6 @@
 package com.example.duriannet.di
 
+import com.example.duriannet.data.local.prefs.AuthPreferences
 import com.example.duriannet.data.remote.api.DurianApi
 import com.example.duriannet.data.remote.api.UserApi
 import com.example.duriannet.data.repository.account_management.UserRepository
@@ -15,6 +16,7 @@ import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import javax.inject.Singleton
+
 
 @InstallIn(SingletonComponent::class)
 @Module
@@ -42,9 +44,12 @@ abstract class RepositoryModule {
 
     companion object {
         @Provides
-        fun provideUserRepository(userApi: UserApi): UserRepository = UserRepository(userApi)
+        @Singleton
+        fun provideUserRepository(userApi: UserApi, authPreferences: AuthPreferences): UserRepository =
+            UserRepository(userApi, authPreferences)
 
         @Provides
+        @Singleton
         fun provideDurianRepository(durianApi: DurianApi): DurianRepository = DurianRepository(durianApi)
     }
 

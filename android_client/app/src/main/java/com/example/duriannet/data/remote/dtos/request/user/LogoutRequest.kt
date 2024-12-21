@@ -1,3 +1,5 @@
 package com.example.duriannet.data.remote.dtos.request.user
 
-data class LogoutRequest()
+data class LogoutRequest(
+    val refreshToken: String,
+)

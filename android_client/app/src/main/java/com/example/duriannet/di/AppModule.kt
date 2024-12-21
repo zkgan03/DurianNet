@@ -2,11 +2,13 @@ package com.example.duriannet.di
 
 import android.content.Context
 import android.content.SharedPreferences
+import com.example.duriannet.data.local.prefs.AuthPreferences
 import com.example.duriannet.data.remote.api.CommentApi
 import com.example.duriannet.data.remote.api.DurianApi
 import com.example.duriannet.utils.Constant.SERVER_BASE_URL
 import com.example.duriannet.data.remote.api.SellerApi
 import com.example.duriannet.data.remote.api.UserApi
+import com.example.duriannet.data.remote.api.interceptor.AuthInterceptor
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -95,6 +97,45 @@ object AppModule {
         @ApplicationContext context: Context
     ): SharedPreferences {
         return context.getSharedPreferences("DurianNetPrefs", Context.MODE_PRIVATE)
+    }
+
+    /*// Provide AuthPreferences instance
+    @Provides
+    @Singleton
+    fun provideAuthPreferences(@ApplicationContext context: Context): AuthPreferences {
+        return AuthPreferences(context)
+    }*/
+
+    // Provide AuthPreferences using SharedPreferences
+    @Provides
+    @Singleton
+    fun provideAuthPreferences(sharedPreferences: SharedPreferences): AuthPreferences {
+        return AuthPreferences(sharedPreferences)
+    }
+
+
+    // Provide OkHttpClient with Interceptors (Auth and Refresh)
+    @Provides
+    @Singleton
+    fun provideOkHttpClient(
+        @ApplicationContext context: Context,
+        authPreferences: AuthPreferences,
+        userApi: UserApi): OkHttpClient {
+        val loggingInterceptor = HttpLoggingInterceptor().apply {
+            level = HttpLoggingInterceptor.Level.BODY
+        }
+
+        val authInterceptor = AuthInterceptor(authPreferences)
+        //val refreshTokenInterceptor = RefreshTokenInterceptor(context, authPreferences, userApi)
+
+        return OkHttpClient.Builder()
+            .addInterceptor(loggingInterceptor) // Log requests and responses
+            .addInterceptor(authInterceptor) // Attach access token to requests
+            //.addInterceptor(refreshTokenInterceptor) // Handle 401 and refresh token
+            .connectTimeout(10, TimeUnit.MINUTES)
+            .readTimeout(10, TimeUnit.MINUTES)
+            .writeTimeout(10, TimeUnit.MINUTES)
+            .build()
     }
 }
 /*@InstallIn(SingletonComponent::class)
