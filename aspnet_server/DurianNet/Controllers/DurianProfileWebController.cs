@@ -5,7 +5,9 @@ using Microsoft.EntityFrameworkCore;
 using DurianNet.Mappers;
 using DurianNet.Dtos.Request.DurianProfile;
 using DurianNet.Models.DataModels;
+using Microsoft.AspNetCore.Authorization;
 
+[Authorize(Policy = "AdminPolicy")]
 [ApiController]
 [Route("durianprofile")]
 public class DurianProfileWebController : Controller
@@ -64,69 +66,6 @@ public class DurianProfileWebController : Controller
         // Redirect back to the Durian Profile page after updating.
         return RedirectToAction("DurianProfilePage");
     }
-
-    /*[HttpPost("AddDurianProfile")]
-    public async Task<IActionResult> AddDurianProfile([FromBody] AddDurianProfileRequestDto dto)
-    {
-        // Check for duplicate Durian Name
-        if (await _context.DurianProfiles.AnyAsync(dp => dp.DurianName == dto.DurianName))
-        {
-            return BadRequest(new { message = "Durian name already exists." });
-        }
-
-        // Check for duplicate Durian Code
-        if (await _context.DurianProfiles.AnyAsync(dp => dp.DurianCode == dto.DurianCode))
-        {
-            return BadRequest(new { message = "Durian code already exists." });
-        }
-
-        string imageUrl = null;
-        string videoUrl = null;
-
-        // Handle Durian Image upload
-        if (!string.IsNullOrEmpty(dto.DurianImage))
-        {
-            string imageDirectory = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/images");
-            if (!Directory.Exists(imageDirectory))
-            {
-                Directory.CreateDirectory(imageDirectory);
-            }
-
-            string imageName = $"durian_{Guid.NewGuid()}_{DateTime.Now.Ticks}.png"; // Unique file name
-            string imagePath = Path.Combine(imageDirectory, imageName);
-            var imageBytes = Convert.FromBase64String(dto.DurianImage.Split(',')[1]); // Remove Base64 metadata prefix
-            await System.IO.File.WriteAllBytesAsync(imagePath, imageBytes);
-            imageUrl = $"/images/{imageName}";
-        }
-
-        // Handle Durian Video upload
-        if (!string.IsNullOrEmpty(dto.DurianVideo))
-        {
-            string videoDirectory = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/videos");
-            if (!Directory.Exists(videoDirectory))
-            {
-                Directory.CreateDirectory(videoDirectory);
-            }
-
-            string videoName = $"durian_{Guid.NewGuid()}_{DateTime.Now.Ticks}.mp4"; // Unique file name
-            string videoPath = Path.Combine(videoDirectory, videoName);
-            var videoBytes = Convert.FromBase64String(dto.DurianVideo.Split(',')[1]); // Remove Base64 metadata prefix
-            await System.IO.File.WriteAllBytesAsync(videoPath, videoBytes);
-            videoUrl = $"/videos/{videoName}";
-        }
-
-        // Save Durian Video record
-        var video = dto.ToDurianVideoFromAddRequest(videoUrl); // Pass video URL explicitly
-        _context.DurianVideos.Add(video);
-        await _context.SaveChangesAsync();
-
-        // Save Durian Profile record
-        var profile = dto.ToDurianProfileFromAddRequest(imageUrl, video.VideoId); // Pass image URL explicitly
-        _context.DurianProfiles.Add(profile);
-        await _context.SaveChangesAsync();
-
-        return Ok(profile.ToDurianProfileDto());
-    }*/
 
     [HttpPost("AddDurianProfile")]
     public async Task<IActionResult> AddDurianProfile([FromBody] AddDurianProfileRequestDto dto)

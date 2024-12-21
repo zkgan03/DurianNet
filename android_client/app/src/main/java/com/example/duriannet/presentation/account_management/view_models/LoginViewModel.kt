@@ -41,7 +41,7 @@ class LoginViewModel @Inject constructor(
             try {
                 val result = userRepository.login(username, password)
                 if (result.isSuccess) {
-                    val token = result.getOrNull()?.token.orEmpty()
+                    val token = result.getOrNull()?.accessToken.orEmpty()
                     _loginState.value = LoginState(isLoggedIn = true, username = username, token = token)
                     postMessage("Login successful")
                 } else {

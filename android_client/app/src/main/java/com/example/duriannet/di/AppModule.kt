@@ -2,11 +2,13 @@ package com.example.duriannet.di
 
 import android.content.Context
 import android.content.SharedPreferences
+import com.example.duriannet.data.local.prefs.AuthPreferences
 import com.example.duriannet.data.remote.api.CommentApi
 import com.example.duriannet.data.remote.api.DurianApi
 import com.example.duriannet.utils.Constant.SERVER_BASE_URL
 import com.example.duriannet.data.remote.api.SellerApi
 import com.example.duriannet.data.remote.api.UserApi
+import com.example.duriannet.data.remote.interceptor.AuthInterceptor
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -27,7 +29,9 @@ object AppModule {
     // Provide Retrofit instance (shared for all APIs)
     @Provides
     @Singleton
-    fun provideRetrofit(): Retrofit {
+    fun provideRetrofit(
+        authPreferences: AuthPreferences
+    ): Retrofit {
         val loggingInterceptor = HttpLoggingInterceptor().apply {
             level = HttpLoggingInterceptor.Level.BODY // Log request and response body
         }
@@ -41,6 +45,7 @@ object AppModule {
             .connectTimeout(10, TimeUnit.MINUTES) // Increase connect timeout
             .readTimeout(10, TimeUnit.MINUTES)   // Increase read timeout
             .writeTimeout(10, TimeUnit.MINUTES)  // Increase write timeout
+            .addInterceptor(AuthInterceptor(authPreferences))  // Attach access token to requests
             .addInterceptor(loggingInterceptor)  // Log requests and responses
             .build()
 
@@ -96,6 +101,45 @@ object AppModule {
     ): SharedPreferences {
         return context.getSharedPreferences("DurianNetPrefs", Context.MODE_PRIVATE)
     }
+
+    /*// Provide AuthPreferences instance
+    @Provides
+    @Singleton
+    fun provideAuthPreferences(@ApplicationContext context: Context): AuthPreferences {
+        return AuthPreferences(context)
+    }*/
+
+    // Provide AuthPreferences using SharedPreferences
+    @Provides
+    @Singleton
+    fun provideAuthPreferences(sharedPreferences: SharedPreferences): AuthPreferences {
+        return AuthPreferences(sharedPreferences)
+    }
+
+
+//    // Provide OkHttpClient with Interceptors (Auth and Refresh)
+//    @Provides
+//    @Singleton
+//    fun provideOkHttpClient(
+//        @ApplicationContext context: Context,
+//        authPreferences: AuthPreferences,
+//        userApi: UserApi): OkHttpClient {
+//        val loggingInterceptor = HttpLoggingInterceptor().apply {
+//            level = HttpLoggingInterceptor.Level.BODY
+//        }
+//
+//        val authInterceptor = AuthInterceptor(authPreferences)
+//        //val refreshTokenInterceptor = RefreshTokenInterceptor(context, authPreferences, userApi)
+//
+//        return OkHttpClient.Builder()
+//            .addInterceptor(loggingInterceptor) // Log requests and responses
+//            .addInterceptor(authInterceptor) // Attach access token to requests
+//            //.addInterceptor(refreshTokenInterceptor) // Handle 401 and refresh token
+//            .connectTimeout(10, TimeUnit.MINUTES)
+//            .readTimeout(10, TimeUnit.MINUTES)
+//            .writeTimeout(10, TimeUnit.MINUTES)
+//            .build()
+//    }
 }
 /*@InstallIn(SingletonComponent::class)
 @Module

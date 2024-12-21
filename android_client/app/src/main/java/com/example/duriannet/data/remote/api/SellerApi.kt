@@ -26,10 +26,8 @@ interface SellerApi {
         @Path("sellerId") sellerId: Int,
     ): Response<SellerResponse>
 
-    @GET("GetSellersAddedByUser/{userId}")
-    suspend fun getSellersAddedByUser(
-        @Path("userId") userId: String,
-    ): Response<List<SellerResponse>>
+    @GET("GetSellersAddedByUser")
+    suspend fun getSellersAddedByUser(): Response<List<SellerResponse>>
 
     @POST("AddSeller")
     suspend fun addSeller(

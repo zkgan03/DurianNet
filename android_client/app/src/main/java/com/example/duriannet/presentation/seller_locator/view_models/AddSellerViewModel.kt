@@ -49,9 +49,7 @@ class AddSellerViewModel @Inject constructor(
                 val longitude = _inputState.value.sellerLocation.second
                 val image = BitmapHelper.encodeBase64Image(drawnImageResult!!)
 
-                //TODO : Replace with actual user id
                 val result = sellerRepository.addSeller(
-                    userId = "1",
                     name = name,
                     description = description,
                     base64Image = image,

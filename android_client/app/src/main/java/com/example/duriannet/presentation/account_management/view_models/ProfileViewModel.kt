@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.example.duriannet.data.repository.account_management.UserRepository
 import com.example.duriannet.data.repository.durian_dictionary.DurianRepository
 import com.example.duriannet.presentation.account_management.state.ProfileState
+import com.example.duriannet.utils.Constant
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -14,7 +15,7 @@ import javax.inject.Inject
 @HiltViewModel
 class ProfileViewModel @Inject constructor(
     private val userRepository: UserRepository,
-    private val durianRepository: DurianRepository
+    private val durianRepository: DurianRepository,
 ) : ViewModel() {
 
     private val _profileState = MutableStateFlow(ProfileState())
@@ -31,7 +32,7 @@ class ProfileViewModel @Inject constructor(
                     val profile = profileResult.getOrNull()
                     val favorites = favoriteResult.getOrNull()?.map { it.durianId to it.durianName } ?: emptyList()
 
-                    val baseUrl = "http://10.0.2.2:5176"
+                    val baseUrl = Constant.SERVER_BASE_URL
                     val profileImageUrl = profile?.profilePicture?.let {
                         if (it.startsWith("http")) it else "$baseUrl${if (it.startsWith("/")) it else "/$it"}"
                     } ?: "$baseUrl/defaultProfileImage.png"

@@ -24,6 +24,11 @@ using System.Net;
 using System.Text;
 using System.Text.Json;
 
+using System.Security.Claims;
+
+using DurianNet.Services.DurianProfileService;
+
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
@@ -64,7 +69,7 @@ builder.Services.AddSwaggerGen(option =>
 builder.Services.AddSingleton<IDetector, YoloV8Detector>();
 builder.Services.AddScoped<ISellerService, SellerService>();
 builder.Services.AddScoped<ICommentService, CommentService>();
-builder.Services.AddScoped<DurianNet.Services.DurianProfileService.IDurianProfileRepository, DurianNet.Services.DurianProfileService.DurianProfileRepository>();
+builder.Services.AddScoped<IDurianProfileRepository, DurianProfileRepository>();
 builder.Services.AddScoped<IDurianVideoRepository, DurianVideoRepository>();
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<ITokenService, TokenService>();
@@ -102,80 +107,28 @@ builder.Services.AddAuthorization(options =>
 {
 
     options.DefaultPolicy = new AuthorizationPolicyBuilder(JwtBearerDefaults.AuthenticationScheme)
-    .RequireAuthenticatedUser()
-    .Build();
+        .RequireAuthenticatedUser()
+        .Build();
 
+    // Policy for Admins and SuperAdmins
     options.AddPolicy("AdminPolicy", policy =>
     {
         policy.AddAuthenticationSchemes(CookieAuthenticationDefaults.AuthenticationScheme);
         policy.RequireAuthenticatedUser();
+        policy.RequireClaim(ClaimTypes.Role, UserType.Admin.ToString(), UserType.SuperAdmin.ToString());
         //policy.RequireRole("Admin");
+    });
+
+    //Policy for SuperAdmin only
+    options.AddPolicy("SuperAdminPolicy", policy =>
+    {
+        policy.AddAuthenticationSchemes(CookieAuthenticationDefaults.AuthenticationScheme);
+        policy.RequireAuthenticatedUser();
+        policy.RequireClaim(ClaimTypes.Role, UserType.SuperAdmin.ToString()); // Only allow SuperAdmin
     });
 });
 
-
-//builder.Services.AddAuthentication(options =>
-//{
-//    options.DefaultAuthenticateScheme =
-//    options.DefaultChallengeScheme =
-//    options.DefaultForbidScheme =
-//    options.DefaultScheme =
-//    options.DefaultSignInScheme =
-//    options.DefaultSignOutScheme = JwtBearerDefaults.AuthenticationScheme;
-//}).AddJwtBearer(options =>
-//{
-//    options.TokenValidationParameters = new TokenValidationParameters
-//    {
-//        ValidateIssuer = true,
-//        ValidIssuer = builder.Configuration["JWT:Issuer"],
-//        ValidateAudience = true,
-//        ValidAudience = builder.Configuration["JWT:Audience"],
-//        ValidateIssuerSigningKey = true,
-//        IssuerSigningKey = new SymmetricSecurityKey(
-//            System.Text.Encoding.UTF8.GetBytes(builder.Configuration["JWT:SigningKey"])
-//        )
-//    };
-//});
-
-//builder.Services.AddAuthentication(options =>
-//{
-//    options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
-//    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-//    options.DefaultSignInScheme = CookieAuthenticationDefaults.AuthenticationScheme;
-//}).AddCookie(CookieAuthenticationDefaults.AuthenticationScheme)
-//  .AddJwtBearer(JwtBearerDefaults.AuthenticationScheme, options =>
-//  {
-//      options.TokenValidationParameters = new TokenValidationParameters
-//      {
-//          ValidateIssuer = true,
-//          ValidIssuer = builder.Configuration["JWT:Issuer"],
-//          ValidateAudience = true,
-//          ValidAudience = builder.Configuration["JWT:Audience"],
-//          ValidateIssuerSigningKey = true,
-//          IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["JWT:SigningKey"]))
-//      };
-//  });
-
-//builder.Services.AddAuthentication(options =>
-//{
-//    options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
-//    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-//})
-//.AddCookie(CookieAuthenticationDefaults.AuthenticationScheme)
-//.AddJwtBearer(JwtBearerDefaults.AuthenticationScheme, options =>
-//{
-//    options.TokenValidationParameters = new TokenValidationParameters
-//    {
-//        ValidateIssuer = true,
-//        ValidIssuer = builder.Configuration["JWT:Issuer"],
-//        ValidateAudience = true,
-//        ValidAudience = builder.Configuration["JWT:Audience"],
-//        ValidateIssuerSigningKey = true,
-//        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["JWT:SigningKey"]))
-//    };
-//});
-
-builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+/*builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddCookie(CookieAuthenticationDefaults.AuthenticationScheme, options =>
     {
         options.LoginPath = "/Account/LoginPage";
@@ -192,7 +145,35 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
                 Encoding.UTF8.GetBytes(builder.Configuration["JWT:SigningKey"])
             )
         };
-    });
+    });*/
+
+builder.Services.AddAuthentication(options =>
+{
+    // Supports multiple authentication schemes
+    options.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme; // Default for MVC views (admin)
+    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme; // Default for API endpoints
+})
+.AddCookie(CookieAuthenticationDefaults.AuthenticationScheme, options =>
+{
+    options.LoginPath = "/Account/LoginPage"; // Redirect to login page if unauthenticated
+    options.AccessDeniedPath = "/Account/AccessDenied"; // Redirect to access denied page
+    //options.ExpireTimeSpan = TimeSpan.FromMinutes(30); // Session timeout
+    //options.SlidingExpiration = true; // Extend session if active
+})
+.AddJwtBearer(options =>
+{
+    options.TokenValidationParameters = new TokenValidationParameters
+    {
+        ValidateIssuer = true,
+        ValidIssuer = builder.Configuration["JWT:Issuer"],
+        ValidateAudience = true,
+        ValidAudience = builder.Configuration["JWT:Audience"],
+        ValidateIssuerSigningKey = true,
+        IssuerSigningKey = new SymmetricSecurityKey(
+            Encoding.UTF8.GetBytes(builder.Configuration["JWT:Key"])
+        )
+    };
+});
 
 
 // Enable session services
@@ -200,7 +181,7 @@ builder.Services.AddDistributedMemoryCache();
 builder.Services.AddSession(options =>
 {
     options.Cookie.Name = ".DurianNet.Session";
-    options.IdleTimeout = TimeSpan.FromMinutes(30); // Session timeout
+    //options.IdleTimeout = TimeSpan.FromMinutes(30); // Session timeout
     options.Cookie.HttpOnly = true; // Ensures session cookie is accessible only via HTTP
     options.Cookie.IsEssential = true; // Mark the session cookie as essential
 });

@@ -54,12 +54,14 @@ public class AccountWebController : Controller
         return View("~/Views/Login/ResetPassword.cshtml");
     }
 
+    [Authorize(Policy = "SuperAdminPolicy")]
     [HttpGet("Registration")]
     public IActionResult Registration()
     {
         return View("~/Views/Login/Registration.cshtml");
     }
 
+    [Authorize(Policy = "SuperAdminPolicy")]
     [HttpPost("Register")]
     public IActionResult Register(string username, string email, string password, string confirmPassword)
     {
@@ -205,8 +207,8 @@ public class AccountWebController : Controller
             principal,
             new AuthenticationProperties
             {
-                IsPersistent = true,
-                ExpiresUtc = DateTime.UtcNow.AddMinutes(30)
+                IsPersistent = false, // <-- Make the cookie session-based (only lives until the browser is closed)
+                //ExpiresUtc = DateTime.UtcNow.AddMinutes(30) // Cookie expiration time, but only for this session
             });
 
 
@@ -327,7 +329,7 @@ public class AccountWebController : Controller
         }
     }
 
-
+    [Authorize(Policy = "SuperAdminPolicy")]
     [HttpPost("registerAdmin")]
     public async Task<IActionResult> RegisterAdmin([FromBody] RegisterDto registerDto)
     {
@@ -398,7 +400,7 @@ public class AccountWebController : Controller
         }
     }
 
-
+    [Authorize(Policy = "AdminPolicy")]
     [HttpPost("logout")]
     public async Task<IActionResult> Logout()
     {
@@ -407,10 +409,15 @@ public class AccountWebController : Controller
         if (string.IsNullOrEmpty(username))
             return Unauthorized("User not logged in.");
 
-
         // Clear session data
-        HttpContext.Session.Remove("Username");
-        HttpContext.Session.Remove("ResetPasswordEmail");
+        //HttpContext.Session.Remove("Username");
+        //HttpContext.Session.Remove("ResetPasswordEmail");
+        // Clear all session data
+        HttpContext.Session.Clear();
+
+        //Clear all old cookies
+        HttpContext.Response.Cookies.Delete(".AspNetCore.Cookies");
+
 
         // Sign out and remove cookies
         //await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);

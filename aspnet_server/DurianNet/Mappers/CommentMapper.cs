@@ -1,6 +1,7 @@
 ﻿using DurianNet.Dtos.Request.Comment;
 using DurianNet.Dtos.Response;
 using DurianNet.Models.DataModels;
+using System.Security.Claims;
 
 namespace DurianNet.Mappers
 {
@@ -33,7 +34,6 @@ namespace DurianNet.Mappers
             {
                 Rating = addCommentDtoRequest.Rating,
                 Content = addCommentDtoRequest.Content,
-                UserId = addCommentDtoRequest.UserId,
                 SellerId = addCommentDtoRequest.SellerId
             };
         }

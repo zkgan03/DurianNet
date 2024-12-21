@@ -2,12 +2,15 @@
 using DurianNet.Mappers;
 using DurianNet.Services.CommentService;
 using DurianNet.Services.SellerService;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 
 namespace DurianNet.Controllers.api
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize]
     public class CommentController : ControllerBase
     {
         private readonly ICommentService _commentService;
@@ -73,12 +76,17 @@ namespace DurianNet.Controllers.api
         {
             Console.WriteLine("AddComment called");
 
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (userId == null) return Unauthorized();
+
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
             }
 
-            var addedComment = await _commentService.AddCommentAsync(request.ToCommentFromAdd());
+            var commet = request.ToCommentFromAdd();
+            commet.UserId = userId;
+            var addedComment = await _commentService.AddCommentAsync(commet);
 
             return Ok(addedComment.ToCommentDtoResponse());
         }
@@ -92,6 +100,13 @@ namespace DurianNet.Controllers.api
 
             if (!ModelState.IsValid) return BadRequest(ModelState);
 
+            var comment = await _commentService.GetCommentByIdAsync(commentId);
+            if (comment == null) return BadRequest(ModelState);
+
+            // get the user id from the token (authentication)
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (userId != comment.UserId || userId == null) return Unauthorized("User not authorized to update comment");
+
             var updatedComment = await _commentService.UpdateCommentAsync(commentId, request.ToCommentFromUpdate());
 
             return Ok(updatedComment.ToCommentDtoResponse());
@@ -103,6 +118,13 @@ namespace DurianNet.Controllers.api
             Console.WriteLine("RemoveComment called");
 
             if (!ModelState.IsValid) return BadRequest(ModelState);
+
+            var comment = await _commentService.GetCommentByIdAsync(commentId);
+            if (comment == null) return BadRequest(ModelState);
+
+            // get the user id from the token (authentication)
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (userId != comment.UserId || userId == null) return Unauthorized("User not authorized to remove comment");
 
             await _commentService.RemoveCommentAsync(commentId);
 

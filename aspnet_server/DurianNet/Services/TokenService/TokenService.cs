@@ -18,7 +18,7 @@ public class TokenService : ITokenService
     public TokenService(IConfiguration config, ApplicationDBContext context)
     {
         _config = config;
-        _key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_config["JWT:SigningKey"]));
+        _key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_config["Jwt:Key"]));
         _context = context;
     }
 
@@ -69,5 +69,65 @@ public class TokenService : ITokenService
             await _context.SaveChangesAsync();
         }
     }
+
+    /*public string GenerateAccessToken(User user)
+    {
+        var tokenHandler = new JwtSecurityTokenHandler();
+
+        var key = Encoding.ASCII.GetBytes(_config.GetSection("Jwt:Key").Value);
+
+        var claims = new ClaimsIdentity(
+        [
+            new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
+                new Claim(JwtRegisteredClaimNames.Sub, user.Id),
+                new Claim(JwtRegisteredClaimNames.Email, user.Email)
+        ]);
+
+        var expiredTime = int.Parse(_config.GetSection("Jwt:AccessTokenExpirationMinutes").Value);
+
+        var tokenDescriptor = new SecurityTokenDescriptor
+        {
+            Subject = claims,
+            Expires = DateTime.UtcNow.AddMinutes(30),
+            Issuer = _config.GetSection("Jwt:Issuer").Value,
+            Audience = _config.GetSection("Jwt:Audience").Value,
+            SigningCredentials = new SigningCredentials(
+                new SymmetricSecurityKey(key),
+                SecurityAlgorithms.HmacSha256Signature)
+        };
+
+        var token = tokenHandler.CreateToken(tokenDescriptor);
+
+        return tokenHandler.WriteToken(token);
+    }*/
+
+    public string GenerateAccessToken(User user)
+    {
+        var tokenHandler = new JwtSecurityTokenHandler();
+        var key = Encoding.ASCII.GetBytes(_config["Jwt:Key"]);
+        if (key == null || key.Length == 0)
+            throw new Exception("JWT Key is not configured correctly");
+
+        var claims = new ClaimsIdentity([
+            new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
+            new Claim(JwtRegisteredClaimNames.Sub, user.Id),
+            new Claim(JwtRegisteredClaimNames.Email, user.Email),
+            new Claim(ClaimTypes.Name, user.UserName),
+        ]);
+
+        var tokenDescriptor = new SecurityTokenDescriptor
+        {
+            Subject = claims,
+            Issuer = _config.GetSection("Jwt:Issuer").Value,
+            Audience = _config.GetSection("Jwt:Audience").Value,
+            SigningCredentials = new SigningCredentials(
+                new SymmetricSecurityKey(key),
+                SecurityAlgorithms.HmacSha256Signature)
+        };
+
+        var token = tokenHandler.CreateToken(tokenDescriptor);
+        return tokenHandler.WriteToken(token);
+    }
+
 }
 

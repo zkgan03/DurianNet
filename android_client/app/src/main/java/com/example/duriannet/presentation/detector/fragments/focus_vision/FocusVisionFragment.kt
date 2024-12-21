@@ -358,8 +358,9 @@ class FocusVisionFragment : BaseFocusVisionFragment() {
     override fun onEmptyDetect() {
         super.onEmptyDetect()
         activity?.runOnUiThread {
-            if (_binding == null || !isAdded) return@runOnUiThread
-
+            if (_binding == null || !isAdded || !isProcessing) {
+                return@runOnUiThread
+            }
             binding.bottomPromptChip.text = "No object detected!"
             binding.overlay.clear()
         }

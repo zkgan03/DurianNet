@@ -40,7 +40,6 @@ namespace DurianNet.Mappers
         {
             return new Seller
             {
-                UserId = dto.UserId,
                 Name = dto.Name,
                 Description = dto.Description,
                 Image = dto.Image,

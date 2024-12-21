@@ -43,14 +43,12 @@ class CommentRepository @Inject constructor(
     }
 
     override suspend fun addComment(
-        userId: String,
         sellerId: Int,
         rating: Float,
         content: String
     ): Result<Comment> {
 
         val addCommentRequest = AddCommentRequest(
-            userId = userId,
             sellerId = sellerId,
             rating = rating,
             content = content
