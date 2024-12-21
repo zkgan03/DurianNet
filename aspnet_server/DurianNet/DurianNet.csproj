@@ -43,6 +43,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Folder Include="wwwroot\detected_durian_imgs\" />
     <Folder Include="wwwroot\videos\" />
   </ItemGroup>
 

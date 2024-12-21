@@ -23,7 +23,11 @@ using Microsoft.OpenApi.Models;
 using System.Net;
 using System.Text;
 using System.Text.Json;
+
 using System.Security.Claims;
+
+using DurianNet.Services.DurianProfileService;
+
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -65,7 +69,7 @@ builder.Services.AddSwaggerGen(option =>
 builder.Services.AddSingleton<IDetector, YoloV8Detector>();
 builder.Services.AddScoped<ISellerService, SellerService>();
 builder.Services.AddScoped<ICommentService, CommentService>();
-builder.Services.AddScoped<DurianNet.Services.DurianProfileService.IDurianProfileRepository, DurianNet.Services.DurianProfileService.DurianProfileRepository>();
+builder.Services.AddScoped<IDurianProfileRepository, DurianProfileRepository>();
 builder.Services.AddScoped<IDurianVideoRepository, DurianVideoRepository>();
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<ITokenService, TokenService>();
