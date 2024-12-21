@@ -5,13 +5,16 @@ using DurianNet.Models.DataModels;
 using DurianNet.Services.CommentService;
 using DurianNet.Services.SellerService;
 using DurianNet.Utils;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 using System.Text.Json;
 
 namespace DurianNet.Controllers.api
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize]
     public class SellerController : ControllerBase
     {
 
@@ -22,6 +25,18 @@ namespace DurianNet.Controllers.api
         {
             _sellerService = sellerService;
             _commentService = commentService;
+        }
+
+        [HttpGet("TestAuth")]
+        public IActionResult TestAuth()
+        {
+            //get the user id from the token (authentication)
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var email = User.FindFirstValue(ClaimTypes.Email);
+            var name = User.FindFirstValue(ClaimTypes.Name);
+
+            //return anonymous object
+            return Ok(new { userId, email, name });
         }
 
 

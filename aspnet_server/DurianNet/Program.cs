@@ -107,8 +107,8 @@ builder.Services.AddAuthorization(options =>
 {
 
     options.DefaultPolicy = new AuthorizationPolicyBuilder(JwtBearerDefaults.AuthenticationScheme)
-    .RequireAuthenticatedUser()
-    .Build();
+        .RequireAuthenticatedUser()
+        .Build();
 
     // Policy for Admins and SuperAdmins
     options.AddPolicy("AdminPolicy", policy =>
@@ -160,7 +160,7 @@ builder.Services.AddAuthentication(options =>
     //options.ExpireTimeSpan = TimeSpan.FromMinutes(30); // Session timeout
     //options.SlidingExpiration = true; // Extend session if active
 })
-.AddJwtBearer(JwtBearerDefaults.AuthenticationScheme, options =>
+.AddJwtBearer(options =>
 {
     options.TokenValidationParameters = new TokenValidationParameters
     {
@@ -170,7 +170,7 @@ builder.Services.AddAuthentication(options =>
         ValidAudience = builder.Configuration["JWT:Audience"],
         ValidateIssuerSigningKey = true,
         IssuerSigningKey = new SymmetricSecurityKey(
-            Encoding.UTF8.GetBytes(builder.Configuration["JWT:SigningKey"])
+            Encoding.UTF8.GetBytes(builder.Configuration["JWT:Key"])
         )
     };
 });
