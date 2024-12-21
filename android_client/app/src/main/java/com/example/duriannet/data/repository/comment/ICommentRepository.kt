@@ -8,7 +8,6 @@ interface ICommentRepository {
     suspend fun getCommentById(commentId: Int): Result<Comment>
 
     suspend fun addComment(
-        userId: String,
         sellerId: Int,
         rating: Float,
         content: String

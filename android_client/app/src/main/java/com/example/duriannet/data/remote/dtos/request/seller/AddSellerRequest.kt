@@ -5,7 +5,6 @@ import com.example.duriannet.utils.BitmapHelper
 import com.google.gson.annotations.SerializedName
 
 data class AddSellerRequest(
-    @SerializedName("userId") val userId: String,
     @SerializedName("name") val name: String,
     @SerializedName("description") val description: String,
     @SerializedName("base64Image") val image: String,

@@ -8,6 +8,7 @@ using DurianNet.Utils;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
+using System.Security.Cryptography;
 using System.Text.Json;
 
 namespace DurianNet.Controllers.api
@@ -50,7 +51,16 @@ namespace DurianNet.Controllers.api
                 return BadRequest(ModelState);
             }
 
-            var addedSeller = await _sellerService.AddSellerAsync(request.ToSellerFromAdd());
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (userId == null)
+            {
+                return Unauthorized("User not authorized to add seller");
+            }
+
+            var seller = request.ToSellerFromAdd();
+            seller.UserId = userId;
+
+            var addedSeller = await _sellerService.AddSellerAsync(seller);
 
             return Ok(addedSeller.ToSellerDtoResponse());
         }
@@ -61,15 +71,17 @@ namespace DurianNet.Controllers.api
         {
             Console.WriteLine("GetAllSellers called");
 
+
+            // TODO : Remove this,  just for testing purpose
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var email = User.FindFirstValue(ClaimTypes.Email);
+            var name = User.FindFirstValue(ClaimTypes.Name);
+
+            Console.WriteLine($"userId: {userId}, email: {email}, name: {name}");
+
             List<Seller> sellers = await _sellerService.GetAllSellersAsync();
 
-            //remove all images from sellers for testing
-            //sellers.ForEach(s => s.Image = "n");
-
-
             List<SellerDtoResponse> sellerResponseDtos = sellers.Select(s => s.ToSellerDtoResponse()).ToList();
-
-            //Console.WriteLine(JsonSerializer.Serialize(sellerResponseDtos[0]));
 
             return Ok(sellerResponseDtos);
         }
@@ -86,12 +98,20 @@ namespace DurianNet.Controllers.api
             return Ok(response);
         }
 
-        [HttpGet("GetSellersAddedByUser/{userId}")]
-        public async Task<IActionResult> GetSellersAddedByUser([FromRoute] string userId)
+        [HttpGet("GetSellersAddedByUser")]
+        public async Task<IActionResult> GetSellersAddedByUser()
         {
             Console.WriteLine("GetSellersAddedByUser called");
 
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+            Console.WriteLine($"userId: {userId}");
+
             //TODO: get the user id from the token (authentication) instead of the route
+            if (userId == null)
+            {
+                return Unauthorized("User not authorized to get sellers added");
+            }
 
             List<Seller> sellers = await _sellerService.GetSellersAddedByUserAsync(userId);
 
@@ -125,7 +145,9 @@ namespace DurianNet.Controllers.api
             var seller = await _sellerService.GetSellerByIdAsync(sellerId);
             if (seller == null) return BadRequest(ModelState);
 
-            // TODO: get the user id from the token (authentication)
+            // get the user id from the token (authentication)
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (userId != seller.UserId || userId == null) return Unauthorized("User not authorized to update seller");
 
             var updatedSeller = await _sellerService.UpdateSellerAsync(sellerId, request.ToSellerFromUpdate());
 
@@ -142,7 +164,9 @@ namespace DurianNet.Controllers.api
             var seller = await _sellerService.GetSellerByIdAsync(sellerId);
             if (seller == null) return BadRequest(ModelState);
 
-            // TODO: get the user id from the token (authentication)
+            // get the user id from the token (authentication)
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (userId != seller.UserId || userId == null) return Unauthorized("User not authorized to update seller");
 
             await _sellerService.RemoveSellerAsync(sellerId);
 

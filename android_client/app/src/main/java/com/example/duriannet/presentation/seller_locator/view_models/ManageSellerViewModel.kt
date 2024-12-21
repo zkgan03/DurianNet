@@ -40,8 +40,7 @@ class ManageSellerViewModel @Inject constructor(
 
     private fun getSellersAddedByUser() {
         viewModelScope.launch {
-            // TODO : Replace with actual user id
-            val request = sellerRepository.getSellersAddedByUser("1")
+            val request = sellerRepository.getSellersAddedByUser()
 
             if (request.isSuccess) {
                 Log.e("ManageSellerViewModel", "Sellers fetched successfully : ${request.getOrNull()}")

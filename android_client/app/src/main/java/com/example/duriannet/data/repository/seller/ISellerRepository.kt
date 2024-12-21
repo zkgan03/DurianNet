@@ -13,10 +13,9 @@ interface ISellerRepository {
 
     suspend fun getSellerById(sellerId: Int): Result<Seller>
 
-    suspend fun getSellersAddedByUser(userId: String): Result<List<Seller>>
+    suspend fun getSellersAddedByUser(): Result<List<Seller>>
 
     suspend fun addSeller(
-        userId: String,
         name: String,
         description: String,
         image: String,

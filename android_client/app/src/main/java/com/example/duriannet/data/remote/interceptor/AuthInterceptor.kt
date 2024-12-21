@@ -1,4 +1,4 @@
-package com.example.duriannet.data.remote.api.interceptor
+package com.example.duriannet.data.remote.interceptor
 
 import android.util.Log
 import com.example.duriannet.data.local.prefs.AuthPreferences

@@ -5,6 +5,7 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.viewModelScope
+import com.example.duriannet.data.local.prefs.AuthPreferences
 import com.example.duriannet.data.repository.comment.ICommentRepository
 import com.example.duriannet.data.repository.seller.ISellerRepository
 import com.example.duriannet.models.toSellerSearchResult
@@ -40,6 +41,7 @@ class MapViewModel @Inject constructor(
     @ApplicationContext private val context: Context,
     private val sellerRepository: ISellerRepository,
     private val commentRepository: ICommentRepository,
+    private val authPreferences: AuthPreferences
 ) : ViewModel() {
 
     private var _state = MutableStateFlow<MapScreenState>(MapScreenState.Loading)
@@ -222,7 +224,13 @@ class MapViewModel @Inject constructor(
                 val seller = sellerRepository.getSellerById(sellerId).getOrThrow()
                 val comments = commentRepository.getSellerComments(sellerId).getOrThrow()
 
-                val (filteredComments, userComments) = comments.partition { it.userId != "1" }
+                Log.e("SellerLocatorViewModel", "username : ${authPreferences.getUserName()}")
+
+                for (comment in comments) {
+                    Log.e("SellerLocatorViewModel", "comment : $comment")
+                }
+
+                val (filteredComments, userComments) = comments.partition { it.username != authPreferences.getUserName()?.lowercase() }
 
                 updateState {
                     it.copy(
@@ -252,7 +260,6 @@ class MapViewModel @Inject constructor(
             }
 
             val result = commentRepository.addComment(
-                userId = "1", //TODO : Replace with real user ID
                 sellerId = selectedSeller.sellerId,
                 content = content,
                 rating = rating
@@ -261,10 +268,12 @@ class MapViewModel @Inject constructor(
             result.onSuccess {
                 sendEvent(Event.Toast("Comment added successfully"))
                 handleSellerSelection(selectedSeller.sellerId)
+
             }.onFailure {
                 val exception = result.exceptionOrNull()
                 Log.e("SellerLocatorViewModel", exception?.message ?: "Failed to add comment")
                 sendEvent(Event.Toast(exception?.message ?: "Failed to add comment"))
+
             }
 
         }

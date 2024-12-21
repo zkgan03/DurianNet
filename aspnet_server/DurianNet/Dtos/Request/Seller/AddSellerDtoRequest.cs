@@ -6,9 +6,6 @@ namespace DurianNet.Dtos.Request.Seller
 {
     public class AddSellerDtoRequest
     {
-        [Required]
-        [JsonPropertyName("userId")]
-        public string UserId { get; set; } // user added this seller
 
         [Required]
         [JsonPropertyName("name")]

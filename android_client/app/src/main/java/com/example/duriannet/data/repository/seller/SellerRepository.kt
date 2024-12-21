@@ -66,9 +66,9 @@ class SellerRepository @Inject constructor(
 
     }
 
-    override suspend fun getSellersAddedByUser(userId: String): Result<List<Seller>> {
+    override suspend fun getSellersAddedByUser(): Result<List<Seller>> {
         val request = try {
-            sellerLocatorApi.getSellersAddedByUser(userId)
+            sellerLocatorApi.getSellersAddedByUser()
         } catch (e: Exception) {
             return Result.failure(e)
         }
@@ -83,7 +83,6 @@ class SellerRepository @Inject constructor(
     }
 
     override suspend fun addSeller(
-        userId: String,
         name: String,
         description: String,
         base64Image: String,
@@ -93,7 +92,6 @@ class SellerRepository @Inject constructor(
     ): Result<Seller> {
 
         val addSellerRequest = AddSellerRequest(
-            userId = userId,
             name = name,
             description = description,
             image = base64Image,

@@ -24,6 +24,10 @@ class AuthPreferences @Inject constructor(
             .apply()
     }
 
+    fun getUserName(): String? {
+        return sharedPreferences.getString("username", "")
+    }
+
     companion object {
         private const val ACCESS_TOKEN_KEY = "access_token"
     }

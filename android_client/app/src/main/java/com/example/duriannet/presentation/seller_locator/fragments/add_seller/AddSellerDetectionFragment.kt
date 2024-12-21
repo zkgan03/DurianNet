@@ -290,6 +290,10 @@ class AddSellerDetectionFragment : BaseFocusVisionFragment() {
 
     override fun onEmptyDetect() {
         activity?.runOnUiThread {
+            if (_binding == null || !isAdded || !isProcessing) {
+                return@runOnUiThread
+            }
+
             Log.e(TAG, "onEmptyDetect")
             binding.bottomPromptChip.text = "No object detected!"
             binding.overlay.clear()
