@@ -7,16 +7,18 @@ namespace DurianNet.Services.DetectionService.YOLO.v8
     public class YoloV8Detector : IDetector
     {
         private readonly YoloV8Predictor _predictor;
+        private int maxNumberDetection = 10;
 
         public YoloV8Detector()
         {
             _predictor = YoloV8Predictor.Create("./Assets/Detection_Model/durian_2_v8s_640.onnx");
         }
 
-        public void UpdateConfiguration(float confidence, float iouThreshold)
+        public void UpdateConfiguration(float confidence, float iouThreshold, int maxNumberDetection)
         {
             _predictor.Configuration.Confidence = confidence;
             _predictor.Configuration.IoU = iouThreshold;
+            this.maxNumberDetection = maxNumberDetection;
         }
 
         public async Task<DetectionResultDto[]> DetectAsync(byte[] image)
@@ -24,6 +26,10 @@ namespace DurianNet.Services.DetectionService.YOLO.v8
             var result = await _predictor.DetectAsync(image);
 
             var detectResults = DetectionResultToDto(result);
+
+            //sort by confidence
+            detectResults = detectResults.OrderByDescending(x => x.Confidence).ToArray();
+            detectResults = detectResults.Length > maxNumberDetection ? detectResults[..maxNumberDetection] : detectResults;
 
             return detectResults;
         }
@@ -33,6 +39,10 @@ namespace DurianNet.Services.DetectionService.YOLO.v8
             var result = await _predictor.DetectAsync(imagePath);
 
             var detectResults = DetectionResultToDto(result);
+
+            //sort by confidence
+            detectResults = detectResults.OrderByDescending(x => x.Confidence).ToArray();
+            detectResults = detectResults.Length > maxNumberDetection ? detectResults[..maxNumberDetection] : detectResults;
 
             return detectResults;
         }

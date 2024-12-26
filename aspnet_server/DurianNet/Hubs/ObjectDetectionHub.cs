@@ -23,7 +23,8 @@ namespace DurianNet.Hubs
 
             _predictor.UpdateConfiguration(
                 confidence: request.ConfidenceThreshold,
-                iouThreshold: request.IoUThreshold
+                iouThreshold: request.IoUThreshold,
+                maxNumberDetection: request.MaxNumberDetection
                 );
 
             // initialize the model and heat up the model
@@ -67,7 +68,7 @@ namespace DurianNet.Hubs
                     result
                     );
 
-                Console.WriteLine(JsonSerializer.Serialize(result));
+                //Console.WriteLine(JsonSerializer.Serialize(result));
             }
             catch (Exception ex)
             {
@@ -83,7 +84,8 @@ namespace DurianNet.Hubs
 
             _predictor.UpdateConfiguration(
                 confidence: request.ConfidenceThreshold,
-                iouThreshold: request.IoUThreshold
+                iouThreshold: request.IoUThreshold,
+                maxNumberDetection: request.MaxNumberDetection
                 );
         }
 
