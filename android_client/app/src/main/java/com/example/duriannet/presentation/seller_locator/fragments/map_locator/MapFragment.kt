@@ -33,6 +33,7 @@ import com.example.duriannet.databinding.ItemUserCommentedBinding
 import com.example.duriannet.databinding.ItemUserNotCommentedBinding
 import com.example.duriannet.models.Comment
 import com.example.duriannet.models.Seller
+import com.example.duriannet.models.User
 import com.example.duriannet.models.asSeller
 import com.example.duriannet.presentation.seller_locator.adapter.MarkerInfoWindowAdapter
 import com.example.duriannet.presentation.seller_locator.adapter.SearchResultsAdapter
@@ -227,7 +228,7 @@ class MapFragment : Fragment() {
     private fun updateBottonSheerState(state: MapScreenState.Success) {
         state.userComment?.let {
             createUserCommentedView(it)
-        } ?: createUserNotCommentedView()
+        } ?: createUserNotCommentedView(state.user)
 
         bottomSheetBinding?.apply {
             if (state.isBottomSheetLoading) {
@@ -465,7 +466,7 @@ class MapFragment : Fragment() {
 
     }
 
-    private fun createUserNotCommentedView() {
+    private fun createUserNotCommentedView(user : User) {
         bottomSheetBinding?.apply {
             // clear user comment section
             userCommentSection.removeAllViews()
@@ -483,7 +484,7 @@ class MapFragment : Fragment() {
                 // TODO : Change to current user image
                 Common.loadServerImageIntoView(
                     requireContext(),
-                    "",
+                    user.profilePicture,
                     imageUser
                 )
 

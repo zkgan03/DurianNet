@@ -14,6 +14,19 @@ import com.microsoft.signalr.HubConnectionBuilder
 import com.microsoft.signalr.HubConnectionState
 import com.microsoft.signalr.TransportEnum
 import com.microsoft.signalr.messagepack.MessagePackHubProtocol
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.channels.BufferOverflow
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.debounce
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.mapLatest
+import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.launch
 import toByteArray
 import withLetterBox
 import java.util.concurrent.ConcurrentHashMap
@@ -37,10 +50,40 @@ class DetectionHub(
     private val requestInferenceTime = ConcurrentHashMap<String, Long>()
     private val requestBitmap = ConcurrentHashMap<String, Bitmap>()
 
+    private val updateConfigFlow = MutableSharedFlow<DetectorConfiguration>(
+        replay = 1,
+        extraBufferCapacity = 1,
+        BufferOverflow.DROP_OLDEST
+    )
+
     init {
         Log.d(TAG, "Connection already started")
         bindHubCallback()
+        bindUpdateConfigFlow()
         start()
+    }
+
+    private fun bindUpdateConfigFlow() {
+        CoroutineScope(Dispatchers.IO).launch {
+            updateConfigFlow
+                .debounce(300)
+                .collect {
+
+                    Log.e(TAG, "Updating configuration $it")
+
+                    processIfInitialized {
+                        hubConnection.send(
+                            "UpdateConfiguration",
+                            arrayOf(
+                                config.cnfThreshold,
+                                config.iouThreshold,
+                                config.maxNumberDetection
+                            ) //must send in sequence
+                        )
+                    }
+                }
+        }
+
     }
 
     private fun bindHubCallback() {
@@ -162,19 +205,13 @@ class DetectionHub(
         }
     }
 
+
     override fun updateConfigurations(config: DetectorConfiguration) {
         super.updateConfigurations(config)
 
-        processIfInitialized {
-            hubConnection.send(
-                "UpdateConfiguration",
-                arrayOf(
-                    config.cnfThreshold,
-                    config.iouThreshold,
-                    config.maxNumberDetection
-                ) //must send in sequence
-            )
-        }
+        Log.e(TAG, "Updating configuration from ui :  $config")
+
+        updateConfigFlow.tryEmit(config)
     }
 
 

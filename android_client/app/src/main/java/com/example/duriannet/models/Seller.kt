@@ -28,12 +28,16 @@ fun Seller.toSellerSearchResult(
     name = name,
     latitude = latLng.latitude,
     longitude = latLng.longitude,
-    distanceFromCurrentLocationInKm = GoogleMapManager.calculateDistanceInMeter(
-        userLatLng.first,
-        userLatLng.second,
-        latLng.latitude,
-        latLng.longitude,
-    ) / 1000,
+    distanceFromCurrentLocationInKm = if (userLatLng.first != 0.0 && userLatLng.second != 0.0) {
+        GoogleMapManager.calculateDistanceInMeter(
+            userLatLng.first,
+            userLatLng.second,
+            latLng.latitude,
+            latLng.longitude,
+        ) / 1000
+    } else {
+        0f
+    },
 )
 
 enum class DurianType {

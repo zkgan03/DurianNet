@@ -6,8 +6,11 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.viewModelScope
 import com.example.duriannet.data.local.prefs.AuthPreferences
+import com.example.duriannet.data.remote.dtos.response.toUser
+import com.example.duriannet.data.repository.account_management.UserRepository
 import com.example.duriannet.data.repository.comment.ICommentRepository
 import com.example.duriannet.data.repository.seller.ISellerRepository
+import com.example.duriannet.models.User
 import com.example.duriannet.models.toSellerSearchResult
 import com.example.duriannet.presentation.seller_locator.events.MapEvent
 import com.example.duriannet.presentation.seller_locator.state.MapScreenState
@@ -39,6 +42,7 @@ import javax.inject.Inject
 @HiltViewModel
 class MapViewModel @Inject constructor(
     @ApplicationContext private val context: Context,
+    private val userRepository: UserRepository,
     private val sellerRepository: ISellerRepository,
     private val commentRepository: ICommentRepository,
     private val authPreferences: AuthPreferences
@@ -68,7 +72,7 @@ class MapViewModel @Inject constructor(
         // run on main thread
         viewModelScope.launch(Dispatchers.IO) {
             val currentLocation = GoogleMapManager.getUserLocationAwait(context)
-            _currentUserLocation.value = Pair(currentLocation!!.latitude, currentLocation.longitude)
+            _currentUserLocation.value = Pair(currentLocation?.latitude ?: 0.0, currentLocation?.longitude ?: 0.0)
 
             setUpQueryFlow()
             initSellers()
@@ -101,8 +105,12 @@ class MapViewModel @Inject constructor(
     private suspend fun loadSellersWithRetry(): Boolean {
         val result = sellerRepository.getAllSellers()
 
+        val user = userRepository
+            .getProfile(authPreferences.getUserName() ?: "")
+
         result.onSuccess { sellers ->
             _state.value = MapScreenState.Success(
+                user = user.getOrNull()!!.toUser(),
                 sellers = sellers,
                 searchResults = sellers.map {
                     it.toSellerSearchResult(

@@ -61,7 +61,7 @@ namespace DurianNet.Controllers.api
 
             if (comment == null)
             {
-                return BadRequest(ModelState);
+                return NotFound("Comment not found");
             }
 
             var response = comment.ToCommentDtoResponse();
@@ -84,9 +84,9 @@ namespace DurianNet.Controllers.api
                 return BadRequest(ModelState);
             }
 
-            var commet = request.ToCommentFromAdd();
-            commet.UserId = userId;
-            var addedComment = await _commentService.AddCommentAsync(commet);
+            var comment = request.ToCommentFromAdd();
+            comment.UserId = userId;
+            var addedComment = await _commentService.AddCommentAsync(comment);
 
             return Ok(addedComment.ToCommentDtoResponse());
         }

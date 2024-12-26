@@ -4,8 +4,9 @@
     - Visual Studio 2022
 
 2. Framework / Project
-    - .NET == 8.0+
+    - .NET 8.0+
     - SQL Server Management Studio 19 / 20
+    - CUDA 11.8
 
 
 

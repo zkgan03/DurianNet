@@ -28,19 +28,6 @@ namespace DurianNet.Controllers.api
             _commentService = commentService;
         }
 
-        [HttpGet("TestAuth")]
-        public IActionResult TestAuth()
-        {
-            //get the user id from the token (authentication)
-            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            var email = User.FindFirstValue(ClaimTypes.Email);
-            var name = User.FindFirstValue(ClaimTypes.Name);
-
-            //return anonymous object
-            return Ok(new { userId, email, name });
-        }
-
-
         [HttpPost("AddSeller")]
         public async Task<IActionResult> AddSeller([FromBody] AddSellerDtoRequest request)
         {

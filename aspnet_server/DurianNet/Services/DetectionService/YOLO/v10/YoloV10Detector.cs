@@ -15,7 +15,7 @@ namespace DurianNet.Services.DetectionService.YOLO.v10
             _predictor = YoloV10Predictor.Create("./Assets/Detection_Model/yolov10s.onnx");
         }
 
-        public void UpdateConfiguration(float confidence, float iouThreshold)
+        public void UpdateConfiguration(float confidence, float iouThreshold, int maxNumberDetection)
         {
             _predictor.Configuration.Confidence = confidence;
             _predictor.Configuration.IoU = iouThreshold;

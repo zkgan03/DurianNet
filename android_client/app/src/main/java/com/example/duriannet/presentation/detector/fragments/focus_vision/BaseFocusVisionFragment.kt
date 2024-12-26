@@ -89,7 +89,7 @@ abstract class BaseFocusVisionFragment : Fragment(), IDetectorListener {
         inputImage: Bitmap,
     ) {
         activity?.runOnUiThread {
-            if (!isAdded || !_isProcessing) {
+            if (!isAdded || !_isProcessing || results.isEmpty()) {
                 return@runOnUiThread
             }
             detectionResultBundle.add(results)
