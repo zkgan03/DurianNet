@@ -102,18 +102,16 @@ AI: ";
 
             Console.WriteLine("Chatting with the AI...");
             Console.WriteLine("Attempt to Getting vector collection...");
-            var vectorCollection = await _vectorDatabase.GetOrCreateCollectionAsync("focs_clean", dimensions: 768);
+            var vectorCollection = await _vectorDatabase.GetOrCreateCollectionAsync("durian_clean", dimensions: 768);
 
             if (vectorCollection.IsEmptyAsync().Result)
             {
-                Console.WriteLine("Vector Collections for focs is empty....");
-                //await VectorDbUtils.DownloadWebsiteHMTLToVectorDB(_vectorDatabase, _embeddingModel);
+                Console.WriteLine("Vector Collections for durian is empty....");
                 await VectorDbUtils.LoadTextFilesToVectorDB(_vectorDatabase, _embeddingModel);
             }
 
             Console.WriteLine("Getting similar documents from vector db...");
             var lastMessage = _memory.ChatHistory.Messages.LastOrDefault();
-            //var searchInput = (lastMessage.Content ?? " ") + "\n" + question; // adding the last message to the search input
             var searchInput = question;
             Console.WriteLine("Search Input : " + searchInput);
             var similarDocuments = await vectorCollection.GetSimilarDocuments(
@@ -181,10 +179,10 @@ AI: ";
 
             // TODO : Get knowledge from the vector db
             Console.WriteLine("Attempt to Getting vector collection...");
-            var vectorCollection = await _vectorDatabase.GetOrCreateCollectionAsync("focs_clean", dimensions: 768);
+            var vectorCollection = await _vectorDatabase.GetOrCreateCollectionAsync("durian_clean", dimensions: 768);
             if (vectorCollection.IsEmptyAsync().Result)
             {
-                Console.WriteLine("Vector Collections for focs is empty....");
+                Console.WriteLine("Vector Collections for durian_clean is empty....");
                 //await VectorDbUtils.DownloadWebsiteHMTLToVectorDB(_vectorDatabase, _embeddingModel);
                 await VectorDbUtils.LoadTextFilesToVectorDB(_vectorDatabase, _embeddingModel);
             }
@@ -192,7 +190,7 @@ AI: ";
             var knowledge = await vectorCollection.GetSimilarDocuments(
                 _embeddingModel,
                 userQues,
-                amount: 5,
+                amount: 6,
                 VectorSearchType.SimilarityScoreThreshold,
                 0.8f
             );

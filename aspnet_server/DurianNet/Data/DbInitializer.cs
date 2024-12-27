@@ -36,7 +36,8 @@ namespace DurianNet.Data
         new() { Id = "2", UserName = "Bob", ProfilePicture = "/images/24068ea4-3da7-4f8c-a015-9128b21b08a6_tzuyu-5.jpg", Email = "sample@gmail.com", PhoneNumber = "0112223335", FullName = "Bob Bi" },
         new() { Id = "3", UserName = "Charlie" , ProfilePicture = "/images/24068ea4-3da7-4f8c-a015-9128b21b08a6_tzuyu-5.jpg", Email = "sample@gmail.com", PhoneNumber = "0112223335", FullName = "Charlie Nick"},
         new() { Id = "4", UserName = "David", ProfilePicture = "/images/24068ea4-3da7-4f8c-a015-9128b21b08a6_tzuyu-5.jpg", Email = "sample@gmail.com", PhoneNumber = "0112223335", FullName = "David Tan" },
-        new() { Id = "5", UserName = "Eve" , ProfilePicture = "/images/24068ea4-3da7-4f8c-a015-9128b21b08a6_tzuyu-5.jpg", Email = "sample@gmail.com", PhoneNumber = "0112223335", FullName = "Eve Chris"}
+        new() { Id = "5", UserName = "Eve" , ProfilePicture = "/images/24068ea4-3da7-4f8c-a015-9128b21b08a6_tzuyu-5.jpg", Email = "sample@gmail.com", PhoneNumber = "0112223335", FullName = "Eve Chris"},
+        new() { Id = "6", UserName = "superadmin", ProfilePicture = "/images/7a308396-fe8a-47b5-bf84-edea23de8501_superadmin.jpg", Email = "superadmin@gmail.com", PhoneNumber = "0112223336", FullName = "superadmin", UserType = UserType.SuperAdmin, UserStatus = UserStatus.Active, PasswordHash = "AQAAAAIAAYagAAAAELuOJL4hYRv7Q9SSnL5h51o0Imx2R9H3SJpKKk1vWnHMwlBjLjjt6TYgLVRwEZpYew==" }
     };
 
         public static List<Comment> dummyComments = new()
