@@ -83,68 +83,6 @@
         });
     }
 
-    // async function submitEditProfileForm() {
-    //     const fullname = document.getElementById('fullname').value.trim();
-    //     const email = document.getElementById('email').value.trim();
-    //     const phone = document.getElementById('phone').value.trim();
-    //     const profilePictureInput = document.getElementById('profilePictureInput').files[0];
-    //     const existingProfilePicture = document.getElementById('profilePicturePreview').src;
-
-    //     if (!fullname || !email || !phone) {
-    //         alert("All fields are required.");
-    //         return;
-    //     }
-
-    //     let profilePicturePath = existingProfilePicture;
-
-    //     try {
-    //         // Step 1: Upload new profile picture if selected
-    //         if (profilePictureInput) {
-    //             const uploadResponse = await fetch('/adminprofile/UploadProfilePicture', {
-    //                 method: 'POST',
-    //                 headers: { 'Content-Type': 'application/json' },
-    //                 body: JSON.stringify({
-    //                     fileName: profilePictureInput.name,
-    //                     fileContent: await fileToBase64(profilePictureInput),
-    //                 }),
-    //             });
-
-    //             if (!uploadResponse.ok) {
-    //                 throw new Error("Failed to upload profile picture.");
-    //             }
-
-    //             const uploadData = await uploadResponse.json();
-    //             profilePicturePath = uploadData.filePath; // New path from server
-    //         }
-
-    //         // Step 2: Update profile with new or existing picture
-    //         const updateResponse = await fetch('/adminprofile/UpdateAdminProfileByUsername', {
-    //             method: 'PUT',
-    //             headers: { 'Content-Type': 'application/json' },
-    //             body: JSON.stringify({
-    //                 FullName: fullname,
-    //                 Email: email,
-    //                 PhoneNumber: phone,
-    //                 ProfilePicture: profilePicturePath, // Use updated path
-    //             }),
-    //         });
-
-    //         if (!updateResponse.ok) {
-    //             const errorData = await updateResponse.json();
-    //             throw new Error(errorData.message || "Failed to update profile.");
-    //         }
-
-    //         const updateData = await updateResponse.json();
-    //         document.getElementById('profilePicturePreview').src = updateData.profilePicture;
-
-    //         alert("Profile updated successfully!");
-    //         window.location.reload();
-    //     } catch (error) {
-    //         console.error("Error:", error);
-    //         alert("An error occurred. Please try again.");
-    //     }
-    // }
-
     async function submitEditProfileForm() {
         const fullname = document.getElementById('fullname').value.trim();
         const email = document.getElementById('email').value.trim();
@@ -204,7 +142,8 @@
 
             document.getElementById('profilePicturePreview').src = updateData.profilePicture;
             alert("Profile updated successfully!");
-            window.location.reload();
+            // Redirect to the Admin Profile page
+            window.location.href = '/adminprofile/ProfilePage';
         } catch (error) {
             console.error("Error:", error);
             errorMessageDiv.textContent = error.message || "An error occurred. Please try again.";
