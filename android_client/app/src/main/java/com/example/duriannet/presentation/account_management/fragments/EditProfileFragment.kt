@@ -96,8 +96,8 @@ class EditProfileFragment : Fragment() {
                     binding.edtProfilePhoneNumber.error = "Phone number is required"
                     return@setOnClickListener
                 }
-                !phoneNumber.matches("^[0-9]{10}$".toRegex()) -> {
-                    binding.edtProfilePhoneNumber.error = "Enter a valid 10-digit phone number"
+                !phoneNumber.matches("^[0-9]{10,11}$".toRegex()) -> {
+                    binding.edtProfilePhoneNumber.error = "Enter a valid 10- or 11-digit phone number"
                     return@setOnClickListener
                 }
             }

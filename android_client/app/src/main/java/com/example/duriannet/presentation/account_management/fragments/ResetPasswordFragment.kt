@@ -49,9 +49,9 @@ class ResetPasswordFragment : Fragment() {
                 return@setOnClickListener
             }
 
-            val passwordPattern = "^(?=.*[A-Z])(?=.*[a-z])(?=.*\\d)(?=.*[@\$!%*?&#_])[A-Za-z\\d@\$!%*?&#_]{8,}$"
+            val passwordPattern = "^(?=.*[A-Z])(?=.*[a-z])(?=.*\\d)(?=.*[@\$!%*?&#_])[A-Za-z\\d@\$!%*?&#_]{12,}\$"
             if (!newPassword.matches(passwordPattern.toRegex())) {
-                binding.edtRpNewPassword.error = "Password must be at least 8 characters long and include at least one uppercase letter, one lowercase letter, one number, and one special character."
+                binding.edtRpNewPassword.error = "Password must be at least 12 characters long and include at least one uppercase letter, one lowercase letter, one number, and one special character."
                 return@setOnClickListener
             }
 
