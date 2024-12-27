@@ -98,6 +98,12 @@
             return;
         }
 
+        // Validate phone number format
+        if (!/^\d{10,11}$/.test(phone)) {
+            errorMessageDiv.textContent = "Phone number must be 10 to 11 digits.";
+            return;
+        }
+
         let profilePicturePath = existingProfilePicture;
 
         try {
