@@ -117,7 +117,7 @@ AI: ";
             var similarDocuments = await vectorCollection.GetSimilarDocuments(
                 _embeddingModel,
                 question,
-                amount: 5,
+                amount: 2,
                 VectorSearchType.SimilarityScoreThreshold,
                 0.8f
             );
