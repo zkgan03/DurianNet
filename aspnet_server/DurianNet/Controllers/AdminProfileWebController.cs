@@ -9,6 +9,8 @@ using DurianNet.Dtos.Request.User;
 using DurianNet.Mappers;
 using System.Text.RegularExpressions;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authentication;
 
 [Authorize(Policy = "AdminPolicy")]
 [ApiController]
@@ -109,8 +111,12 @@ public class AdminProfileWebController : Controller
         }
 
         // Clear session data
-        HttpContext.Session.Remove("Username");
+        /*HttpContext.Session.Remove("Username");
         HttpContext.Session.Remove("ResetPasswordEmail");
+        HttpContext.Response.Cookies.Delete("AuthToken");*/
+
+        HttpContext.Session.Clear();
+        HttpContext.Response.Cookies.Delete(".AspNetCore.Cookies");
         HttpContext.Response.Cookies.Delete("AuthToken");
 
         // Change the user status to "deleted"
@@ -118,6 +124,8 @@ public class AdminProfileWebController : Controller
 
         // Save the changes to the database
         await _context.SaveChangesAsync();
+
+        await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
 
         // Return success response with the updated user details
         return Ok(user.ToUserDetailsDto());
