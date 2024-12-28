@@ -190,7 +190,7 @@ AI: ";
             var knowledge = await vectorCollection.GetSimilarDocuments(
                 _embeddingModel,
                 userQues,
-                amount: 3,
+                amount: 2,
                 VectorSearchType.SimilarityScoreThreshold,
                 0.8f
             );
