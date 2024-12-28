@@ -4,6 +4,7 @@ import android.graphics.Canvas
 import android.graphics.Color
 import android.graphics.Paint
 import android.graphics.Rect
+import android.util.Log
 import androidx.annotation.ColorInt
 import androidx.core.math.MathUtils
 import com.example.duriannet.models.DetectionResult
@@ -119,31 +120,40 @@ fun Bitmap.drawResults(
     results: Array<DetectionResult>,
     detectionSize: Pair<Int, Int>,
     showText: Boolean = true,
-    strokeWidth: Float = 4f,
+    strokeWidth: Float = 5f,
     @ColorInt textColor: Int = Color.WHITE,
-    textSize: Float = 25f,
+    textSize: Float = 16f,
     @ColorInt borderColor: Int = Color.RED,
 ): Bitmap {
     val bitmap = this
     val canvas = Canvas(bitmap)
 
+    val (detectionWidth, detectionHeight) = detectionSize
+
+    val scaleFactor = min(detectionWidth * 1f / bitmap.width, detectionHeight * 1f / bitmap.height)
+    val adjustedStrokeWidth = strokeWidth / scaleFactor
+    val adjustedTextSize = textSize / scaleFactor
+
+    Log.e("Bitmap", "Bitmap size: ${bitmap.width}x${bitmap.height}")
+    Log.e("Bitmap", "scaleFactor: $scaleFactor")
+    Log.e("Bitmap", "adjustedStrokeWidth: $adjustedStrokeWidth")
+    Log.e("Bitmap", "adjustedTextSize: $adjustedTextSize")
+
     val boxPaint = Paint()
     boxPaint.color = borderColor
     boxPaint.style = Paint.Style.STROKE
-    boxPaint.strokeWidth = strokeWidth
+    boxPaint.strokeWidth = adjustedStrokeWidth
 
     val txtBackgroundPaint = Paint()
     txtBackgroundPaint.color = borderColor
     txtBackgroundPaint.style = Paint.Style.FILL
-    txtBackgroundPaint.textSize = textSize
+    txtBackgroundPaint.textSize = adjustedTextSize
 
     val textPaint = Paint()
     textPaint.color = textColor
     textPaint.style = Paint.Style.FILL
-    textPaint.textSize = textSize
+    textPaint.textSize = adjustedTextSize
 
-    val (detectionWidth, detectionHeight) = detectionSize
-    val scaleFactor = min(detectionWidth * 1f / bitmap.width, detectionHeight * 1f / bitmap.height)
     val padWidth = (detectionWidth - bitmap.width * scaleFactor) / 2
     val padHeight = (detectionHeight - bitmap.height * scaleFactor) / 2
 
