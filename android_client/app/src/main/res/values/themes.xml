@@ -10,4 +10,12 @@
     </style>
 
     <style name="Theme.DurianNet" parent="Base.Theme.DurianNet" />
+
+    <style name="Theme.App.Starting" parent="Theme.SplashScreen">
+        <item name="windowSplashScreenBackground">@color/background_green</item>
+        <item name="windowSplashScreenAnimatedIcon">@drawable/splashscreen_logo</item>
+        <item name="postSplashScreenTheme">@style/Base.Theme.DurianNet</item>
+        <item name="windowSplashScreenAnimationDuration">200</item>
+    </style>
+
 </resources>

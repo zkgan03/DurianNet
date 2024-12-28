@@ -150,9 +150,7 @@ class InstantGalleryFragment : BaseInstantDetectFragment() {
                         resource.drawResults(
                             results = results,
                             detectionSize = Pair(height, width),
-                            strokeWidth = 16f,
                             borderColor = requireContext().getColor(R.color.accent_dark_green),
-                            textSize = 100f
                         )
                     )
 

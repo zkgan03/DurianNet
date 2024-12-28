@@ -75,6 +75,9 @@ dependencies {
     implementation(libs.androidx.navigation.fragment.ktx)
     implementation(libs.androidx.navigation.ui.ktx)
 
+    //Splash Screen
+    implementation("androidx.core:core-splashscreen:1.0.0")
+
     //SignalR
     val signalrVersion = "8.0.6"
     implementation("com.microsoft.signalr:signalr:${signalrVersion}")
