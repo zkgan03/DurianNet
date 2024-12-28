@@ -187,8 +187,17 @@ namespace DurianNet.Controllers.api
             var user = await _userManager.FindByNameAsync(username);
             if (user == null) return NotFound("User not found");
 
+            /*var result = await _userManager.ChangePasswordAsync(user, dto.CurrentPassword, dto.Password);
+            if (!result.Succeeded) return BadRequest(result.Errors);*/
+
             var result = await _userManager.ChangePasswordAsync(user, dto.CurrentPassword, dto.Password);
-            if (!result.Succeeded) return BadRequest(result.Errors);
+            if (!result.Succeeded)
+            {
+                var errorMessage = result.Errors.FirstOrDefault(e => e.Code == "PasswordMismatch")?.Description ?? "Failed to change password";
+                if (errorMessage == "Incorrect password.") errorMessage = "Incorrect current password."; // Customize message
+                return BadRequest(errorMessage); // Return plain string
+            }
+
 
             return Ok("Password changed successfully");
         }
