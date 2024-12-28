@@ -50,7 +50,7 @@ class LoginFragment : Fragment() {
         val rememberMe = sharedPreferences.getString("rememberMe", null)
         val username = sharedPreferences.getString("username", null)
 
-        //if (token != null && username != null) {
+        /*//if (token != null && username != null) {
         if (rememberMe != null && username != null) {
             lifecycleScope.launch {
                 try {
@@ -69,6 +69,11 @@ class LoginFragment : Fragment() {
                     requireContext().showToast("Error validating user status. Please try again.")
                 }
             }
+            return
+        }*/
+
+        if (rememberMe != null && username != null) {
+            navigateToProfile(sharedPreferences, username)
             return
         }
 
@@ -97,6 +102,23 @@ class LoginFragment : Fragment() {
 
         binding.lblLoginToSignUp1.setOnClickListener {
             navController.navigate(R.id.action_login_to_sign_up)
+        }
+    }
+
+    private fun navigateToProfile(sharedPreferences: SharedPreferences, username: String) {
+        lifecycleScope.launch {
+            try {
+                val users = viewModel.getAllUsers()
+                val currentUser = users?.find { it.username == username }
+                if (currentUser != null && currentUser.status == "Active") {
+                    navController.navigate(R.id.action_login_to_durian_profile)
+                } else {
+                    requireContext().showToast("Account is not active. Please contact support.")
+                }
+            } catch (e: Exception) {
+                Log.e("LoginFragment", "Error checking user status: ${e.message}")
+                requireContext().showToast("Error validating user status. Please try again.")
+            }
         }
     }
 
