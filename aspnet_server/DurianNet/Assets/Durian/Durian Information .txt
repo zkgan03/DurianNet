@@ -1,37 +1,37 @@
 Durian Information (name, description, characteristic, taste profile)
 
-Durian name: Musang King
-Durian description: Also known as "Mao Shan Wang," Musang King is one of the most popular durian varieties in Malaysia due to its strong, unique flavor.
-Characteristics: Bright yellow flesh, creamy and smooth texture, and small seeds. It has a strong aroma and thorny exterior.
-Taste profile: Rich, sweet, and slightly bitter with a creamy consistency.
+Musang King (Mao Shan Wang)
 
-Durian name: D24 (Sultan)
-Durian description: Widely known as the "Sultan" durian, D24 is favored for its balanced flavor profile and affordability.
-Characteristics: Pale yellow flesh, smooth texture, and medium-sized seeds. Its spikes are moderately sharp.
-Taste profile: Mildly sweet with a slight bitterness, creamy but less intense than Musang King.
+Description: Popular for its strong, unique flavor.
+Characteristics: Bright yellow flesh, creamy texture, small seeds, strong aroma, thorny exterior.
+Taste: Rich, sweet, slightly bitter, creamy.
+D24 (Sultan)
 
-Durian name: Red Prawn
-Durian description: Originating from Penang, Red Prawn durians are popular for their sweet taste and soft texture.
-Characteristics: Reddish-orange flesh, soft texture, and large seeds. The exterior has a rounder shape with softer thorns.
-Taste profile: Very sweet and creamy, often with a hint of floral notes.
+Description: Known for balanced flavor and affordability.
+Characteristics: Pale yellow flesh, smooth texture, medium seeds, moderately sharp spikes.
+Taste: Mildly sweet, slightly bitter, creamy but less intense than Musang King.
+Red Prawn
 
-Durian name: XO
-Durian description: Named after its alcoholic aftertaste, the XO durian is loved for its deep flavor.
-Characteristics: Pale, almost greyish-yellow flesh, slightly watery texture, and pungent aroma. It has elongated seeds.
-Taste profile: Bitter with a subtle alcoholic aftertaste, creamy with a slight fermented flavor.
+Description: Sweet and soft, originating from Penang.
+Characteristics: Reddish-orange flesh, soft texture, large seeds, rounder shape, softer thorns.
+Taste: Very sweet, creamy, hint of floral notes.
+XO
 
-Durian name: Black Thorn
-Durian description: A premium variety mainly found in Penang, known for its deep, complex flavors.
-Characteristics: Dark yellow-orange flesh, soft and sticky texture, and has a small thorn at the bottom of the fruit.
-Taste profile: Sweet, rich, and slightly bitter, with a smooth and custard-like texture.
+Description: Named for its alcoholic aftertaste and deep flavor.
+Characteristics: Greyish-yellow flesh, watery texture, pungent aroma, elongated seeds.
+Taste: Bitter, alcoholic aftertaste, slightly fermented, creamy.
+Black Thorn
 
-Durian name: Golden Phoenix
-Durian description: Known for its distinctive, light-colored flesh and strong aroma, Golden Phoenix is popular in Singapore and Malaysia.
-Characteristics: Pale yellow or whitish flesh, soft and smooth texture, with medium-sized seeds. The exterior is smaller with sharper thorns.
-Taste profile: Mildly sweet with a hint of bitterness, soft and creamy, often with a slight alcoholic taste.
+Description: Premium variety from Penang, known for deep, complex flavors.
+Characteristics: Dark yellow-orange flesh, soft, sticky texture, small thorn at the bottom.
+Taste: Sweet, rich, slightly bitter, smooth, custard-like.
+Golden Phoenix
 
-Durian name: Green Bamboo
-Durian description: This variety is famous in Thailand and Malaysia for its balanced flavor and less pungent aroma, appealing to newcomers.
-Characteristics: Light green, smooth skin, golden yellow flesh with a creamy and smooth texture. The seeds are relatively small.
-Taste profile: Sweet, mild bitterness with a subtle creaminess, suitable for people who prefer less intense flavors.
+Description: Distinctive light-colored flesh and strong aroma.
+Characteristics: Pale yellow/whitish flesh, soft texture, medium seeds, smaller fruit, sharper thorns.
+Taste: Mildly sweet, slightly bitter, creamy, with a hint of alcoholic taste.
+Green Bamboo
 
+Description: Famous for balanced flavor and mild aroma, ideal for newcomers.
+Characteristics: Light green smooth skin, golden yellow flesh, creamy texture, small seeds.
+Taste: Sweet, mild bitterness, subtly creamy, less intense flavor.
