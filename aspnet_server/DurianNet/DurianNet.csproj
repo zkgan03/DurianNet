@@ -7,14 +7,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Content Remove="wwwroot\images\image_1.jpg" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <_ContentIncludedByDefault Remove="wwwroot\images\durian.jpg" />
-  </ItemGroup>
-
-  <ItemGroup>
     <PackageReference Include="LangChain.Core" Version="0.15.2" />
     <PackageReference Include="LangChain.Databases.Sqlite" Version="0.15.3" />
     <PackageReference Include="LangChain.Providers.Ollama" Version="0.15.2" />
@@ -37,14 +29,11 @@
     <PackageReference Include="Swashbuckle.AspNetCore" Version="6.9.0" />
     <PackageReference Include="YoloV8.Gpu" Version="4.1.5" />
   </ItemGroup>
-
+  
   <ItemGroup>
-    <None Include="wwwroot\images\image_1.jpg" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="wwwroot\detected_durian_imgs\" />
-    <Folder Include="wwwroot\videos\" />
-  </ItemGroup>
+    <None Include="wwwroot\**">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+</ItemGroup>
 
 </Project>

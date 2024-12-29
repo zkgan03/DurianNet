@@ -1,5 +1,6 @@
 ﻿@{
     ViewData["Title"] = "Admin Profile";
+    var username = ViewContext.HttpContext.Session.GetString("Username");
 }
 
 <div class="w-full">
@@ -40,10 +41,20 @@
                class="py-2 px-6 text-white block w-1/5 rounded bg-[#12796F] text-center font-bold transition hover:bg-[#0f5d57]">
                 Edit Profile
             </a>
-            <button type="button" onclick="confirmDeleteAccount()"
-                    class="py-2 px-6 text-white block w-1/5 rounded bg-[#D97706] text-center font-bold transition hover:bg-[#b45e05]">
-                Delete Account
+            @if (username != "superadmin")
+            {
+                <button type="button" onclick="confirmDeleteAccount()"
+                        class="py-2 px-6 text-white block w-1/5 rounded bg-[#D97706] text-center font-bold transition hover:bg-[#b45e05]">
+                    Delete Account
+                </button>
+            }
+            @* else
+            {
+            <button type="button" disabled
+            class="py-2 px-6 text-white bg-gray-400 block w-1/5 rounded text-center font-bold">
+            Delete Account (Disabled)
             </button>
+            } *@
         </div>
     </div>
 </div>

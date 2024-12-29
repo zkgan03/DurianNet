@@ -1,0 +1,47 @@
+Durian Information 2 (name, description, characteristic, taste profile)
+
+Kampung Durian (Village Durian)
+
+Description: A mix of local breeds with natural, less commercialized flavors.
+Characteristics: Varied flesh color and texture, medium to large seeds, thorny exterior.
+Taste: Sweet with slight bitterness, flavor varies by breed.
+Chanee
+
+Description: Popular Thai variety with a creamy texture and balanced taste.
+Characteristics: Yellow flesh, dense and soft texture, large seeds, less thorny shell.
+Taste: Sweet, slightly bitter, creamy, smooth texture.
+Ganja
+
+Description: Thai variety with a rich, complex flavor, often compared to Musang King.
+Characteristics: Light yellow flesh, creamy texture, large seeds, moderately thorny rind.
+Taste: Sweet with slight bitterness, intense and creamy.
+Black Pearl
+
+Description: Rare variety with unique greyish flesh favored by enthusiasts.
+Characteristics: Greyish pale flesh, soft and sticky texture, small seeds, thick husk, less prominent thorns.
+Taste: Mildly sweet, slightly bitter, custard-like with a subtle aftertaste.
+Hor Lor
+
+Description: Penang-origin durian with sticky, smooth flesh and unique flavor.
+Characteristics: Golden-yellow flesh, sticky, creamy texture, medium seeds, oval-shaped shell with sharp thorns.
+Taste: Sweet, mild bitterness, caramel-like flavor.
+D101
+
+Description: Popular Malaysian variety known for its sweet, creamy taste.
+Characteristics: Bright orange flesh, thick and smooth texture, large seeds, rounder shell with moderate thorns.
+Taste: Very sweet, mild bitterness, rich and creamy.
+Tekka (Bamboo Leg)
+
+Description: Robust and unique Malaysian durian flavor, preferred by aficionados.
+Characteristics: Light orange flesh, thick and dense texture, large seeds, greenish, moderately thorny shell.
+Taste: Strong bittersweet flavor, nutty undertone, less creamy.
+Kan Yao
+
+Description: Expensive and sought-after Thai durian with exceptional flavor and texture.
+Characteristics: Golden-yellow flesh, thick, creamy texture, medium seeds, oblong rind, widely spaced spikes.
+Taste: Sweet, buttery, subtle bitterness, exceptionally creamy and smooth.
+Monthong (Golden Pillow)
+
+Description: Thailand’s most famous durian with a mild, sweet flavor.
+Characteristics: Pale yellow flesh, thick, slightly dry texture, large seeds, thick rind with blunt thorns.
+Taste: Very sweet, little bitterness, smooth, firm, less pungent.

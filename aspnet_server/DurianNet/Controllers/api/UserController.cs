@@ -60,123 +60,6 @@ namespace DurianNet.Controllers.api
             return Ok($"Email in session: {email}");
         }
 
-        /*[HttpPost("appLogin")]
-        public async Task<IActionResult> appLogin([FromBody] LoginDto loginDto)
-        {
-            if (!ModelState.IsValid) return BadRequest(ModelState);
-
-            var user = await _userManager.Users.FirstOrDefaultAsync(u => u.UserName.ToLower() == loginDto.Username.ToLower());
-            if (user == null) return Unauthorized("Invalid username or password");
-
-            // Check if the user is deleted
-            if (user.UserStatus == UserStatus.Deleted)
-                return Unauthorized("User account is deleted. Contact support.");
-
-            var result = await _userManager.CheckPasswordAsync(user, loginDto.Password);
-            if (!result) return Unauthorized("Invalid username or password");
-
-            // Generate Token
-            //var token = _tokenService.CreateToken(user);
-            var accessToken = _tokenService.GenerateAccessToken(user);
-            var refreshToken = _tokenService.GenerateRefreshToken();
-
-            user.RefreshTokens.Add(refreshToken);
-
-            // Save the refresh token in the database
-            await _userManager.UpdateAsync(user);
-
-            // Web request: Set a cookie for session-based authentication
-            var claims = new[]
-            {
-                    new Claim(ClaimTypes.NameIdentifier, user.Id),
-                    new Claim(ClaimTypes.Email, user.Email),
-                    new Claim(ClaimTypes.Name, user.UserName),
-                    new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
-                };
-
-            var identity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
-            var principal = new ClaimsPrincipal(identity);
-
-            await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, principal, new AuthenticationProperties
-            {
-                IsPersistent = true,  // Keep the user logged in
-                ExpiresUtc = DateTime.UtcNow.AddMinutes(30)  // Session expiration time
-            });
-
-            *//*return Ok(new
-            {
-                UserName = user.UserName,
-                Email = user.Email,
-                Token = token
-            });*//*
-
-            return Ok(new
-            {
-                UserName = user.UserName,
-                Email = user.Email,
-                AccessToken = accessToken,
-                RefreshToken = refreshToken.Token
-            });
-        }*/
-
-        /*[HttpPost("appLogin")]
-        public async Task<IActionResult> appLogin([FromBody] LoginDto loginDto)
-        {
-            try
-            {
-                if (!ModelState.IsValid)
-                    return BadRequest(ModelState);
-
-                var user = await _userManager.Users.FirstOrDefaultAsync(u => u.UserName.ToLower() == loginDto.Username.ToLower());
-                if (user == null)
-                    return Unauthorized("Invalid username or password");
-
-                // Check if the user is deleted
-                if (user.UserStatus == UserStatus.Deleted)
-                    return Unauthorized("User account is deleted. Contact support.");
-
-                var result = await _userManager.CheckPasswordAsync(user, loginDto.Password);
-                if (!result)
-                    return Unauthorized("Invalid username or password");
-
-                var accessToken = _tokenService.GenerateAccessToken(user);
-                var refreshToken = _tokenService.GenerateRefreshToken();
-
-                user.RefreshTokens.Add(refreshToken);
-                await _userManager.UpdateAsync(user);
-
-                var claims = new[] {
-            new Claim(ClaimTypes.NameIdentifier, user.Id),
-            new Claim(ClaimTypes.Email, user.Email),
-            new Claim(ClaimTypes.Name, user.UserName),
-            new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
-        };
-
-                var identity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
-                var principal = new ClaimsPrincipal(identity);
-
-                await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, principal, new AuthenticationProperties
-                {
-                    IsPersistent = true,
-                    ExpiresUtc = DateTime.UtcNow.AddMinutes(30)
-                });
-
-                return Ok(new
-                {
-                    UserName = user.UserName,
-                    Email = user.Email,
-                    AccessToken = accessToken,
-                    RefreshToken = refreshToken.Token
-                });
-            }
-            catch (Exception ex)
-            {
-                // Log the actual error to see what's wrong
-                Console.WriteLine($"Error in /appLogin: {ex.Message} - Stack Trace: {ex.StackTrace}");
-                return StatusCode(500, $"An unexpected fault happened: {ex.Message}");
-            }
-        }*/
-
         [HttpPost("appLogin")]
         public async Task<IActionResult> appLogin([FromBody] LoginDto loginDto)
         {
@@ -255,42 +138,6 @@ namespace DurianNet.Controllers.api
             return Ok("Logged out successfully");
         }
 
-
-        /*[HttpPost("appLogout")]
-        public async Task<IActionResult> appLogout([FromBody] LogoutDtoRequest request)
-        {
-            Console.WriteLine("Logout called");
-
-            var user = await _userManager.GetUserAsync(User);
-
-            if (user == null)
-            {
-                Console.WriteLine("User not found");
-                return Unauthorized();
-            }
-
-            Console.WriteLine("Revoking refresh token");
-            // Revoke the refresh token for the user
-            await _tokenService.RevokeRefreshToken(user, request.RefreshToken);
-
-            // Clear the JWT access token and refresh token on the client side (handle on client side as well)
-            // Remove JWT cookie or local storage item on client side if necessary
-            // Response.Cookies.Delete("access_token");
-            // Response.Cookies.Delete("refresh_token");
-
-            await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
-
-            Console.WriteLine("Logged out successfully");
-
-            return Ok("Logged out successfully");
-        }*/
-
-        /*public IActionResult appLogout()
-        {
-            // Clear client-side data like token and shared preferences
-            return Ok("Logged out successfully.");
-        }*/
-
         [HttpPost("appRegister")]
         public async Task<IActionResult> appRegister([FromBody] RegisterDto registerDto)
         {
@@ -340,8 +187,17 @@ namespace DurianNet.Controllers.api
             var user = await _userManager.FindByNameAsync(username);
             if (user == null) return NotFound("User not found");
 
+            /*var result = await _userManager.ChangePasswordAsync(user, dto.CurrentPassword, dto.Password);
+            if (!result.Succeeded) return BadRequest(result.Errors);*/
+
             var result = await _userManager.ChangePasswordAsync(user, dto.CurrentPassword, dto.Password);
-            if (!result.Succeeded) return BadRequest(result.Errors);
+            if (!result.Succeeded)
+            {
+                var errorMessage = result.Errors.FirstOrDefault(e => e.Code == "PasswordMismatch")?.Description ?? "Failed to change password";
+                if (errorMessage == "Incorrect password.") errorMessage = "Incorrect current password."; // Customize message
+                return BadRequest(errorMessage); // Return plain string
+            }
+
 
             return Ok("Password changed successfully");
         }

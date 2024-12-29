@@ -53,42 +53,6 @@
     </div>
 </div>
 
-@* <script>
-    document.getElementById('registrationForm').addEventListener('submit', async function (event) {
-        event.preventDefault();
-
-        const username = document.getElementById('username').value.trim();
-        const email = document.getElementById('email').value.trim();
-        const password = document.getElementById('password').value;
-        const confirmPassword = document.getElementById('confirmPassword').value;
-
-        if (password !== confirmPassword) {
-            alert("Passwords do not match!");
-            return;
-        }
-
-        const payload = { username, email, password };
-
-        try {
-            //const response = await fetch('/api/account/registerAdmin', {
-            const response = await fetch('/account/registerAdmin', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(payload),
-            });
-
-            if (!response.ok) {
-                const error = await response.text(); // Get the error message from the server
-                alert(`Registration failed: ${error}`);
-            } else {
-                alert("Registration successful!");
-                window.location.href = '/account/Registration';
-            }
-        } catch (error) {
-            alert("An error occurred. Please try again.");
-        }
-    });
-</script> *@
 
 <script>
     document.getElementById('registrationForm').addEventListener('submit', async function (event) {

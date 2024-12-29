@@ -59,7 +59,8 @@ The following is a friendly and informative conversation between a Human and an 
 
 2. Response Format:  
    - Use clear, concise, and friendly language.  
-   - Structure responses for easy readability, such as lists or short paragraphs when appropriate.  
+   - Structure responses for easy readability, such as lists or short paragraphs when appropriate.
+   - Keep answers straight to the point, short, and simple. Avoid unnecessary details.
 
 3. Tone:  
    - Maintain a supportive and professional tone that aligns with the durian.  
@@ -117,7 +118,7 @@ AI: ";
             var similarDocuments = await vectorCollection.GetSimilarDocuments(
                 _embeddingModel,
                 question,
-                amount: 5,
+                amount: 2,
                 VectorSearchType.SimilarityScoreThreshold,
                 0.8f
             );
@@ -190,7 +191,7 @@ AI: ";
             var knowledge = await vectorCollection.GetSimilarDocuments(
                 _embeddingModel,
                 userQues,
-                amount: 6,
+                amount: 2,
                 VectorSearchType.SimilarityScoreThreshold,
                 0.8f
             );

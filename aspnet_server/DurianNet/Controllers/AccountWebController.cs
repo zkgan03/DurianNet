@@ -95,68 +95,6 @@ public class AccountWebController : Controller
         return RedirectToAction("DurianProfilePage", "durianprofile");
     }
 
-
-    //// TODO : add admin policy
-    //[Authorize(policy: "AdminPolicy")]
-    //[HttpPost("loginAdmin")]
-    //public async Task<IActionResult> LoginAdmin(LoginDto loginDto)
-    //{
-    //    if (!ModelState.IsValid)
-    //        return BadRequest(new { message = "Invalid input. Please check your username and password." });
-
-    //    var user = await _userManager
-    //        .Users
-    //        .FirstOrDefaultAsync(x => x.UserName.ToLower() == loginDto.Username.ToLower());
-
-    //    if (user == null)
-    //        return Unauthorized(new { message = "Invalid username!" });
-
-    //    if (user.UserType != UserType.Admin && user.UserType != UserType.SuperAdmin)
-    //        return Unauthorized(new { message = "Only admins and super admins can log in to the admin web interface." });
-
-    //    if (user.UserStatus == UserStatus.Deleted)
-    //        return Unauthorized(new { message = "This admin account is deleted." });
-
-    //    var result = await _signinManager.CheckPasswordSignInAsync(user, loginDto.Password, false);
-
-    //    if (!result.Succeeded)
-    //        return Unauthorized(new { message = "Invalid username or password!" });
-
-
-    //    // Set the session cookie with the username
-    //    HttpContext.Session.SetString("Username", user.UserName);
-
-    //    // create claims
-    //    var claims = new List<Claim>
-    //        {
-    //            new Claim(ClaimTypes.Name, user.UserName),
-    //            new Claim(ClaimTypes.NameIdentifier, user.Id),
-    //            new Claim(ClaimTypes.Role, user.UserType.ToString())
-    //        };
-
-    //    // create identity
-    //    var identity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
-
-    //    // create principal
-    //    var principal = new ClaimsPrincipal(identity);
-
-    //    // sign in
-    //    await HttpContext.SignInAsync(
-    //        CookieAuthenticationDefaults.AuthenticationScheme,
-    //        principal,
-    //        new AuthenticationProperties
-    //        {
-    //            IsPersistent = true,
-    //            ExpiresUtc = DateTime.UtcNow.AddMinutes(30)
-    //        });
-
-    //    // Pass success message using TempData
-    //    //TempData["SuccessMessage"] = "Successfully logged in!";
-    //    //return RedirectToAction("DurianProfilePage", "durianprofile");
-    //    return Ok(new { message = "Login successful!", UserName = user.UserName, Email = user.Email });
-    //}
-
-
     //web api start here
     [HttpPost("loginAdmin")]
     public async Task<IActionResult> LoginAdmin(LoginDto loginDto)
@@ -428,43 +366,4 @@ public class AccountWebController : Controller
         return Ok("Logged out successfully.");
     }
 
-    ////This is admin logout
-    //[Authorize(policy: "AdminPolicy")]
-    //[HttpPost("logout")]
-    //public async Task<IActionResult> Logout()
-    //{
-    //    // Retrieve the username from session
-    //    //var username = HttpContext.Session.GetString("Username");
-    //    //if (string.IsNullOrEmpty(username))
-    //    //    return Unauthorized("User not logged in.");
-
-    //    var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-
-    //    // get the user
-    //    var user = await _userManager.FindByIdAsync(userId);
-
-    //    if (user == null)
-    //    {
-    //        return Unauthorized("User not logged in.");
-    //    }
-
-    //    // Clear session data
-    //    HttpContext.Session.Remove("Username");
-    //    HttpContext.Session.Remove("ResetPasswordEmail");
-
-    //    // Sign out and remove cookies
-    //    //await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
-    //    HttpContext.Response.Cookies.Delete("AuthToken");
-
-    //    await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
-
-    //    return Ok("Logged out successfully.");
-    //}
-
-    //[Authorize(Policy = "AdminPolicy")]
-    //[HttpGet("admin-action")]
-    //public IActionResult AdminAction()
-    //{
-    //    return Ok("This is an admin-only action.");
-    //}
 }

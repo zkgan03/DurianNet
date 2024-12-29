@@ -243,8 +243,11 @@ app.MapControllerRoute(
 
 app.MapHub<ObjectDetectionHub>("/DetectionHub");
 
-// Seed database
-SeedDatabase(app); // TODO : Remove this method
+// Seed database if in development mode
+if (app.Environment.IsDevelopment())
+{
+    SeedDatabase(app);
+}
 
 app.Run();
 
