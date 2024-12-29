@@ -58,13 +58,19 @@ class UserRepository @Inject constructor(
                 // Attempt to parse the error response body
                 val errorResponse = response.errorBody()?.string()
                 val errorMessage = try {
-                    // Assuming the error response is a list of objects
-                    val errorList = Gson().fromJson(errorResponse, List::class.java)
-                    (errorList[0] as? Map<*, *>)?.get("description")?.toString() ?: "Unknown error"
+                    val errorJson = Gson().fromJson(errorResponse, Map::class.java)
+                    errorJson["message"]?.toString() ?: "Unknown error"
                 } catch (e: Exception) {
-                    "Failed to parse error: ${response.message()}"
+                    "Incorrect current password"
+                    //"Failed to parse error: ${response.message()}"
                 }
-                throw Exception(errorMessage)
+
+                if (errorMessage == "Incorrect current password") {
+                    throw Exception("Incorrect current password")
+                } else {
+                    throw Exception(errorMessage)
+                }
+
             }
         }
     }
