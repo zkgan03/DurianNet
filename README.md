@@ -1,6 +1,10 @@
 # DurianNet
 DurianNet is a Final Year Project that implements a Client-Server Model using Kotlin (Android) and ASP.NET Core 8 (Backend). It features an AI-powered durian type recognition system leveraging Ultralytics YOLOv8 for object detection and a chatbot powered by Ollama Llama 3.1 with LangChain C# using RAG architecture.
 
+https://github.com/user-attachments/assets/79672e44-b799-4903-9445-f59e463855a2
+
+https://github.com/user-attachments/assets/d4af8495-0b18-44a0-9ae2-be90a8786da0
+
 
 ## 🌟 Key Features
 ### 🔍 Dual Mode Detection
